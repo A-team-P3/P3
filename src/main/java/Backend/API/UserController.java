@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
-    @GetMapping("/hello") // Q: what does this annotation do? A: it tells Spring that this is a GET endpoint
+    @GetMapping("/hello") // Tells Spring that this is a GET endpoint
     ResponseEntity<String> hello(@RequestParam int n) {
         if (n > 0) {
             return new ResponseEntity<>("parameter is larger then 0", HttpStatus.OK);
@@ -21,4 +21,18 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    /*
+    getUsersByRank(int min, int max, String region)
+        list of users
+
+    getUserByName(String name)
+        index of user
+
+    getUserByScore(int score)
+        index of user
+
+    getNumberOfPlayers()
+        number of players
+     */
 }
