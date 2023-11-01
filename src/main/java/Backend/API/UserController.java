@@ -13,6 +13,7 @@ public class UserController {
         if (n > 0) {
             return new ResponseEntity<>("parameter is larger then 0", HttpStatus.OK);
         }
+
         if (n == 0) {
             return new ResponseEntity<>("parameter is 0", HttpStatus.OK);
         }
