@@ -3,13 +3,13 @@ package Backend.API;
 public class User {
     private int id;
     private String name;
-    private int score;
+    private String score; //was INT
     private String country;
     private String region;
 
     //add timestamp (unless redis handles it)
 
-    public User(int id, String name, int score, String country, String region) {
+    public User(int id, String name, String score /*was int*/, String country, String region) {
         this.id = id;
         this.name = name;
         this.score = score;
@@ -25,9 +25,9 @@ public class User {
         return name;
     }
 
-    public int getScore() {
+    public String getScore() {
         return score;
-    }
+    } // was INT
 
     public String getCountry() {
         return country;

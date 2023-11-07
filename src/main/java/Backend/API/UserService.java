@@ -31,11 +31,12 @@ public class UserService {
         int adjective = rand.nextInt(adjectives.size());
         int number = rand.nextInt(100);
 
-        return adjectives.get(adjective) + nouns.get(noun) + number;
+        return  adjectives.get(adjective) + nouns.get(noun) + number;
     }
 
-    private int RandomScore(int bound) {
-        return rand.nextInt(bound);
+    private String RandomScore(int bound) {
+        return String.valueOf(rand.nextInt(bound));
+
     }
 
     private String RandomRegion() {
@@ -50,7 +51,9 @@ public class UserService {
 
     public UserService() {
         for (int i = 0; i<100; i++) {
-            users.add(new User(i, RandomName(), RandomScore(1000), RandomCountry(), RandomRegion()));
+            /*User temp =*/ new User(i, RandomName(), RandomScore(1000), RandomCountry(), RandomRegion());
+            //jedis.zadd("playersByPoints", Double.parseDouble(temp.getName()), temp.getScore()); //addning all the users to the playersByPoint stack
+            // hash the rest of the users functions under the same id or something
         }
         //need to sort users by score primary with timestamp as tiebreaker
         //need a custom comparator
@@ -64,6 +67,7 @@ public class UserService {
     public List<String> getPlayersByPoints(){
         return jedis.zrevrange("playersByPoints", 0,5);
     }
+
 
     public User GetUser(int index) {
         return users.get(index);
