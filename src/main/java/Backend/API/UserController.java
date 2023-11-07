@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,13 +32,11 @@ public class UserController {
     }
 
     //test path
+
+    //getting the players with the highest scores
     @GetMapping("/users")
-    ResponseEntity<List<User>> Users() {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i< userService.GetSize(); i++) {
-            users.add(userService.GetUser(i));
-        }
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    ResponseEntity<List<String>> Users() {
+        return new ResponseEntity<>(userService.getPlayersByPoints(),HttpStatus.OK);
     }
 
 

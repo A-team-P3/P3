@@ -1,6 +1,11 @@
 package Backend.API;
 
+
+
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.resps.Tuple;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +14,12 @@ import java.util.Random;
 
 @Service //Service for interacting with the database to get user data
 public class UserService {
+    public static Jedis getJedis() {
+        return jedis;
+    }
+
+    //establishing connection to database
+    static Jedis jedis = new Jedis("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
     private List<User> users = new ArrayList<>();
 
     private Random rand = new Random();
@@ -47,6 +58,11 @@ public class UserService {
 
     public int GetSize() {
         return users.size();
+    }
+
+    //function that returns a list of the players with the highest scores
+    public List<String> getPlayersByPoints(){
+        return jedis.zrevrange("playersByPoints", 0,5);
     }
 
     public User GetUser(int index) {

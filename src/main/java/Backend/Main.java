@@ -1,5 +1,7 @@
 package Backend;
 
+
+import Backend.API.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import redis.clients.jedis.Jedis;
@@ -11,10 +13,9 @@ public class Main {
         SpringApplication.run(Main.class, args);
 
         // Connect to Redis Cloud database
-        Jedis jedis = new Jedis("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
+        Jedis jedis = UserService.getJedis();
         jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9");
 
-        // Print out the top 6 players (test)
-        jedis.zrevrange("playersByPoints", 0, 5).forEach(System.out::println);
+
     }
 }
