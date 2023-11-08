@@ -69,7 +69,13 @@ public class DatabaseService {
 
     // Returns a list of the players with the highest scores
     public List<Tuple> getPlayersByPoints(int min, int max){
-        return jedis.zrevrangeWithScores("playersByPoints", min,max);
+        if (max > min)
+        {
+            return jedis.zrevrangeWithScores("playersByPoints", min,max);
+        }
+        else {
+            return jedis.zrangeWithScores("playersByPoints", max,min);
+        }
     }
 
     public String getPointsByPlayers(String player) {
