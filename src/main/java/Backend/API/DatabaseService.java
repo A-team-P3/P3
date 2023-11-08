@@ -11,7 +11,6 @@ import java.util.Random;
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
 
-    private List<Player> players = new ArrayList<>();
     private Random rand = new Random();
     private JedisPool jedisPool;
     private Jedis jedis;
@@ -20,7 +19,7 @@ public class DatabaseService {
         // Establishing connection to database
         this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
         this.jedis = getJedisConnection();
-        populateDatabase();
+        //populateDatabase();
     }
     private Jedis getJedisConnection() {
         jedis = jedisPool.getResource();
@@ -61,13 +60,18 @@ public class DatabaseService {
         return countries.get(rand.nextInt(countries.size()));
     }
 
-    public int getSize() {
-        return players.size();
+    public Integer getSize() {
+        return Math.toIntExact(jedis.zcard("playersByPoints"));
+
     }
 
     // Returns a list of the players with the highest scores
     public List<String> getPlayersByPoints(int min, int max){
         return jedis.zrevrange("playersByPoints", min,max);
+    }
+    public Integer getPointsByPlayers(String player) {
+
+        return  jedis.zscore("playersByPoints", player).intValue();
     }
 
     public void populateDatabase() {
@@ -76,7 +80,4 @@ public class DatabaseService {
         }
     }
 
-    public Player getUser(int index) {
-        return players.get(index);
-    }
 }

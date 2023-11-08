@@ -3,6 +3,7 @@ package Backend.API;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,5 +41,16 @@ public class PlayerController {
     @GetMapping("/size")
     ResponseEntity<Integer> Size() {
         return new ResponseEntity<>(databaseService.getSize(), HttpStatus.OK);
+    }
+
+    @GetMapping("/scores")
+    ResponseEntity<Integer> Scores(@RequestParam String player) {
+        return new ResponseEntity<>(databaseService.getPointsByPlayers(player), HttpStatus.OK);
+    }
+
+    //Error
+    @GetMapping("/error")
+    String Error(){
+        return "Bad luck, u fucked it up";
     }
 }

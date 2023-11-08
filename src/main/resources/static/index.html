@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fetch JSON from API</title>
+    <style>
+        button, p{
+            display: inline-block;
+            vertical-align: middle;
+        }
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 425px;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 2px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+        table.no {
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="body">
+    <div class="pageControls">
+        <button onclick="
+            list((pageNumber*usersPerPage)-usersPerPage, (pageNumber*usersPerPage)-1)
+        ">Last Page</button>
+        <p id="pageNumber"></p>
+        <button onclick="
+            list((pageNumber*usersPerPage)+usersPerPage, (pageNumber*usersPerPage)+usersPerPage*2-1)
+        ">Next Page</button>
+        <p id="indexNumber"></p>
+    </div>
+    <div id="slideContainer"></div>
+    <div class="pageControls2"></div>
+
+
+    <script>
+
+        const url = 'http://localhost:8080/users'
+        let users = [];
+        let pageNumber = 0
+        const usersPerPage = 50
+        let numberOfUses
+
+        async function getUsers(min, max) {
+            const response = await fetch(url + '?min=' + min +'&max=' + max);
+            const data = await response.json();
+
+            const response2 = await fetch('http://localhost:8080/size');
+            numberOfUses = await response2.json();
+
+            console.log(numberOfUses);
+
+            for(const i in data) {
+                users.push(data[i]);
+            }
+
+        }
+
+        async function list(min, max) {
+            if (min < 0) {
+                return;
+            }
+            users = [];
+            await getUsers(min, max);
+            if (users.length === 0) {
+                return;
+            }
+            if (min/usersPerPage > pageNumber) {
+                pageNumber++;
+            }
+            if (min/usersPerPage < pageNumber) {
+                pageNumber--;
+            }
+
+            document.getElementById("pageNumber").innerHTML = "Page: " + (pageNumber+1) + " of " + (Math.ceil(numberOfUses/usersPerPage))
+            document.getElementById("indexNumber").innerHTML = "User: " + (min+1).toLocaleString() + " - " + (min+users.length).toLocaleString() + " of " + (numberOfUses).toLocaleString();
+            document.getElementById("slideContainer").innerHTML = '<ul>'
+
+            let counter = min;
+            let str = '<table>';
+            str += '<tr><th>Rank</th><th>Name</th><th>Score</th></tr>'
+            users.forEach(function(user) {
+                counter++;
+                str += '<tr><td>' + counter.toLocaleString() +'</td><td>'+ user.name + ' ' + user.lastName + '</td><td>' + user.score.toLocaleString() + '</td></tr>';
+            });
+
+            str += '</table>';
+
+            document.getElementById("slideContainer").innerHTML = str;
+
+        }
+
+        list(pageNumber, pageNumber+usersPerPage-1);
+        $(".pageControls").clone().appendTo(".pageControls2");
+
+
+
+    </script>
+
+</body>
+</html>
