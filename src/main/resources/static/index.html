@@ -32,11 +32,11 @@
 <body class="body">
     <div class="pageControls">
         <button onclick="
-            list((pageNumber*usersPerPage)-usersPerPage, (pageNumber*usersPerPage)-1)
+            list((pageNumber*usersPerPage)-usersPerPage, (pageNumber*usersPerPage)-1, true)
         ">Last Page</button>
         <p id="pageNumber"></p>
         <button onclick="
-            list((pageNumber*usersPerPage)+usersPerPage, (pageNumber*usersPerPage)+usersPerPage*2-1)
+            list((pageNumber*usersPerPage)+usersPerPage, (pageNumber*usersPerPage)+usersPerPage*2-1, true)
         ">Next Page</button>
         <p id="indexNumber"></p>
     </div>
@@ -51,6 +51,18 @@
         let pageNumber = 0
         const usersPerPage = 50
         let numberOfUses
+        let ascending = false;
+
+        function switchOrder() {
+            ascending = !ascending;
+            //var cell = document.getElementById("slideContainer").rows[0].cells;
+            if (ascending) {
+                //cell[2].innerHTML = "Score ↑"
+            } else {
+                //cell[2].innerHTML = "Score ↓"
+            }
+            list(pageNumber*usersPerPage, (pageNumber*usersPerPage)+usersPerPage-1, false)
+        }
 
         async function getUsers(min, max) {
             const response = await fetch(url + '?min=' + min +'&max=' + max);
@@ -68,41 +80,60 @@
 
         }
 
-        async function list(min, max) {
+        async function list(min, max, incrementPage) {
             if (min < 0) {
                 return;
             }
             users = [];
+            if (!ascending) {
+                let temp = max;
+                max = min;
+                min = temp;
+            }
             await getUsers(min, max);
             if (users.length === 0) {
                 return;
             }
-            if (min/usersPerPage > pageNumber) {
-                pageNumber++;
+            if (incrementPage) {
+                if (min/usersPerPage > pageNumber) {
+                    pageNumber++;
+                }
+                if (min/usersPerPage < pageNumber) {
+                    pageNumber--;
+                }
             }
-            if (min/usersPerPage < pageNumber) {
-                pageNumber--;
-            }
+
 
             document.getElementById("pageNumber").innerHTML = "Page: " + (pageNumber+1) + " of " + (Math.ceil(numberOfUses/usersPerPage))
-            document.getElementById("indexNumber").innerHTML = "User: " + (min+1).toLocaleString() + " - " + (min+users.length).toLocaleString() + " of " + (numberOfUses).toLocaleString();
             document.getElementById("slideContainer").innerHTML = '<ul>'
+            let counter;
+            if (ascending) {
+                counter = min;
+                document.getElementById("indexNumber").innerHTML = "User: " + (counter+1) + " - " + ((counter)-(min-max)+1) + " of " + (numberOfUses).toLocaleString();
+            } else {
+                counter = numberOfUses-max+1;
+                document.getElementById("indexNumber").innerHTML = "User: " + ((counter)-(min-max)-1) + " - " + (counter-1) + " of " + (numberOfUses).toLocaleString();
+            }
 
-            let counter = min;
             let str = '<table>';
-            str += '<tr><th>Rank</th><th>Name</th><th>Score</th></tr>'
+            str += '<tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">Score</th></tr>'
             users.forEach(function(user) {
-                counter++;
+                if (ascending) {
+                    counter++;
+                } else {
+                    counter--;
+                }
+
                 str += '<tr><td>' + counter.toLocaleString() +'</td><td>'+ user.element + '</td><td>' + user.score.toLocaleString() + '</td></tr>';
             });
 
             str += '</table>';
 
             document.getElementById("slideContainer").innerHTML = str;
-
+            //console.log(document.getElementById("slideContainer").innerHTML); //wtf???? why does this not work?
         }
 
-        list(pageNumber, pageNumber+usersPerPage-1);
+        list(pageNumber, pageNumber+usersPerPage-1, true);
         $(".pageControls").clone().appendTo(".pageControls2");
 
 
