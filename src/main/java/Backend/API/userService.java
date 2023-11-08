@@ -4,7 +4,6 @@ package Backend.API;
 
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.resps.Tuple;
 
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 @Service //Service for interacting with the database to get user data
-public class UserService {
+public class userService {
     public static Jedis getJedis() {
         return jedis;
     }
@@ -24,7 +23,7 @@ public class UserService {
 
     private Random rand = new Random();
 
-    private String RandomName() {
+    private String randomName() {
         List<String> nouns = Arrays.asList("Gamer", "Eagle", "Cobra", "Priest", "Pilot", "Ace", "Officer", "Commander", "Dragon", "Swan", "Dolphin", "Hawk", "Vulture", "Mole", "Toucan", "Lizard", "Moose", "Bamboo", "Robber", "Painter", "Sheriff", "Judge", "Cook", "Baron", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert");
         List<String> adjectives = Arrays.asList("Mystic", "Elite", "Disguising", "Mighty", "Big", "Tiny", "Aerobatic", "Lanky", "Fearful", "Shocking", "Striking", "Practical", "Unlucky", "Sweaty", "Floppy", "Pensive", "Steady", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky");
         int noun = rand.nextInt(nouns.size());
@@ -34,24 +33,24 @@ public class UserService {
         return  adjectives.get(adjective) + nouns.get(noun) + number;
     }
 
-    private String RandomScore(int bound) {
+    private String randomScore(int bound) {
         return String.valueOf(rand.nextInt(bound));
 
     }
 
-    private String RandomRegion() {
+    private String randomRegion() {
         List<String> regions = Arrays.asList("EU", "NA", "AS", "SA");
         return regions.get(rand.nextInt(regions.size()));
     }
 
-    private String RandomCountry() {
+    private String randomCountry() {
         List<String> countries = Arrays.asList("DK", "SE", "GE", "UK", "US", "RU", "NO", "JP", "CH");
         return countries.get(rand.nextInt(countries.size()));
     }
 
-    public UserService() {
+    public userService() {
         for (int i = 0; i<100; i++) {
-            /*User temp =*/ new User(i, RandomName(), RandomScore(1000), RandomCountry(), RandomRegion());
+            /*User temp =*/ new User(i, randomName(), randomScore(1000), randomCountry(), randomRegion());
             //jedis.zadd("playersByPoints", Double.parseDouble(temp.getName()), temp.getScore()); //addning all the users to the playersByPoint stack
             // hash the rest of the users functions under the same id or something
         }
@@ -59,17 +58,17 @@ public class UserService {
         //need a custom comparator
     }
 
-    public int GetSize() {
+    public int getSize() {
         return users.size();
     }
 
-    //function that returns a list of the players with the highest scores
+    // Returns a list of the players with the highest scores
     public List<String> getPlayersByPoints(){
         return jedis.zrevrange("playersByPoints", 0,5);
     }
 
 
-    public User GetUser(int index) {
+    public User getUser(int index) {
         return users.get(index);
     }
 

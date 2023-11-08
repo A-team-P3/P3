@@ -11,35 +11,19 @@ import java.util.List;
 
 @RestController
 public class UserController {
-    private UserService userService;
+    private Backend.API.userService userService;
     @Autowired // Autowired constructor to add Service to the RestController
-    public UserController(UserService userService) {
+    public UserController(Backend.API.userService userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/hello") // Tells Spring that this is a GET endpoint
-    ResponseEntity<String> hello(@RequestParam int n) {
-        if (n > 0) {
-            return new ResponseEntity<>("parameter is larger then 0", HttpStatus.OK);
-        }
+    // Test path
 
-        if (n == 0) {
-            return new ResponseEntity<>("parameter is 0", HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    //test path
-
-    //getting the players with the highest scores
+    // Gets the players with the highest scores
     @GetMapping("/users")
     ResponseEntity<List<String>> Users() {
-        return new ResponseEntity<>(userService.getPlayersByPoints(),HttpStatus.OK);
+        return new ResponseEntity<>(userService.getPlayersByPoints(), HttpStatus.OK);
     }
-
-
 
     /*
     getUsersByRank(int min, int max, String region)
@@ -56,6 +40,6 @@ public class UserController {
      */
     @GetMapping("/size")
     ResponseEntity<Integer> Size(){
-        return new ResponseEntity<>(userService.GetSize(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getSize(), HttpStatus.OK);
     }
 }

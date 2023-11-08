@@ -1,7 +1,6 @@
 package Backend;
 
-
-import Backend.API.UserService;
+import Backend.API.userService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import redis.clients.jedis.Jedis;
@@ -13,7 +12,7 @@ public class Main {
         SpringApplication.run(Main.class, args);
 
         // Connect to Redis Cloud database
-        Jedis jedis = UserService.getJedis();
+        Jedis jedis = userService.getJedis();
         jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9");
 
 
