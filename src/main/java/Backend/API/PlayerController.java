@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.resps.Tuple;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,7 +23,7 @@ public class PlayerController {
 
     // Gets the players with the highest scores
     @GetMapping("/users")
-    ResponseEntity<List<String>> Users(@RequestParam int min, int max) {
+    ResponseEntity<List<Tuple>> Users(@RequestParam int min, int max) {
         return new ResponseEntity<>(databaseService.getPlayersByPoints(min, max), HttpStatus.OK);
     }
 
@@ -43,10 +45,12 @@ public class PlayerController {
         return new ResponseEntity<>(databaseService.getSize(), HttpStatus.OK);
     }
 
-    @GetMapping("/scores")
-    ResponseEntity<Integer> Scores(@RequestParam String player) {
+
+    @GetMapping("/score")
+    ResponseEntity<String> Scores(@RequestParam String player) {
         return new ResponseEntity<>(databaseService.getPointsByPlayers(player), HttpStatus.OK);
     }
+
 
     //Error
     @GetMapping("/error")

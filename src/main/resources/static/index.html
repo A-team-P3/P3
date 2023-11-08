@@ -56,6 +56,7 @@
             const response = await fetch(url + '?min=' + min +'&max=' + max);
             const data = await response.json();
 
+
             const response2 = await fetch('http://localhost:8080/size');
             numberOfUses = await response2.json();
 
@@ -92,7 +93,7 @@
             str += '<tr><th>Rank</th><th>Name</th><th>Score</th></tr>'
             users.forEach(function(user) {
                 counter++;
-                str += '<tr><td>' + counter.toLocaleString() +'</td><td>'+ user.name + ' ' + user.lastName + '</td><td>' + user.score.toLocaleString() + '</td></tr>';
+                str += '<tr><td>' + counter.toLocaleString() +'</td><td>'+ user.element + '</td><td>' + user.score.toLocaleString() + '</td></tr>';
             });
 
             str += '</table>';

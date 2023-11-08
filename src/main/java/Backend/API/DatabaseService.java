@@ -3,6 +3,8 @@ package Backend.API;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.resps.Tuple;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,13 +68,14 @@ public class DatabaseService {
     }
 
     // Returns a list of the players with the highest scores
-    public List<String> getPlayersByPoints(int min, int max){
-        return jedis.zrevrange("playersByPoints", min,max);
+    public List<Tuple> getPlayersByPoints(int min, int max){
+        return jedis.zrevrangeWithScores("playersByPoints", min,max);
     }
-    public Integer getPointsByPlayers(String player) {
 
-        return  jedis.zscore("playersByPoints", player).intValue();
+    public String getPointsByPlayers(String player) {
+        return  jedis.zscore("playersByPoints", player).toString();
     }
+
 
     public void populateDatabase() {
         for (int i = 0; i < 100; i++) {
