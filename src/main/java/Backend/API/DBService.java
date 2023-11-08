@@ -40,7 +40,20 @@ public class DBService {
             return userId.toString();
         }
     }
-
+    public ResponseEntity<String> getScoresByRange(int leaderboardId, int start, int stop) {
+        String leaderboardKey = "leaderboard" + leaderboardId;
+        try (Jedis jedis = getJedisConnection()) {
+            if (!jedis.exists(leaderboardKey)) {
+                return new ResponseEntity<>("Leaderboard does not exist", HttpStatus.NOT_FOUND);
+            } else {
+                String scores = jedis.zrevrangeWithScores(leaderboardKey, start, stop).toString();
+                return new ResponseEntity<>(scores, HttpStatus.OK);
+            }
+        } catch (JedisException e) {
+            // Log the exception as needed
+            return new ResponseEntity<>("Error getting scores", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     //Function to set a user's score in a leaderboard. Can update existing or add new user and score.
     //Checks if the leaderboard exists, and if the user already exists in the leaderboard.

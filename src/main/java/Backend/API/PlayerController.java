@@ -36,4 +36,8 @@ public class PlayerController {
     ResponseEntity<String> findUserById(@RequestParam int leaderboardId, @RequestParam String userId) throws Exception {
         return dbService.findByUserId(leaderboardId, userId);
     }
+    @GetMapping("/getScoresByRange")
+    ResponseEntity<String> getScoresByRange(@RequestParam int leaderboardId, @RequestParam int start, @RequestParam int stop) throws Exception {
+        return dbService.getScoresByRange(leaderboardId, start, stop);
+    }
 }

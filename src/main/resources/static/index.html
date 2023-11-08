@@ -8,33 +8,33 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #121212;
-    color: #39ff14; /* Neon green text */
+    color: #ce41ff; /* Neon green text */
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center; /* Updated this line */
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
     padding: 20px;
 }
-
 .grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
     max-width: 1000px;
     margin: 20px auto;
 }
 
 .tile {
     background-color: #1e1e1e;
-    border: 2px solid #39ff14; /* Neon green border */
+    border: 4px solid #fffc00; /* Neon green border */
     border-radius: 15px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between; /* Aligns the button to the bottom */
-    box-shadow: 0 0 10px #39ff14; /* Neon green glow */
+    box-shadow: 0 0 10px #c5fc00; /* Neon green glow */
+    height: 220px
 }
 
 .input-group {
@@ -59,29 +59,31 @@ body {
 
 .button {
     padding: 10px 20px;
-    background-color: #262626;
-    border: 1px solid #39ff14;
+    background-color: rgba(195, 210, 67, 0.63);
+    border: 0px solid #ffe014;
     border-radius: 10px;
-    color: #39ff14;
+    color: #000200;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    box-shadow: 0 0 10px #c5fc00; /* Neon green glow */
 }
 
 .button:hover {
     background-color: #39ff14;
     color: #121212;
+    box-shadow: 0 0 10px #39ff14; /* Neon green glow */
 }
 
 .output {
     background-color: #1e1e1e;
-    border: 2px solid #39ff14;
+    border: 2px solid #ffec00;
     border-radius: 15px;
     padding: 20px;
     margin-top: 20px;
     width: 100%;
 	max-width: 1000px;
-    box-shadow: 0 0 10px #39ff14;
-    color: #39ff14;
+    box-shadow: 0 0 10px #ffea00;
+    color: #ffea00;
 }
 
 #response {
@@ -176,6 +178,21 @@ function findUser() {
             document.getElementById('response').textContent = 'Error occurred';
         });
 }
+function getScoresByRange() {
+    const leaderboardId = document.getElementById('rangeLeaderboardId').value;
+    const start = document.getElementById('rangeStart').value;
+    const stop = document.getElementById('rangeStop').value;
+    fetch(`/getScoresByRange?leaderboardId=${leaderboardId}&start=${start}&stop=${stop}`)
+        .then(handleResponse)
+        .then(data => {
+            document.getElementById('response').textContent = data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('response').textContent = 'Error occurred';
+        });
+}
+
 </script>
 </head>
 <body>
@@ -183,9 +200,19 @@ function findUser() {
 
 <div class="grid">
     <div class="tile">
+        <label for="rangeLeaderboardId">Leaderboard ID:</label>
+        <input type="number" id="rangeLeaderboardId" name="leaderboardId" required>
+        <label for="rangeStart">Start Range:</label>
+        <input type="number" id="rangeStart" name="start" required>
+        <label for="rangeStop">Stop Range:</label>
+        <input type="number" id="rangeStop" name="stop" required>
+        <button class="button" onclick="getScoresByRange()">GET SCORES BY RANGE</button>
+    </div>
+
+    <div class="tile">
         <label for="createLeaderboardId">Leaderboard ID:</label>
         <input type="number" id="createLeaderboardId" name="leaderboardId" required>
-        <button class="button" onclick="createLeaderboard()">Create Leaderboard</button>
+        <button class="button" onclick="createLeaderboard()">CREATE LEADERBOARD</button>
     </div>
 
     <div class="tile">
@@ -195,7 +222,7 @@ function findUser() {
         <input type="number" id="addScoreScore" name="score" required>
         <label for="addScoreUserId">User ID:</label>
         <input type="text" id="addScoreUserId" name="userId" required>
-        <button class="button" onclick="addScoreToLeaderboard()">Add Score to Leaderboard</button>
+        <button class="button" onclick="addScoreToLeaderboard()">ADD SCORE TO DB</button>
     </div>
 
     <div class="tile">
@@ -203,7 +230,7 @@ function findUser() {
         <input type="number" id="populateLeaderboardId" name="leaderboardId" required>
         <label for="populateNumberOfUsers">Number of Users:</label>
         <input type="number" id="populateNumberOfUsers" name="numberOfUsers" required>
-        <button class="button" onclick="populateDatabase()">Populate Database</button>
+        <button class="button" onclick="populateDatabase()">POPULATE DB</button>
     </div>
 
     <div class="tile">
@@ -211,7 +238,7 @@ function findUser() {
         <input type="number" id="findUserLeaderboardId" name="leaderboardId" required>
         <label for="findUserUserId">User ID:</label>
         <input type="text" id="findUserUserId" name="userId" required>
-        <button class="button" onclick="findUser()">Find User</button>
+        <button class="button" onclick="findUser()">FIND USER</button>
     </div>
 
     <!-- Add more tiles as needed -->
