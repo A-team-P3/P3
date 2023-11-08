@@ -20,8 +20,8 @@ public class PlayerController {
 
     // Gets the players with the highest scores
     @GetMapping("/users")
-    ResponseEntity<List<String>> Users() {
-        return new ResponseEntity<>(DatabaseService.getPlayersByPoints(), HttpStatus.OK);
+    ResponseEntity<List<String>> Users(@RequestParam int min, int max) {
+        return new ResponseEntity<>(databaseService.getPlayersByPoints(min, max), HttpStatus.OK);
     }
 
     /*
