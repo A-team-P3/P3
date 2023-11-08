@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Random;
 
 @Service //Service for interacting with the database to get user data
-public class userService {
+public class DatabaseService {
     public static Jedis getJedis() {
         return jedis;
     }
 
     //establishing connection to database
     static Jedis jedis = new Jedis("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
-    private List<User> users = new ArrayList<>();
+    private List<Player> players = new ArrayList<>();
 
     private Random rand = new Random();
 
@@ -48,9 +48,9 @@ public class userService {
         return countries.get(rand.nextInt(countries.size()));
     }
 
-    public userService() {
+    public DatabaseService() {
         for (int i = 0; i<100; i++) {
-            /*User temp =*/ new User(i, randomName(), randomScore(1000), randomCountry(), randomRegion());
+            /*User temp =*/ new Player(i, randomName(), randomScore(1000), randomCountry(), randomRegion());
             //jedis.zadd("playersByPoints", Double.parseDouble(temp.getName()), temp.getScore()); //addning all the users to the playersByPoint stack
             // hash the rest of the users functions under the same id or something
         }
@@ -59,7 +59,7 @@ public class userService {
     }
 
     public int getSize() {
-        return users.size();
+        return players.size();
     }
 
     // Returns a list of the players with the highest scores
@@ -68,8 +68,8 @@ public class userService {
     }
 
 
-    public User getUser(int index) {
-        return users.get(index);
+    public Player getUser(int index) {
+        return players.get(index);
     }
 
 }

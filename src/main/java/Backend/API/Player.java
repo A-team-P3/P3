@@ -1,6 +1,6 @@
 package Backend.API;
 
-public class User {
+public class Player {
     private int id;
     private String name;
     private String score; //was INT
@@ -9,7 +9,7 @@ public class User {
 
     //add timestamp (unless redis handles it)
 
-    public User(int id, String name, String score /*was int*/, String country, String region) {
+    public Player(int id, String name, String score /*was int*/, String country, String region) {
         this.id = id;
         this.name = name;
         this.score = score;
