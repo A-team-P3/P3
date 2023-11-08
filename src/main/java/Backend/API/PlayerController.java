@@ -4,19 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 public class PlayerController {
-    private DatabaseService DatabaseService;
-    @Autowired // Autowired constructor to add Service to the RestController
-    public PlayerController(DatabaseService DatabaseService) {
-        this.DatabaseService = DatabaseService;
-    }
+    private DatabaseService databaseService;
 
-    // Test path
+    @Autowired // Autowired constructor to add Service to the RestController
+    public PlayerController(DatabaseService databaseService) {
+        this.databaseService = databaseService;
+    }
 
     // Gets the players with the highest scores
     @GetMapping("/users")
@@ -38,7 +38,7 @@ public class PlayerController {
         number of players
      */
     @GetMapping("/size")
-    ResponseEntity<Integer> Size(){
-        return new ResponseEntity<>(DatabaseService.getSize(), HttpStatus.OK);
+    ResponseEntity<Integer> Size() {
+        return new ResponseEntity<>(databaseService.getSize(), HttpStatus.OK);
     }
 }
