@@ -22,6 +22,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'redis.clients:jedis'
+	implementation 'redis.clients:jedis:3.6.0'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.5.5'
 }
 
 tasks.named('test') {
