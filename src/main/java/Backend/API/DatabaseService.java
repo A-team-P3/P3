@@ -1,14 +1,8 @@
 package Backend.API;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,19 +11,29 @@ import java.util.Random;
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
 
-
-    //establishing connection to database
-    private JedisPool jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
-
     private List<Player> players = new ArrayList<>();
-
     private Random rand = new Random();
-   /* public DatabaseService() {
-        System.out.println("ost");
-        //populateDatabase();
-    }*/
-    public JedisPool getJedis() {
+    private JedisPool jedisPool;
+    private Jedis jedis;
+
+    public DatabaseService() {
+        // Establishing connection to database
+        this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
+        this.jedis = getJedisConnection();
+        populateDatabase();
+    }
+    private Jedis getJedisConnection() {
+        jedis = jedisPool.getResource();
+        jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9"); // Add your Redis password here
+        return jedis;
+    }
+
+    public JedisPool getJedisPool() {
         return jedisPool;
+    }
+
+    public Jedis getJedis() {
+        return jedis;
     }
 
     private String randomName() {
@@ -77,21 +81,12 @@ public class DatabaseService {
     }
 
     public void populateDatabase() {
-        for (int i = 0; i<100; i++) {
-            try (Jedis jedis = jedisPool.getResource()){
-                jedis.zadd("playersByPoints", randomScore(10000), String.format(randomName()));
-            }
-
-//            jedis.zadd("playersByPoints", randomScore(10000), String.format(randomName())); //adding all the users to the playersByPoint stack
-            // hash the rest of the users functions under the same id or something
+        for (int i = 0; i < 100; i++) {
+            jedis.zadd("playersByPoints", randomScore(10000), String.format(randomName()));
         }
-        //need to sort users by score primary with timestamp as tiebreaker
-        //need a custom comparat
-
     }
 
     public Player getUser(int index) {
         return players.get(index);
     }
-
 }

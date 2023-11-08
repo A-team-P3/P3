@@ -12,13 +12,11 @@ import java.util.List;
 @RestController
 public class PlayerController {
     private DatabaseService databaseService;
-    /*
+
     @Autowired // Autowired constructor to add Service to the RestController
     public PlayerController(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
-
-    // Test path
 
     // Gets the players with the highest scores
     @GetMapping("/users")
@@ -40,7 +38,7 @@ public class PlayerController {
         number of players
      */
     @GetMapping("/size")
-    ResponseEntity<Integer> Size(){
+    ResponseEntity<Integer> Size() {
         return new ResponseEntity<>(databaseService.getSize(), HttpStatus.OK);
     }
 }
