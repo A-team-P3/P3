@@ -1,9 +1,12 @@
 package Backend.API;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 
 import java.util.ArrayList;
@@ -13,15 +16,21 @@ import java.util.Random;
 
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
-    public static Jedis getJedis() {
-        return jedis;
-    }
+
 
     //establishing connection to database
-    static Jedis jedis = new Jedis("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
+    private JedisPool jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
+
     private List<Player> players = new ArrayList<>();
 
     private Random rand = new Random();
+   /* public DatabaseService() {
+        System.out.println("ost");
+        //populateDatabase();
+    }*/
+    public JedisPool getJedis() {
+        return jedisPool;
+    }
 
     private String randomName() {
         List<String> nouns = Arrays.asList("Gamer", "Eagle", "Cobra", "Priest", "Pilot", "Ace", "Officer", "Commander", "Dragon", "Swan", "Dolphin", "Hawk", "Vulture", "Mole", "Toucan", "Lizard", "Moose", "Bamboo", "Robber", "Painter", "Sheriff", "Judge", "Cook", "Baron", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert");
@@ -67,6 +76,19 @@ public class DatabaseService {
         return jedis.zrevrange("playersByPoints", 0,5);
     }
 
+    public void populateDatabase() {
+        for (int i = 0; i<100; i++) {
+            try (Jedis jedis = jedisPool.getResource()){
+                jedis.zadd("playersByPoints", randomScore(10000), String.format(randomName()));
+            }
+
+//            jedis.zadd("playersByPoints", randomScore(10000), String.format(randomName())); //adding all the users to the playersByPoint stack
+            // hash the rest of the users functions under the same id or something
+        }
+        //need to sort users by score primary with timestamp as tiebreaker
+        //need a custom comparat
+
+    }
 
     public Player getUser(int index) {
         return players.get(index);
