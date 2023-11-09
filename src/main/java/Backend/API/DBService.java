@@ -27,11 +27,9 @@ public class DBService {
     }
 
     private class UserIdGenerator {
-
         private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
         private static final int USER_ID_LENGTH = 7;
         private final Random random = new Random();
-
         public String createNewUserID() {
             StringBuilder userId = new StringBuilder(USER_ID_LENGTH);
             for (int i = 0; i < USER_ID_LENGTH; i++) {
@@ -85,7 +83,7 @@ public class DBService {
                 String[] userScoreArray = oldScoreEntry.split(":");
                 int oldScore = Integer.parseInt(userScoreArray[0]);
                 long Timestamp = Long.parseLong(userScoreArray[1]);
-                if (oldScore <= newScore) { //If the new score is higher than the old score:
+                if (oldScore < newScore) { //If the new score is higher than the old score:
                     jedis.hset(leaderboardHashKey, userId, newScoreEntry);
                     jedis.zrem(leaderboardKey, oldScoreEntry); //Remove the old score from the sorted set
                     jedis.zadd(leaderboardKey, newScore, newScoreEntry); //Update the sorted set
@@ -154,13 +152,12 @@ public class DBService {
                 return new ResponseEntity<>("Leaderboard already exists", HttpStatus.CONFLICT);
             } else {
                 jedis.zadd(leaderboardKey, 0, "initial:0"); // Adding an initial value to create the set
-                jedis.del(leaderboardKey); // Removing the initial value so the set is empty
+               // jedis.del(leaderboardKey); // Removing the initial value so the set is empty
                 return new ResponseEntity<>("Leaderboard created", HttpStatus.OK);
             }
         }
     } //how do I use this method? I tried http://localhost:8080/createLeaderboard?leaderboardId=1
     public ResponseEntity<String> addScoreToLeaderboard(int leaderboardId, int score, String userId) {
-        String leaderboardKey = "leaderboard" + leaderboardId;
         return setScore(leaderboardId, score, userId);
     }//how do i use this method? I tried http://localhost:8080/addScoreToLeaderboard?leaderboardId=1&score=1&userId=1
 
