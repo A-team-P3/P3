@@ -3,33 +3,12 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fetch JSON from API</title>
-    <style>
-        button, p{
-            display: inline-block;
-            vertical-align: middle;
-        }
-        table {
-            font-family: arial, sans-serif;
-            border-collapse: collapse;
-            width: 425px;
-        }
-
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 2px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #dddddd;
-        }
-        table.no {
-            margin: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="/style.css">
+    <title>Leaderboard</title>
 </head>
-<body class="body">
+<body>
+<div class="Center">
+    <header>Leaderboard</header>
     <div class="pageControls">
         <button onclick="
             list((pageNumber*usersPerPage)-usersPerPage, (pageNumber*usersPerPage)-1, true)
@@ -42,7 +21,7 @@
     </div>
     <div id="slideContainer"></div>
     <div class="pageControls2"></div>
-
+</div>
 
     <script>
 
@@ -51,7 +30,7 @@
         let pageNumber = 0
         const usersPerPage = 50
         let numberOfUses
-        let ascending = false;
+        let ascending = true;
 
         function switchOrder() {
             ascending = !ascending;
