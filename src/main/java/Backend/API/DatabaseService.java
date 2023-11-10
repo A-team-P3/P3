@@ -18,14 +18,18 @@ public class DatabaseService {
     private Jedis jedis;
 
     public DatabaseService() {
-        // Establishing connection to database
-        this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
-        this.jedis = getJedisConnection();
+        establishDatabaseConnection();
         //populateDatabase();
     }
+
+    private void establishDatabaseConnection() {
+        // Establishing connection to database
+        this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
+        this.jedis = jedisPool.getResource();
+        this.jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9"); // Add your Redis password here
+    }
+
     private Jedis getJedisConnection() {
-        jedis = jedisPool.getResource();
-        jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9"); // Add your Redis password here
         return jedis;
     }
 

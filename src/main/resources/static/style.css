@@ -28,7 +28,7 @@ div.Center {
     transform: translate(-50%, -50%);
 }
  #slideContainer{
-     height: 700px;
+     height: 540px;
      width: 1900px;
      overflow: auto;
      text-align: -webkit-center;

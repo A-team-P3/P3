@@ -89,9 +89,16 @@
                 counter = numberOfUses-max+1;
                 document.getElementById("indexNumber").innerHTML = "User: " + ((counter)-(min-max)-1) + " - " + (counter-1) + " of " + (numberOfUses).toLocaleString();
             }
-
+            let score;
+            if (document.getElementById("leaderboard") != null) {
+                score = document.getElementById("leaderboard").rows[0].cells[2].innerHTML;
+            }
+            else {
+                score = "Score ↑";
+            }
             let str = '<table id="leaderboard">';
-            str += '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">Score</th></tr></thead>'
+
+            str += '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + score + '</th></tr></thead>'
             users.forEach(function(user) {
                 if (ascending) {
                     counter++;
