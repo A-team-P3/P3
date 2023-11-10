@@ -1,0 +1,12 @@
+# Use the official Gradle image to create a build artifact.
+FROM gradle:jdk21 as builder
+WORKDIR /app
+COPY --chown=gradle:gradle . /app
+RUN gradle build --no-daemon
+
+# Use the official OpenJDK image for the runtime.
+FROM openjdk:21-jdk
+EXPOSE 8080
+RUN mkdir /app
+COPY --from=builder /app/build/libs/*.jar /app/spring-boot-application.jar
+ENTRYPOINT ["java", "-jar", "/app/spring-boot-application.jar"]

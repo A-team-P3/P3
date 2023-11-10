@@ -17,12 +17,12 @@ public class DBService {
     public DBService() {
         // Assuming you want to configure the pool in the constructor,
         // otherwise you could move this to an @PostConstruct method or a configuration class.
-        this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618); // Add your host and port here
+        this.jedisPool = new JedisPool("130.225.39.42", 6379); // Add your host and port here
     }
 
     private Jedis getJedisConnection() {
         Jedis jedis = jedisPool.getResource();
-        jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9"); // Add your Redis password here
+        jedis.auth("tJ1Y37fGm5c2A2m6jCE0"); // Add your Redis password here
         return jedis;
     }
 
@@ -86,7 +86,7 @@ public class DBService {
                 if (oldScore < newScore) { //If the new score is higher than the old score:
                     jedis.hset(leaderboardHashKey, userId, newScoreEntry);
                     jedis.zrem(leaderboardKey, oldScoreEntry); //Remove the old score from the sorted set
-                    jedis.zadd(leaderboardKey, newScore, newScoreEntry); //Update the sorted set
+                    jedis.zadd(leaderboardKey, newScore, newScoreEntry); //Add new score to the sorted set
                     return new ResponseEntity<>("Old score (" + oldScore + ")removed, new score (" + newScore + ") added to leaderboard", HttpStatus.CREATED);
                 } else {
                     return new ResponseEntity<>("New score not higher than old score, not added", HttpStatus.OK);
