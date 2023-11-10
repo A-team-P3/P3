@@ -34,11 +34,11 @@
 
         function switchOrder() {
             ascending = !ascending;
-            //var cell = document.getElementById("slideContainer").rows[0].cells;
+            var cell = document.getElementById("leaderboard").rows[0].cells;
             if (ascending) {
-                //cell[2].innerHTML = "Score ↑"
+                cell[2].innerHTML = "Score ↑"
             } else {
-                //cell[2].innerHTML = "Score ↓"
+                cell[2].innerHTML = "Score ↓"
             }
             list(pageNumber*usersPerPage, (pageNumber*usersPerPage)+usersPerPage-1, false)
         }
@@ -47,11 +47,8 @@
             const response = await fetch(url + '?min=' + min +'&max=' + max);
             const data = await response.json();
 
-
             const response2 = await fetch('http://localhost:8080/size');
             numberOfUses = await response2.json();
-
-            console.log(numberOfUses);
 
             for(const i in data) {
                 users.push(data[i]);
@@ -84,7 +81,6 @@
 
 
             document.getElementById("pageNumber").innerHTML = "Page: " + (pageNumber+1) + " of " + (Math.ceil(numberOfUses/usersPerPage))
-            document.getElementById("slideContainer").innerHTML = '<ul>'
             let counter;
             if (ascending) {
                 counter = min;
@@ -94,8 +90,8 @@
                 document.getElementById("indexNumber").innerHTML = "User: " + ((counter)-(min-max)-1) + " - " + (counter-1) + " of " + (numberOfUses).toLocaleString();
             }
 
-            let str = '<table>';
-            str += '<tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">Score</th></tr>'
+            let str = '<table id="leaderboard">';
+            str += '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">Score</th></tr></thead>'
             users.forEach(function(user) {
                 if (ascending) {
                     counter++;
@@ -109,7 +105,8 @@
             str += '</table>';
 
             document.getElementById("slideContainer").innerHTML = str;
-            //console.log(document.getElementById("slideContainer").innerHTML); //wtf???? why does this not work?
+            console.log("hallo2");
+            console.log(document.getElementById("leaderboard").rows.length); //wtf???? why does this not work?
         }
 
         list(pageNumber, pageNumber+usersPerPage-1, true);
