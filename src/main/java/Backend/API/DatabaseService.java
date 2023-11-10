@@ -38,8 +38,8 @@ public class DatabaseService {
     }
 
     private String randomName() {
-        List<String> nouns = Arrays.asList("Gamer", "Eagle", "Cobra", "Priest", "Pilot", "Ace", "Officer", "Commander", "Dragon", "Swan", "Dolphin", "Hawk", "Vulture", "Mole", "Toucan", "Lizard", "Moose", "Bamboo", "Robber", "Painter", "Sheriff", "Judge", "Cook", "Baron", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert");
-        List<String> adjectives = Arrays.asList("Mystic", "Elite", "Disguising", "Mighty", "Big", "Tiny", "Aerobatic", "Lanky", "Fearful", "Shocking", "Striking", "Practical", "Unlucky", "Sweaty", "Floppy", "Pensive", "Steady", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky");
+        List<String> nouns = Arrays.asList("Gamer", "Eagle", "Cobra", "Priest", "Pilot", "Ace", "Officer", "Commander", "Dragon", "Swan", "Dolphin", "Hawk", "Vulture", "Mole", "Toucan", "Lizard", "Moose", "Bamboo", "Robber", "Painter", "Sheriff", "Judge", "Cook", "Baron", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert", "Slut");
+        List<String> adjectives = Arrays.asList("Mystic", "Elite", "Disguising", "Mighty", "Big", "Tiny", "Aerobatic", "Lanky", "Fearful", "Shocking", "Striking", "Practical", "Unlucky", "Sweaty", "Floppy", "Pensive", "Steady", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky", "Clumsy");
         int noun = rand.nextInt(nouns.size());
         int adjective = rand.nextInt(adjectives.size());
         int number = rand.nextInt(100);
