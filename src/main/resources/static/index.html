@@ -24,38 +24,42 @@
 </div>
 
     <script>
-
-        const url = 'http://localhost:8080/users'
-        let users = [];
-        let pageNumber = 0
-        const usersPerPage = 50
-        let numberOfUses
+        "use strict";
+        const url = 'http://localhost:8080/users';
+        let pageNumber = 0;
+        const usersPerPage = 50;
+        let numberOfUses;
         let ascending = true;
 
         function switchOrder() {
             ascending = !ascending;
-            let cell = document.getElementById("leaderboard").rows[0].cells;
-            if (ascending) {
-                cell[2].innerHTML = "Score ↑"
-            } else {
-                cell[2].innerHTML = "Score ↓"
-            }
+
+            const cell = document.getElementById("leaderboard").rows[0].cells;
+
+            ascending ? cell[2].innerHTML = "Score ↑" : cell[2].innerHTML = "Score ↓";
+
             list(pageNumber*usersPerPage, (pageNumber*usersPerPage)+usersPerPage-1, false)
         }
 
         async function getUsers(min, max) {
+            let users = [];
             try {
                 const [usersRes, numberOfUsersRes] = await Promise.all([
                     fetch(url + '?min=' + min +'&max=' + max),
                     fetch('http://localhost:8080/size')
                 ]);
 
+                // parse
                 const userList = await usersRes.json();
                 numberOfUses = await numberOfUsersRes.json();
 
+                // add all user data to user list
                 for(let i in userList) {
                     users.push(userList[i]);
                 }
+
+                // return user list
+                return users;
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -63,28 +67,20 @@
         }
 
         async function list(min, max, incrementPage) {
-            if (min < 0) {
-                return;
-            }
-            users = [];
+
+            if (min < 0) return; // sker det her??
+
             if (!ascending) {
                 let temp = max;
                 max = min;
                 min = temp;
             }
-            await getUsers(min, max);
-            if (users.length === 0) {
-                return;
-            }
-            if (incrementPage) {
-                if (min/usersPerPage > pageNumber) {
-                    pageNumber++;
-                }
-                if (min/usersPerPage < pageNumber) {
-                    pageNumber--;
-                }
-            }
+            const users = await getUsers(min, max);
 
+            // if db is empty
+            if (users.length === 0) return;
+
+            incrementPage && min/usersPerPage > pageNumber ? pageNumber++ : pageNumber--;
 
             document.getElementById("pageNumber").innerHTML = "Page: " + (pageNumber+1) + " of " + (Math.ceil(numberOfUses/usersPerPage))
             let counter;
@@ -105,7 +101,7 @@
             let str = '<table id="leaderboard">';
 
             str += '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + score + '</th></tr></thead>'
-            users.forEach(function(user) {
+            users.forEach((user) => {
 
                 ascending ? counter++ : counter-- ;
 
