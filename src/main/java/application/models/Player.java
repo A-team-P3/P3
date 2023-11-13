@@ -1,4 +1,4 @@
-package Backend.API;
+package application.models;
 
 public class Player {
     private int id;
