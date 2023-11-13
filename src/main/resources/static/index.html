@@ -34,7 +34,7 @@
 
         function switchOrder() {
             ascending = !ascending;
-            var cell = document.getElementById("leaderboard").rows[0].cells;
+            let cell = document.getElementById("leaderboard").rows[0].cells;
             if (ascending) {
                 cell[2].innerHTML = "Score ↑"
             } else {
@@ -44,16 +44,22 @@
         }
 
         async function getUsers(min, max) {
-            const response = await fetch(url + '?min=' + min +'&max=' + max);
-            const data = await response.json();
+            try {
+                const [usersRes, numberOfUsersRes] = await Promise.all([
+                    fetch(url + '?min=' + min +'&max=' + max),
+                    fetch('http://localhost:8080/size')
+                ]);
 
-            const response2 = await fetch('http://localhost:8080/size');
-            numberOfUses = await response2.json();
+                const userList = await usersRes.json();
+                numberOfUses = await numberOfUsersRes.json();
 
-            for(const i in data) {
-                users.push(data[i]);
+                for(let i in userList) {
+                    users.push(userList[i]);
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
-
         }
 
         async function list(min, max, incrementPage) {
@@ -100,11 +106,8 @@
 
             str += '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + score + '</th></tr></thead>'
             users.forEach(function(user) {
-                if (ascending) {
-                    counter++;
-                } else {
-                    counter--;
-                }
+
+                ascending ? counter++ : counter-- ;
 
                 str += '<tr><td>' + counter.toLocaleString() +'</td><td>'+ user.element + '</td><td>' + user.score.toLocaleString() + '</td></tr>';
             });
