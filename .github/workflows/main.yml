@@ -20,7 +20,12 @@ jobs:
       run: rsync -avz --exclude '.git/' --exclude 'node_modules/' --delete-after ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/opt/docker/spring-boot/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
+        
+    - name: Verify File Transfer
+      run: ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "ls -la /opt/docker/spring-boot/"
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        
     - name: Build and Run on Server
       run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/ && ./gradlew build && docker-compose down && docker-compose up --build -d"
       env:
