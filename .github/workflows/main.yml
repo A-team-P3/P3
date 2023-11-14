@@ -14,7 +14,7 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+        echo "130.225.39.42 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDinynxdcNYWn+aOuxZmF/BEAEZCR5nMWvQc924u2m2FEfjfU+SwHICza7RFDQtRR9AG6kuCp6jZfT8pt1XsQI3HqxSlR1QnccP/SodJaO0mf94KoWYnbEBmCERlc3IjIjd27Ug9SzYNejuATx2GUpTigL0Vj1F+Q3kupaGOLqnmLpuJfnGYc3nsFPji7J/3z9EU7d3Zt//Tz7aExloog+iYSOvAp6V3Zmc2vE93f5ZqBDmGI5ux3YybSMzxURzSdEkVhdZZU7LuNSYDnx6pMnCIfOUXptnGEO4LjACH4jRn+1PqQyPRJBBKA83TwIqFZF1mT4tHDNmsyIuRsE/keW+XDy3k/m71Lio+JplA6OO9c8SsnL9qyCTDkSWCmO6n4dwleiADNQiwQM+doUwazgKIVvqLi/AZH2uUu9uIgCCcryTBJ5/DuiumaeNEVudw2qPDHre15JBAHjzaE/Jy3toUeabRsspUrs/XOOje/Zo/GkxpLLhiiFNX5J304yPcXk=" >> ~/.ssh/known_hosts
 
     - name: Sync Repository to Server
       run: rsync -avz --exclude '.git/' --exclude 'node_modules/' --delete-after ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/opt/docker/spring-boot/
