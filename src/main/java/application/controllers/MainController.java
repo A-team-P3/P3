@@ -46,12 +46,6 @@ public class MainController {
     }
 
 
-    @GetMapping("/score")
-    ResponseEntity<String> Scores(@RequestParam String player) {
-        return new ResponseEntity<>(databaseService.getPointsByPlayers(player), HttpStatus.OK);
-    }
-
-
     //Error
     @GetMapping("/error")
     String Error(){

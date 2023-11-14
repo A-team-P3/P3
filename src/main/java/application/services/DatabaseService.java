@@ -1,8 +1,11 @@
 package application.services;
 
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Protocol;
+import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
 import java.util.ArrayList;
@@ -18,17 +21,13 @@ public class DatabaseService {
     private Jedis jedis;
 
     public DatabaseService() {
-        establishDatabaseConnection();
+        this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
         //populateDatabase();
     }
-
-    private void establishDatabaseConnection() {
-        // Establishing connection to database
-        this.jedisPool = new JedisPool("130.225.39.42", 6379);
-        this.jedis = jedisPool.getResource();
-        this.jedis.auth("tJ1Y37fGm5c2A2m6jCE0"); // Add your Redis password here
+    private Jedis getJedisConnection() {
+        Jedis jedis = jedisPool.getResource();// Add your Redis password here
+        return jedis;
     }
-
     private String randomName() {
         List<String> nouns = Arrays.asList("Gamer", "Love", "Life", "Priest", "Pilot", "Business", "Officer", "Eater", "trafficker", "Dragon", "Swan", "Season", "Hawk", "Peasant", "Lizard", "Time", "Bamboo", "Licker", "Robber", "Painter", "Bone", "Juice", "Party", "Preacher", "Picker", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert", "Slut", "Hunter");
         List<String> adjectives = Arrays.asList("Mystic", "Elite", "Distinguished", "Mighty", "Big", "Tiny", "Filthy", "Lanky", "Fearful", "Slow", "Striking", "Slime", "Speedy", "Unlucky", "Sweaty", "Floppy", "Sad", "Steady", "Child", "Rat", "Lone", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky", "Clumsy", "Satanic", "Unwashed", "Conservative");
@@ -43,6 +42,34 @@ public class DatabaseService {
         return rand.nextInt(bound);
 
     }
+    private String leaderboardKeyString (int leaderboardId) {
+        String key = "leaderboard:" + leaderboardId;
+        return key;
+    }
+
+    //[100, 100:129239384:ALEXHOE, BinaryElement:Balls]
+
+    public List<Tuple> getScoresByRange(int leaderboardId, int start, int stop) {
+        String leaderboardKey = leaderboardKeyString(leaderboardId);
+
+        try (Jedis jedis = getJedisConnection()) {
+            if (jedis.exists(leaderboardKey)) {
+                String scores = jedis.zrevrangeWithScores(leaderboardKey, start, stop).toString();
+            }
+        } catch(JedisException e) {
+            // Log the exception as needed
+            System.out.println("Error getting scores");
+        }
+        //Exception handling should be revised. No checks for non-existent leaderboards
+        /*
+        catch (JedisException e) {
+            // Log the exception as needed
+            return new ResponseEntity<>("Error getting scores", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
+            return new ResponseEntity<>("Leaderboard does not exist", HttpStatus.INTERNAL_SERVER_ERROR);
+        }         */
+    }
+
 
     private String randomRegion() {
         List<String> regions = Arrays.asList("EU", "NA", "AS", "SA");
@@ -55,29 +82,27 @@ public class DatabaseService {
     }
 
     public Integer getSize() {
-        return Math.toIntExact(jedis.zcard("playersByPoints"));
-
+        try (Jedis jedis = getJedisConnection()) {
+            return Math.toIntExact(jedis.zcard("leaderboard1"));
+        }
     }
 
     // Returns a list of the players with the highest scores
     public List<Tuple> getPlayersByPoints(int min, int max){
-        if (max > min)
-        {
-            return jedis.zrevrangeWithScores("playersByPoints", min,max);
-        }
-        else {
-            return jedis.zrangeWithScores("playersByPoints", max,min);
+
+        try (Jedis jedis = getJedisConnection()) {
+            if (max > min) {
+                return jedis.zrevrangeWithScores("leaderboard1", min, max);
+            }
+            else {
+                return jedis.zrangeWithScores("leaderboard1", max, min);
+            }
         }
     }
-
-    public String getPointsByPlayers(String player) {
-        return  jedis.zscore("playersByPoints", player).toString();
-    }
-
 
     public void populateDatabase() {
         for (int i = 0; i < 100; i++) {
-            jedis.zadd("playersByPoints", randomScore(10000), String.format(randomName()));
+            jedis.zadd("leaderboard1", randomScore(10000), String.format(randomName()));
         }
     }
 
