@@ -30,6 +30,7 @@
 
     <script>
         "use strict";
+        const form = document.getElementById("frm");
         const url = 'http://localhost:8080/users';
         let pageNumber = 0;
         const usersPerPage = 50;
@@ -49,6 +50,8 @@
 
             list(min, max, false)
         }
+
+        form.addEventListener("submit",  handleSubmit);
 
         function handleSubmit(e){
             e.preventDefault();
