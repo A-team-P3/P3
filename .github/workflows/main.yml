@@ -9,6 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
@@ -17,7 +20,7 @@ jobs:
         echo "130.225.39.42 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDinynxdcNYWn+aOuxZmF/BEAEZCR5nMWvQc924u2m2FEfjfU+SwHICza7RFDQtRR9AG6kuCp6jZfT8pt1XsQI3HqxSlR1QnccP/SodJaO0mf94KoWYnbEBmCERlc3IjIjd27Ug9SzYNejuATx2GUpTigL0Vj1F+Q3kupaGOLqnmLpuJfnGYc3nsFPji7J/3z9EU7d3Zt//Tz7aExloog+iYSOvAp6V3Zmc2vE93f5ZqBDmGI5ux3YybSMzxURzSdEkVhdZZU7LuNSYDnx6pMnCIfOUXptnGEO4LjACH4jRn+1PqQyPRJBBKA83TwIqFZF1mT4tHDNmsyIuRsE/keW+XDy3k/m71Lio+JplA6OO9c8SsnL9qyCTDkSWCmO6n4dwleiADNQiwQM+doUwazgKIVvqLi/AZH2uUu9uIgCCcryTBJ5/DuiumaeNEVudw2qPDHre15JBAHjzaE/Jy3toUeabRsspUrs/XOOje/Zo/GkxpLLhiiFNX5J304yPcXk=" >> ~/.ssh/known_hosts
 
     - name: Sync Repository to Server
-      run: rsync -avz -v --exclude '.git/' --exclude 'node_modules/' --delete-after ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/opt/docker/spring-boot/
+      run: rsync -avz -vv --exclude '.git/' --delete-after ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/opt/docker/spring-boot/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
