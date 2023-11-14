@@ -18,6 +18,11 @@
             list((pageNumber*usersPerPage)+usersPerPage, (pageNumber*usersPerPage)+usersPerPage*2-1, true)
         ">Next Page</button>
         <p id="indexNumber"></p>
+        <form id="frm" >
+            <label for="leaderboardId">Leaderboard Id:</label>
+            <input value="" id="leaderboardId" name="leaderboardId">
+
+        </form>
     </div>
     <div id="slideContainer"></div>
     <div class="pageControls2"></div>
@@ -31,6 +36,7 @@
         let numberOfUses;
         let ascending = true;
 
+
         function switchOrder() {
             ascending = !ascending;
 
@@ -38,20 +44,70 @@
 
             ascending ? cell[2].innerHTML = "Score ↑" : cell[2].innerHTML = "Score ↓";
 
-            list(pageNumber*usersPerPage, (pageNumber*usersPerPage)+usersPerPage-1, false)
+            let min = pageNumber*usersPerPage;
+            let max = (pageNumber*usersPerPage)+usersPerPage-1;
+
+            list(min, max, false)
         }
 
-        async function getUsers(min, max) {
+        function handleSubmit(e){
+            e.preventDefault();
+
+            let min = pageNumber*usersPerPage;
+            let max = (pageNumber*usersPerPage)+usersPerPage-1;
+
+            let input = document.getElementById("leaderboardId");
+
+            let value = input.value;
+
+            console.log("YEEEHAW: ", value);
+
+            getUsers(min, max, value);
+        }
+
+                        /*
+        function getLeaderboardId(event){
+            event.preventDefault();
+
+
+
+            let input = document.getElementById("leaderBoardId");
+
+            let value = input.value;
+
+            console.log("YEEEHAW: ", value);
+
+
+            //let leaderboardId = document.getElementById("leaderboardId").value;
+            console.log("Leaderboard ID: " + leaderboardId);
+            console.log(isNaN(leaderboardId));
+            //TODO: make getLeaderboardSize()
+            if (!isNaN(leaderboardId) || leaderboardId < 0 /*|| leaderboardId > getLeaderboardSize()) {
+                return 1;
+            } else {
+                return leaderboardId;
+            }
+
+        }
+        */
+
+
+        async function getUsers(min, max, leaderboardId) {
             let users = [];
+
+            if(isNaN(leaderboardId))
+                leaderboardId = 1;
+
             try {
                 const [usersRes, numberOfUsersRes] = await Promise.all([
-                    fetch(url + '?min=' + min +'&max=' + max),
+                    fetch(url + '?leaderboardId=' + leaderboardId + '&min=' + min +'&max=' + max),
                     fetch('http://localhost:8080/size')
                 ]);
 
                 // parse
                 const userList = await usersRes.json();
                 numberOfUses = await numberOfUsersRes.json();
+                console.log(userList);
 
                 // add all user data to user list
                 for(let i in userList) {
@@ -111,8 +167,8 @@
             str += '</table>';
 
             document.getElementById("slideContainer").innerHTML = str;
-            console.log("hallo2");
-            console.log(document.getElementById("leaderboard").rows.length); //wtf???? why does this not work?
+
+
         }
 
         list(pageNumber, pageNumber+usersPerPage-1, true);

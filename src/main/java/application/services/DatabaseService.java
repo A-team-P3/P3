@@ -47,18 +47,35 @@ public class DatabaseService {
         return key;
     }
 
+    // Returns a list of the members with the highest scores
     public List<Tuple> getMembersByRange(int leaderboardId, int start, int stop) {
         String leaderboardKey = leaderboardKeyString(leaderboardId);
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.exists(leaderboardKey)) {
-                return jedis.zrevrangeWithScores(leaderboardKey, start, stop);
+                if (start < stop) {
+                    return jedis.zrevrangeWithScores(leaderboardKey, start, stop);
+                } else {
+                    return jedis.zrangeWithScores(leaderboardKey, stop, start);
+                }
             }
         }
         catch(JedisException e) {
             // TODO: implement correct exception handling
             System.out.println("Error getting scores");
-            return null;
+
         }
+        return null;
+    }
+
+    public Integer getSize() {
+        try (Jedis jedis = getJedisConnection()) {
+            return Math.toIntExact(jedis.zcard("leaderboard:1"));
+        }
+        catch(JedisException e) {
+            // TODO: implement correct exception handling
+            System.out.println("Error getting size");
+        }
+        return null;
     }
 
 
@@ -72,24 +89,7 @@ public class DatabaseService {
         return countries.get(rand.nextInt(countries.size()));
     }
 
-    public Integer getSize() {
-        try (Jedis jedis = getJedisConnection()) {
-            return Math.toIntExact(jedis.zcard("leaderboard1"));
-        }
-    }
 
-    // Returns a list of the players with the highest scores
-    public List<Tuple> getPlayersByPoints(int min, int max){
-
-        try (Jedis jedis = getJedisConnection()) {
-            if (max > min) {
-                return jedis.zrevrangeWithScores("leaderboard1", min, max);
-            }
-            else {
-                return jedis.zrangeWithScores("leaderboard1", max, min);
-            }
-        }
-    }
 
     public void populateDatabase() {
         for (int i = 0; i < 100; i++) {

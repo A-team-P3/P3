@@ -23,8 +23,8 @@ public class MainController {
 
     // Gets the players with the highest scores
     @GetMapping("/users")
-    ResponseEntity<List<Tuple>> Users(@RequestParam int min, int max) {
-        return new ResponseEntity<>(databaseService.getPlayersByPoints(min, max), HttpStatus.OK);
+    ResponseEntity<List<Tuple>> Users(@RequestParam int leaderboardId, int min, int max) {
+        return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, min, max), HttpStatus.OK);
     }
 
     /*

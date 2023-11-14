@@ -58,6 +58,10 @@ button, p{
     cursor: pointer;
     margin: 25px;
 }
+form {
+    color: white;
+}
+
 table{
     font-family: cursive;
     border-collapse: collapse;
