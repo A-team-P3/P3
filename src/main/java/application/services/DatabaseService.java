@@ -24,21 +24,9 @@ public class DatabaseService {
 
     private void establishDatabaseConnection() {
         // Establishing connection to database
-        this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618);
+        this.jedisPool = new JedisPool("130.225.39.42", 6379);
         this.jedis = jedisPool.getResource();
-        this.jedis.auth("MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9"); // Add your Redis password here
-    }
-
-    private Jedis getJedisConnection() {
-        return jedis;
-    }
-
-    public JedisPool getJedisPool() {
-        return jedisPool;
-    }
-
-    public Jedis getJedis() {
-        return jedis;
+        this.jedis.auth("tJ1Y37fGm5c2A2m6jCE0"); // Add your Redis password here
     }
 
     private String randomName() {
