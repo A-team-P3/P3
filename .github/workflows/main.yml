@@ -6,7 +6,7 @@ on:
       - main  # Set this to the branch you want to deploy from
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Set up SSH
@@ -15,36 +15,18 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-        
-    - name: Check Out Repository
-      uses: actions/checkout@v2
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v2
-      with:
-        java-version: '21'
-        distribution: 'temurin'  # Use 'adopt' or 'temurin' or any other distribution
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew build
-
-    - name: Build and push Docker image
-      run: |
-        docker build -t spring-boot .
-        docker save spring-boot | bzip2 | ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "bunzip2 | docker load"
+    - name: Sync Repository to Server
+      run: rsync -avz --exclude '.git/' --exclude 'node_modules/' --delete-after ./ ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/opt/docker/spring-boot/
       env:
-        DOCKER_BUILDKIT: 1
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to Server
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "docker-compose -f /opt/docker/spring-boot/docker-compose.yml up -d"
+    - name: Build and Run on Server
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/ && ./gradlew build && docker-compose down && docker-compose up --build -d"
       env:
-        DOCKER_BUILDKIT: 1
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Clean up Gradle Cache
-      run: ./gradlew clean
-
-    - name: Clean up Docker
-      run: docker system prune -af
+    - name: Clean up Remote Gradle Cache
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/ && ./gradlew clean"
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
