@@ -47,27 +47,18 @@ public class DatabaseService {
         return key;
     }
 
-    //[100, 100:129239384:ALEXHOE, BinaryElement:Balls]
-
-    public List<Tuple> getScoresByRange(int leaderboardId, int start, int stop) {
+    public List<Tuple> getMembersByRange(int leaderboardId, int start, int stop) {
         String leaderboardKey = leaderboardKeyString(leaderboardId);
-
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.exists(leaderboardKey)) {
-                String scores = jedis.zrevrangeWithScores(leaderboardKey, start, stop).toString();
+                return jedis.zrevrangeWithScores(leaderboardKey, start, stop);
             }
-        } catch(JedisException e) {
-            // Log the exception as needed
-            System.out.println("Error getting scores");
         }
-        //Exception handling should be revised. No checks for non-existent leaderboards
-        /*
-        catch (JedisException e) {
-            // Log the exception as needed
-            return new ResponseEntity<>("Error getting scores", HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (Exception e){
-            return new ResponseEntity<>("Leaderboard does not exist", HttpStatus.INTERNAL_SERVER_ERROR);
-        }         */
+        catch(JedisException e) {
+            // TODO: implement correct exception handling
+            System.out.println("Error getting scores");
+            return null;
+        }
     }
 
 
