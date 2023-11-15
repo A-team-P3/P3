@@ -1,4 +1,6 @@
 header{
+    height: 100px;
+    padding-top: 15px;
     text-align: center;
     text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     font-size: 90px;
@@ -6,7 +8,6 @@ header{
     font-weight: 500;
     line-height: normal;
     background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 0%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
-    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -29,7 +30,7 @@ div.Center {
 }
  #slideContainer{
      height: 540px;
-     width: 1900px;
+     width: 1400px;
      overflow: auto;
      text-align: -webkit-center;
 
@@ -58,6 +59,10 @@ button, p{
     cursor: pointer;
     margin: 25px;
 }
+form {
+    color: white;
+}
+
 table{
     font-family: cursive;
     border-collapse: collapse;
