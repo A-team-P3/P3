@@ -26,7 +26,7 @@ public class MainController {
     ResponseEntity<List<Tuple>> Users(@RequestParam int leaderboardId, int min, int max) {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, min, max), HttpStatus.OK);
     }
-//remove this
+
     /*
     getUsersByRank(int min, int max, String region)
         list of users
