@@ -1,8 +1,11 @@
 # Use the official Java 21 image as a parent image
-FROM openjdk:21
+FROM eclipse-temurin:17
 
 # Set the working directory inside the container
 WORKDIR /opt/docker/spring-boot
+
+# Install xargs and other necessary tools using apk
+RUN apk add --no-cache findutils
 
 # Copy the gradle wrapper and other necessary files
 COPY gradlew .
