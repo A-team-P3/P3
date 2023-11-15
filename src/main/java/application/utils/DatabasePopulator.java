@@ -13,34 +13,31 @@ public class DatabasePopulator {
     private JedisPool jedisPool;
 
     public DatabasePopulator() {
-        // TODO: remove and make getJedisConnection() work from DatabaseService
-        this.jedisPool = new JedisPool("localhost", 6379);
-        populateDatabase();
+        // TODO: placeholder to make it work for now (to be removed)
+        this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
+        populateDatabase(2, 1000);
     }
-    // TODO: remove and make getJedisConnection() work from DatabaseService
+    // TODO: placeholder to make it work for now (to be removed)
     public Jedis getJedisConnection() {
         jedis = jedisPool.getResource();
         return jedis;
     }
 
-    public void populateDatabase() {
+    public void populateDatabase(int leaderboardId, int numberOfUsers) {
         try (Jedis jedis = getJedisConnection()) {
-            for (int i = 0; i < 5; i++) {
-                String id = userIdGenerator();
+            for (int i = 0; i < numberOfUsers; i++) {
 
-                Map<String, String> fields = new HashMap<>();
-                fields.put("id", id);
-                fields.put("name", randomName());
-                fields.put("score", String.valueOf(randomScore(1000)));
-                fields.put("country", randomCountry());
-                fields.put("region", randomRegion());
-                fields.put("timestamp", String.valueOf(randomTimestamp()));
-                jedis.hmset(id, fields);
+                String member = "";
+                int score = randomScore(1000);
+                String timestamp = String.valueOf(randomTimestamp());
+                String id = userIdGenerator();
+                member = member.concat(score + ":" + timestamp + ":" + id);
+
+                jedis.zadd("leaderboard:" + leaderboardId, score, member);
             }
         }
         catch (Exception e) {
-            System.err.println("Error populating database!");
-            System.out.println(e);
+            System.err.println(e + ": error populating database!");
         }
     }
 
