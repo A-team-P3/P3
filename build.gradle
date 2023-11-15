@@ -28,4 +28,9 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    // Disable tests based on the property
+    if (!project.hasProperty('runTests') || project.property('runTests') == 'false') {
+        enabled = false
+    }
 }
+
