@@ -1,30 +1,21 @@
 package application.utils;
 
-import application.services.DatabaseService;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.awt.image.DataBuffer;
 import java.util.*;
 
 public class DatabasePopulator {
     private Random rand = new Random();
-    private Jedis jedis;
     private JedisPool jedisPool;
 
-    public DatabasePopulator() {
-        // TODO: placeholder to make it work for now (to be removed)
-        this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
-        populateDatabase(2, 1000);
-    }
-    // TODO: placeholder to make it work for now (to be removed)
-    public Jedis getJedisConnection() {
-        jedis = jedisPool.getResource();
-        return jedis;
+    public DatabasePopulator(JedisPool jedisPool) {
+        this.jedisPool = jedisPool;
+        populateDatabase(3, 5);
     }
 
     public void populateDatabase(int leaderboardId, int numberOfUsers) {
-        try (Jedis jedis = getJedisConnection()) {
+        try (Jedis jedis = jedisPool.getResource()) {
             for (int i = 0; i < numberOfUsers; i++) {
 
                 String member = "";
