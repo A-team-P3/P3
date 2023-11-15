@@ -1,4 +1,4 @@
-# Use the official Java 21 image as a parent image
+# Use the official Java 17 image from eclipse-temurin
 FROM eclipse-temurin:17
 
 # Set the working directory inside the container
