@@ -1,31 +1,24 @@
 package application.services;
 
 import application.utils.DatabasePopulator;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+
 
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
 
     private JedisPool jedisPool;
-    private Jedis jedis;
 
     public DatabaseService() {
-        //this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
-        new DatabasePopulator();
+        this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
+        new DatabasePopulator(jedisPool);
     }
 
-    // TODO: check how we can connect in databasePopulator without 2 getJecisConnection methods
     public Jedis getJedisConnection() {
         Jedis jedis = jedisPool.getResource();
         return jedis;
