@@ -1,15 +1,24 @@
 header{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
     height: 100px;
     padding-bottom: 15px;
-    text-align: center;
     text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     font-size: 90px;
-    font-family: cursive;
-    font-weight: 500;
     line-height: normal;
     background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 0%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+.topHeader{
+    font-size: 60px;
+    width: 1000px;
+    color:yellow;
+    background:#062235;
+    text-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    -webkit-text-fill-color:yellow;
 }
 body{
     margin: 0;
@@ -33,7 +42,6 @@ div.Center {
      width: 1400px;
      overflow: auto;
      text-align: -webkit-center;
-
  }
  .pageControls{
      position: relative;
@@ -50,14 +58,29 @@ div.Center {
     background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 100%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
 }
 
-button, p{
+button{
     font-family: cursive;
+    font-size: 30px;
     display: inline-block;
-    vertical-align: middle;
     background: transparent;
-    color: white;
+    color: yellow;
     cursor: pointer;
-    margin: 25px;
+    width: 400px;
+    margin: 50px;
+    border-radius: 10px;
+}
+#back {
+    position: absolute;
+    font-size: 10px;
+    left: 0;
+    top: 0;
+    width: 100px;
+    border-radius: 10px;
+}
+.button-group{
+    position: relative;
+    width: 200px;
+    display: table;
 }
 form {
     color: white;

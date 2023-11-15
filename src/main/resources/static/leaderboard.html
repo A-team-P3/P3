@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/style.css">
+    <title>Leaderboard</title>
+</head>
+<body>
+<header>Leaderboard</header>
+<div class="Center">
+    <div class="pageControls">
+        <form id="frm" >
+            <label for="leaderboardId">Leaderboard Id:</label>
+            <input value="" id="leaderboardId" name="leaderboardId">
+
+        </form>
+        <form id="frm2" >
+            <label for="rank">Rank:</label>
+            <input value="" id="rank" name="rank">
+
+        </form>
+    </div>
+    <div id="slideContainer">
+        <table id="leaderboard"> </table>
+    </div>
+</div>
+<a href="index.html">
+    <button type="button" id="back"> Back</button>
+</a>
+<script>
+    const url = 'http://localhost:7070/';
+    let players = [];
+    let numberOfPlayers;
+    let lowestIndex;
+    let highestIndex;
+    let playersPerFetch = 50;
+    const form = document.getElementById("frm");
+    const form2 = document.getElementById("frm2");
+    let leaderboardId = 1;
+    let table = document.getElementById("leaderboard");
+
+    form.addEventListener("submit",  handleSubmit);
+    form2.addEventListener("submit",  handleSubmitRank);
+
+    function handleSubmit(e){
+        e.preventDefault();
+
+        let input = document.getElementById("leaderboardId");
+
+        leaderboardId = input.value;
+        tableClear();
+        tableInsert(0, playersPerFetch - 1);
+    }
+
+    function handleSubmitRank(e){
+        e.preventDefault();
+        let input = parseInt(document.getElementById("rank").value);
+        if (isNaN(input)) {
+            return;
+        }
+
+        getNumberOfPlayers()
+        if (input > numberOfPlayers) {
+            alert(`Search Failed: Lowest Rank: ${numberOfPlayers}`);
+            return;
+        }
+        tableClear();
+        tableInsert(input-1, input+playersPerFetch-1);
+    }
+
+    async function getNumberOfPlayers() {
+        const response2 = await fetch(url + 'size');
+        numberOfPlayers = parseInt(await response2.json());
+    }
+
+    async function getPlayers(min, max) {
+        players = [];
+        //localhost:8080/players?min=15&max=5
+        const response = await fetch(`${url}players?leaderboardId=${leaderboardId}&min=${min}&max=${max}`);
+        const data = await response.json();
+
+        for(const i in data) {
+            players.push(data[i]);
+        }
+
+    }
+
+    function tableClear(){
+        let tableHeader = table.rows[0].innerHTML;
+        table.innerHTML = "";
+        table.insertRow(0).innerHTML = tableHeader;
+        lowestIndex = undefined;
+        highestIndex = undefined;
+    }
+
+    //inserts data from API fetch into table rows
+    async function tableInsert(startRange, endRange) {
+        //console.log(`fi: ${startRange}, li: ${endRange}`)
+        if (startRange < 0) {
+            startRange = 0;
+            if (endRange < 0) {
+                //console.log("Both indexes less then 0");
+                return;
+            }
+        }
+        //checks if first call
+        if (lowestIndex === undefined) {
+            lowestIndex = startRange;
+        }
+        if (highestIndex === undefined) {
+            highestIndex = endRange+1;
+        }
+        //get number of users, should be improved so its called less
+        await getNumberOfPlayers()
+
+        await getPlayers(startRange, endRange);
+        if (players.length === 0) {
+            return;
+        }
+        let counter = startRange;
+        let rows = table.rows.length
+        if (startRange < lowestIndex) {
+            //console.log("XDDDDDDDDDDD");
+            rows = 1;
+        }
+        for (let i = 0; i < players.length; i++) {
+            //console.log("index: " + i);
+            counter++;
+            table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].element + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
+        }
+        //console.log(`li: ${lowestIndex}, hi: ${highestIndex}`)
+        if (startRange < lowestIndex) {
+            lowestIndex = startRange;
+        }
+        if (endRange > highestIndex) {
+            highestIndex = counter;
+        }
+
+
+    }
+
+    table.insertRow(0).innerHTML = '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + "score" + '</th></tr></thead><tbody></tbody>'
+
+    //lowestIndex = 299; highestIndex = 299+usersPerFetch;
+    tableInsert(0, playersPerFetch - 1);
+
+    const div = document.querySelector("#slideContainer")
+
+    div.addEventListener("scroll", () => {
+            //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
+            if (Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < 1) {
+                //console.log("highest index: " + highestIndex);
+                tableInsert(highestIndex, highestIndex+playersPerFetch-1);
+            }
+            if (div.scrollTop < 1 && lowestIndex > playersPerFetch/2) {
+                //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
+                div.scrollTop = 75;
+                //console.log(table.rows[10].scrollTop);
+                tableInsert(lowestIndex-playersPerFetch, lowestIndex-1);
+            }
+        },
+        {
+            passive: true
+        }
+    );
+
+
+
+</script>
+
+</body>
+</html>
