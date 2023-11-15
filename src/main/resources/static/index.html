@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/style.css">
     <title>Leaderboard</title>
@@ -10,176 +9,151 @@
 <div class="Center">
     <header>Leaderboard</header>
     <div class="pageControls">
-        <button onclick="
-            list((pageNumber*usersPerPage)-usersPerPage, (pageNumber*usersPerPage)-1, true)
-        ">Last Page</button>
-        <p id="pageNumber"></p>
-        <button onclick="
-            list((pageNumber*usersPerPage)+usersPerPage, (pageNumber*usersPerPage)+usersPerPage*2-1, true)
-        ">Next Page</button>
-        <p id="indexNumber"></p>
         <form id="frm" >
             <label for="leaderboardId">Leaderboard Id:</label>
             <input value="" id="leaderboardId" name="leaderboardId">
 
         </form>
     </div>
-    <div id="slideContainer"></div>
-    <div class="pageControls2"></div>
+    <div id="slideContainer">
+        <table id="leaderboard"> </table>
+    </div>
 </div>
+<script>
 
-    <script>
-        "use strict";
-        const form = document.getElementById("frm");
-        const url = 'http://localhost:8080/users';
-        let pageNumber = 0;
-        const usersPerPage = 50;
-        let numberOfUses;
-        let ascending = true;
+    const url = 'http://localhost:8080/'
+    let users = [];
+    let numberOfUsers;
+    let lowestIndex;
+    let highestIndex;
+    let usersPerFetch = 50;
+    const form = document.getElementById("frm");
+    let leaderboardId = 1;
+    let table = document.getElementById("leaderboard");
+
+    form.addEventListener("submit",  handleSubmit);
+
+    function handleSubmit(e){
+        e.preventDefault();
+
+        let input = document.getElementById("leaderboardId");
+
+        leaderboardId = input.value;
+        tableClear();
+        tableInsert(0, usersPerFetch-1);
+    }
 
 
-        function switchOrder() {
-            ascending = !ascending;
 
-            const cell = document.getElementById("leaderboard").rows[0].cells;
+    async function getNumberOfUsers() {
+        const response2 = await fetch(url + 'size');
+        numberOfUsers = await response2.json();
+    }
 
-            ascending ? cell[2].innerHTML = "Score ↑" : cell[2].innerHTML = "Score ↓";
+    async function getUsers(min, max) {
+        users = [];
+        //localhost:8080/users?min=15&max=5
+        const response = await fetch(`${url}users?leaderboardId=${leaderboardId}&min=${min}&max=${max}`);
+        const data = await response.json();
 
-            let min = pageNumber*usersPerPage;
-            let max = (pageNumber*usersPerPage)+usersPerPage-1;
 
-            list(min, max, false)
+
+        for(const i in data) {
+            users.push(data[i]);
         }
 
-        form.addEventListener("submit",  handleSubmit);
+    }
 
-        function handleSubmit(e){
-            e.preventDefault();
+    function tableClear(){
+        let tableHeader = table.rows[0].innerHTML;
+        table.innerHTML = "";
+        table.insertRow(0).innerHTML = tableHeader;
+    }
 
-            let min = pageNumber*usersPerPage;
-            let max = (pageNumber*usersPerPage)+usersPerPage-1;
-
-            let input = document.getElementById("leaderboardId");
-
-            let value = input.value;
-
-            console.log("YEEEHAW: ", value);
-
-            getUsers(min, max, value);
-        }
-
-                        /*
-        function getLeaderboardId(event){
-            event.preventDefault();
-
-
-
-            let input = document.getElementById("leaderBoardId");
-
-            let value = input.value;
-
-            console.log("YEEEHAW: ", value);
-
-
-            //let leaderboardId = document.getElementById("leaderboardId").value;
-            console.log("Leaderboard ID: " + leaderboardId);
-            console.log(isNaN(leaderboardId));
-            //TODO: make getLeaderboardSize()
-            if (!isNaN(leaderboardId) || leaderboardId < 0 /*|| leaderboardId > getLeaderboardSize()) {
-                return 1;
-            } else {
-                return leaderboardId;
-            }
-
-        }
-        */
-
-
-        async function getUsers(min, max, leaderboardId) {
-            let users = [];
-
-            if(isNaN(leaderboardId))
-                leaderboardId = 1;
-
-            try {
-                const [usersRes, numberOfUsersRes] = await Promise.all([
-                    fetch(url + '?leaderboardId=' + leaderboardId + '&min=' + min +'&max=' + max),
-                    fetch('http://localhost:8080/size')
-                ]);
-
-                // parse
-                const userList = await usersRes.json();
-                numberOfUses = await numberOfUsersRes.json();
-                console.log(userList);
-
-                // add all user data to user list
-                for(let i in userList) {
-                    users.push(userList[i]);
-                }
-
-                // return user list
-                return users;
-
-            } catch (error) {
-                console.error('Error fetching data:', error);
+    //inserts data from API fetch into table rows
+    async function tableInsert(startRange, endRange) {
+        //console.log(`fi: ${startRange}, li: ${endRange}`)
+        if (startRange < 0) {
+            startRange = 0;
+            if (endRange < 0) {
+                //console.log("Both indexes less then 0");
+                return;
             }
         }
-
-        async function list(min, max, incrementPage) {
-
-            if (min < 0) return; // sker det her??
-
-            if (!ascending) {
-                let temp = max;
-                max = min;
-                min = temp;
-            }
-            const users = await getUsers(min, max);
-
-            // if db is empty
-            if (users.length === 0) return;
-
-            incrementPage && min/usersPerPage > pageNumber ? pageNumber++ : pageNumber--;
-
-            document.getElementById("pageNumber").innerHTML = "Page: " + (pageNumber+1) + " of " + (Math.ceil(numberOfUses/usersPerPage))
-            let counter;
-            if (ascending) {
-                counter = min;
-                document.getElementById("indexNumber").innerHTML = "User: " + (counter+1) + " - " + ((counter)-(min-max)+1) + " of " + (numberOfUses).toLocaleString();
-            } else {
-                counter = numberOfUses-max+1;
-                document.getElementById("indexNumber").innerHTML = "User: " + ((counter)-(min-max)-1) + " - " + (counter-1) + " of " + (numberOfUses).toLocaleString();
-            }
-            let score;
-            if (document.getElementById("leaderboard") != null) {
-                score = document.getElementById("leaderboard").rows[0].cells[2].innerHTML;
-            }
-            else {
-                score = "Score ↑";
-            }
-            let str = '<table id="leaderboard">';
-
-            str += '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + score + '</th></tr></thead>'
-            users.forEach((user) => {
-
-                ascending ? counter++ : counter-- ;
-
-                str += '<tr><td>' + counter.toLocaleString() +'</td><td>'+ user.element + '</td><td>' + user.score.toLocaleString() + '</td></tr>';
-            });
-
-            str += '</table>';
-
-            document.getElementById("slideContainer").innerHTML = str;
-
-
+        //checks if first call
+        if (lowestIndex === undefined) {
+            lowestIndex = startRange;
+        }
+        if (highestIndex === undefined) {
+            highestIndex = endRange+1;
+        }
+        //get number of users, should be improved so its called less
+        await getNumberOfUsers()
+        //check if last index reached
+        if (endRange > highestIndex && highestIndex == numberOfUsers) {
+            return;
+        }
+        //check if end of requested range is above the number of users in the database
+        if (endRange > numberOfUsers) {
+            //set the range to the last index in the database
+            // (if database has 400 users, and 390 to 440 is called, it sets index to 399
+            endRange = numberOfUsers-1;
+        }
+        await getUsers(startRange, endRange);
+        if (users.length === 0) {
+            return;
+        }
+        let counter = startRange;
+        let rows = table.rows.length
+        if (startRange < lowestIndex) {
+            //console.log("XDDDDDDDDDDD");
+            rows = 1;
+        }
+        for (let i = 0; i < users.length; i++) {
+            //console.log("index: " + i);
+            counter++;
+            table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + users[i].element + '</td><td>' + users[i].score.toLocaleString() + '</td></tr>';
+        }
+        //console.log(`li: ${lowestIndex}, hi: ${highestIndex}`)
+        if (startRange < lowestIndex) {
+            lowestIndex = startRange;
+        }
+        if (endRange > highestIndex) {
+            highestIndex = counter;
         }
 
-        list(pageNumber, pageNumber+usersPerPage-1, true);
-        $(".pageControls").clone().appendTo(".pageControls2");
+
+    }
+
+    table.insertRow(0).innerHTML = '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + "score" + '</th></tr></thead><tbody></tbody>'
+
+    //lowestIndex = 299; highestIndex = 299+usersPerFetch;
+    tableInsert(0, usersPerFetch-1);
+
+
+    const div = document.querySelector("#slideContainer")
+
+    div.addEventListener("scroll", () => {
+            //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
+            if (Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < 1) {
+                //console.log("highest index: " + highestIndex);
+                tableInsert(highestIndex, highestIndex+usersPerFetch-1);
+            }
+            if (div.scrollTop < 1 && lowestIndex > usersPerFetch/2) {
+                //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
+                div.scrollTop = 75;
+                //console.log(table.rows[10].scrollTop);
+                tableInsert(lowestIndex-usersPerFetch, lowestIndex-1);
+            }
+        },
+        {
+            passive: true
+        }
+    );
 
 
 
-    </script>
+</script>
 
 </body>
 </html>
