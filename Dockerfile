@@ -2,13 +2,18 @@
 FROM openjdk:21
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /opt/docker/spring-boot
 
-# Copy the gradle build file into the container
+# Copy the gradle wrapper and other necessary files
+COPY gradlew .
+COPY gradle gradle
 COPY build.gradle .
 
+# Set the execute permission on the Gradle wrapper
+RUN chmod +x gradlew
+
 # Copy the source code into the container
-COPY src /app/src
+COPY src src
 
 # Build the application
 RUN ./gradlew build
