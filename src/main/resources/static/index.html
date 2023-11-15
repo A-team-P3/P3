@@ -21,7 +21,7 @@
 </div>
 <script>
 
-    const url = 'http://localhost:8080/'
+    const url = 'http://localhost:7070/'
     let players = [];
     let numberOfPlayers;
     let lowestIndex;
@@ -85,16 +85,7 @@
         }
         //get number of users, should be improved so its called less
         await getNumberOfPlayers()
-        //check if last index reached
-        if (endRange > highestIndex && highestIndex == numberOfPlayers) {
-            return;
-        }
-        //check if end of requested range is above the number of users in the database
-        if (endRange > numberOfPlayers) {
-            //set the range to the last index in the database
-            // (if database has 400 users, and 390 to 440 is called, it sets index to 399
-            endRange = numberOfPlayers - 1;
-        }
+
         await getPlayers(startRange, endRange);
         if (players.length === 0) {
             return;
