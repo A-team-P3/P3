@@ -90,7 +90,7 @@
         //get number of users, should be improved so its called less
         await getNumberOfUsers()
         //check if last index reached
-        if (endRange > highestIndex && highestIndex === numberOfUsers) {
+        if (endRange > highestIndex && highestIndex == numberOfUsers) {
             return;
         }
         //check if end of requested range is above the number of users in the database
