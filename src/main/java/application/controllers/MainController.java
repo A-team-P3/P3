@@ -22,8 +22,8 @@ public class MainController {
     }
 
     // Gets the players with the highest scores
-    @GetMapping("/users")
-    ResponseEntity<List<Tuple>> Users(@RequestParam int leaderboardId, int min, int max) {
+    @GetMapping("/players")
+    ResponseEntity<List<Tuple>> players(@RequestParam int leaderboardId, int min, int max) {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, min, max), HttpStatus.OK);
     }
 
@@ -41,14 +41,14 @@ public class MainController {
         number of players
      */
     @GetMapping("/size")
-    ResponseEntity<Integer> Size() {
+    ResponseEntity<Integer> size() {
         return new ResponseEntity<>(databaseService.getSize(), HttpStatus.OK);
     }
 
 
     //Error
     @GetMapping("/error")
-    String Error(){
+    String error(){
         return "Bad luck, u fucked it up";
     }
 }
