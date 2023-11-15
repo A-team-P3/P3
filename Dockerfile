@@ -4,9 +4,6 @@ FROM eclipse-temurin:17
 # Set the working directory inside the container
 WORKDIR /opt/docker/spring-boot
 
-# Install xargs and other necessary tools using apk
-RUN apk add --no-cache findutils
-
 # Update package lists and install findutils
 RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
 
