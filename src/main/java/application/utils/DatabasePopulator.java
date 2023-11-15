@@ -1,8 +1,48 @@
 package application.utils;
 
-import java.util.Random;
+import application.services.DatabaseService;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
+import java.awt.image.DataBuffer;
+import java.util.*;
 
 public class DatabasePopulator {
+    private Random rand = new Random();
+    private Jedis jedis;
+    private JedisPool jedisPool;
+
+    public DatabasePopulator() {
+        // TODO: remove and make getJedisConnection() work from DatabaseService
+        this.jedisPool = new JedisPool("localhost", 6379);
+        populateDatabase();
+    }
+    // TODO: remove and make getJedisConnection() work from DatabaseService
+    public Jedis getJedisConnection() {
+        jedis = jedisPool.getResource();
+        return jedis;
+    }
+
+    public void populateDatabase() {
+        try (Jedis jedis = getJedisConnection()) {
+            for (int i = 0; i < 5; i++) {
+                String id = userIdGenerator();
+
+                Map<String, String> fields = new HashMap<>();
+                fields.put("id", id);
+                fields.put("name", randomName());
+                fields.put("score", String.valueOf(randomScore(1000)));
+                fields.put("country", randomCountry());
+                fields.put("region", randomRegion());
+                fields.put("timestamp", String.valueOf(randomTimestamp()));
+                jedis.hmset(id, fields);
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error populating database!");
+            System.out.println(e);
+        }
+    }
 
     private String userIdGenerator() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
@@ -15,5 +55,38 @@ public class DatabasePopulator {
         }
 
         return userId.toString();
+    }
+
+    private String randomName() {
+        List<String> nouns = Arrays.asList("Gamer", "Love", "Life", "Priest", "Pilot", "Business", "Officer", "Eater", "trafficker", "Dragon", "Swan", "Season", "Hawk", "Peasant", "Lizard", "Time", "Bamboo", "Licker", "Robber", "Painter", "Bone", "Juice", "Party", "Preacher", "Picker", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert", "Slut", "Hunter");
+        List<String> adjectives = Arrays.asList("Mystic", "Elite", "Distinguished", "Mighty", "Big", "Tiny", "Filthy", "Lanky", "Fearful", "Slow", "Striking", "Slime", "Speedy", "Unlucky", "Sweaty", "Floppy", "Sad", "Steady", "Child", "Rat", "Lone", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky", "Clumsy", "Satanic", "Unwashed", "Conservative");
+        int noun = rand.nextInt(nouns.size());
+        int adjective = rand.nextInt(adjectives.size());
+        int number = rand.nextInt(100);
+
+        return  adjectives.get(adjective) + nouns.get(noun) + number;
+    }
+
+    private int randomScore(int bound) {
+        return rand.nextInt(bound);
+
+    }
+
+    private String randomCountry() {
+        List<String> countries = Arrays.asList("DK", "SE", "GE", "UK", "US", "RU", "NO", "JP", "CH");
+        return countries.get(rand.nextInt(countries.size()));
+    }
+
+    private String randomRegion() {
+        List<String> regions = Arrays.asList("EU", "NA", "AS", "SA");
+        return regions.get(rand.nextInt(regions.size()));
+    }
+
+    // Random timestamp between 01/01-2020 and 01/01-2024
+    private long randomTimestamp() {
+        long min = 1577836800L;             // 01/01-2020
+        long max = 1735689600L;             // 01/01-2024
+        long timeDifference = max - min;    // 1735689600 - 1577836800 = 158_852_800
+        return min + (long) (Math.random() * timeDifference);   // e.x. 1577836800 + (0.5 * 158_852_800) = 164_676_240 = 01/07-2022
     }
 }
