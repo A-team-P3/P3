@@ -1,5 +1,6 @@
 package application.services;
 
+import application.utils.DatabasePopulator;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -16,32 +17,20 @@ import java.util.Random;
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
 
-    private Random rand = new Random();
     private JedisPool jedisPool;
     private Jedis jedis;
 
     public DatabaseService() {
-        this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
-        //populateDatabase();
+        //this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
+        new DatabasePopulator();
     }
-    private Jedis getJedisConnection() {
-        Jedis jedis = jedisPool.getResource();// Add your Redis password here
+
+    // TODO: check how we can connect in databasePopulator without 2 getJecisConnection methods
+    public Jedis getJedisConnection() {
+        Jedis jedis = jedisPool.getResource();
         return jedis;
     }
-    private String randomName() {
-        List<String> nouns = Arrays.asList("Gamer", "Love", "Life", "Priest", "Pilot", "Business", "Officer", "Eater", "trafficker", "Dragon", "Swan", "Season", "Hawk", "Peasant", "Lizard", "Time", "Bamboo", "Licker", "Robber", "Painter", "Bone", "Juice", "Party", "Preacher", "Picker", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert", "Slut", "Hunter");
-        List<String> adjectives = Arrays.asList("Mystic", "Elite", "Distinguished", "Mighty", "Big", "Tiny", "Filthy", "Lanky", "Fearful", "Slow", "Striking", "Slime", "Speedy", "Unlucky", "Sweaty", "Floppy", "Sad", "Steady", "Child", "Rat", "Lone", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky", "Clumsy", "Satanic", "Unwashed", "Conservative");
-        int noun = rand.nextInt(nouns.size());
-        int adjective = rand.nextInt(adjectives.size());
-        int number = rand.nextInt(100);
 
-        return  adjectives.get(adjective) + nouns.get(noun) + number;
-    }
-
-    private int randomScore(int bound) {
-        return rand.nextInt(bound);
-
-    }
     private String leaderboardKeyString (int leaderboardId) {
         String key = "leaderboard:" + leaderboardId;
         return key;
@@ -77,24 +66,4 @@ public class DatabaseService {
         }
         return null;
     }
-
-
-    private String randomRegion() {
-        List<String> regions = Arrays.asList("EU", "NA", "AS", "SA");
-        return regions.get(rand.nextInt(regions.size()));
-    }
-
-    private String randomCountry() {
-        List<String> countries = Arrays.asList("DK", "SE", "GE", "UK", "US", "RU", "NO", "JP", "CH");
-        return countries.get(rand.nextInt(countries.size()));
-    }
-
-
-
-    public void populateDatabase() {
-        for (int i = 0; i < 100; i++) {
-            jedis.zadd("leaderboard1", randomScore(10000), String.format(randomName()));
-        }
-    }
-
 }
