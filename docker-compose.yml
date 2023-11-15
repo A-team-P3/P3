@@ -8,10 +8,3 @@ services:
       - /opt/docker/spring-boot:/app
     environment:
       - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-    depends_on:
-      - redis
-
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
