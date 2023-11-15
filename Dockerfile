@@ -7,6 +7,9 @@ WORKDIR /opt/docker/spring-boot
 # Install xargs and other necessary tools using apk
 RUN apk add --no-cache findutils
 
+# Update package lists and install findutils
+RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
+
 # Copy the gradle wrapper and other necessary files
 COPY gradlew .
 COPY gradle gradle
