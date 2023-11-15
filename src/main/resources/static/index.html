@@ -41,6 +41,8 @@
         leaderboardId = input.value;
         tableClear();
         tableInsert(0, playersPerFetch - 1);
+        lowestIndex = undefined;
+        highestIndex = undefined;
     }
 
     async function getNumberOfPlayers() {
