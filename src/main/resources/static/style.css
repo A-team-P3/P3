@@ -1,49 +1,45 @@
 header{
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, 50%);
-    height: 100px;
+    height: 10vh;
     padding-bottom: 15px;
     text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-    font-size: 90px;
+    font-size: 10vh;
     line-height: normal;
     background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 0%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .topHeader{
-    font-size: 60px;
-    width: 1000px;
+    font-size: 6vh;
+    width: 120vh;
     color:yellow;
     background:#062235;
     text-shadow: 0 0px 0px rgba(0, 0, 0, 0);
     -webkit-text-fill-color:yellow;
 }
 body{
-    margin: 0;
-    padding: 0;
     background: #062235;
     height: 99vh;
     width: 200vh;
-    justify-content: center;
-    align-items: center;
     display: flex;
     overflow: hidden;
 }
 div.Center {
+    height: 99vh;
+    text-align: -webkit-center;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
  #slideContainer{
-     height: 540px;
-     width: 1400px;
+     height: 50vh;
+     width: 170vh;
      overflow: auto;
      text-align: -webkit-center;
  }
  .pageControls{
+     height: 5vh;
+     width: 170vh;
      position: relative;
      text-align: -webkit-center;
  }
@@ -71,15 +67,15 @@ button{
 }
 #back {
     position: absolute;
-    font-size: 10px;
+    font-size: 2vh;
     left: 0;
     top: 0;
-    width: 100px;
+    width: 10vh;
     border-radius: 10px;
 }
 .button-group{
-    position: relative;
-    width: 200px;
+    position: absolute;
+    top: 30%;
     display: table;
 }
 form {
