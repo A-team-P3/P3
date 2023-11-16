@@ -38,6 +38,7 @@ div.Center {
      text-align: -webkit-center;
  }
  .pageControls{
+     padding-bottom: 1vh;
      height: 5vh;
      width: 170vh;
      position: relative;
