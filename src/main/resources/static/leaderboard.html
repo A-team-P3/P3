@@ -6,8 +6,10 @@
     <title>Leaderboard</title>
 </head>
 <body>
-<div class="Center">
-<header>Leaderboard</header>
+
+<header><a href="index.html">
+    <button class="back-button" type="button" id="back"> Back</button>
+</a>Leaderboard</header>
     <div class="pageControls">
         <form id="frm" >
             <label for="leaderboardId">Leaderboard Id:</label>
@@ -23,10 +25,6 @@
     <div id="slideContainer">
         <table id="leaderboard"> </table>
     </div>
-</div>
-<a href="index.html">
-    <button type="button" id="back"> Back</button>
-</a>
 <script>
     const url = 'http://localhost:7070/';
     let players = [];
