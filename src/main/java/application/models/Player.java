@@ -1,37 +1,42 @@
 package application.models;
 
-public class Player {
-    private int id;
-    private String name;
-    private String score;
-    private String country;
-    private String region;
+import java.time.LocalDate;
+import java.util.Date;
 
-    public Player(int id, String name, String score, String country, String region) {
+public class Player {
+    private String id;
+    private String name;
+    private String region;
+    private LocalDate creationDate;
+
+    //Make new player constructor
+    public Player(String id, String name, String region) {
         this.id = id;
         this.name = name;
-        this.score = score;
-        this.country = country;
         this.region = region;
+        this.creationDate = LocalDate.now();
+    }
+    //Update player constructor; Used when pulling a player from Redis
+    public Player(String id, String name, String region, LocalDate creationDate) {
+        this.id = id;
+        this.name = name;
+        this.region = region;
+        this.creationDate = creationDate;
     }
 
-    public int getId() {
+
+
+
+    public String getId() {
         return id;
     }
-
     public String getName() {
         return name;
     }
-
-    public String getScore() {
-        return score;
-    } // was INT
-
-    public String getCountry() {
-        return country;
-    }
-
     public String getRegion() {
         return region;
+    }
+    public LocalDate getCreationDate() {
+        return creationDate;
     }
 }

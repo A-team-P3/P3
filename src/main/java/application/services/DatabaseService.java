@@ -1,12 +1,17 @@
 package application.services;
 
+import application.models.Player;
 import application.utils.DatabasePopulator;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
+
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service //Service for interacting with the database to get user data
@@ -59,4 +64,35 @@ public class DatabaseService {
         }
         return null;
     }
+    /*
+        public Player(int id, String name, String score, String country, String region) {
+        this.id = id;
+        this.name = name;
+        this.score = score;
+        this.region = region;
+    }
+     */
+    public void setPlayer(Player playerObject) {
+        try (Jedis jedis = getJedisConnection()) {
+            String key = "players:" + playerObject.getId();
+            Map<String, String> hash = new HashMap<>();
+            hash.put("id", playerObject.getId());
+            hash.put("name", playerObject.getName());
+            hash.put("region", playerObject.getRegion());
+            hash.put("creationDate", playerObject.getCreationDate().toString());
+            jedis.hset(key, hash);
+        }
+    }
+    public Player getPlayer(String id) {
+        try (Jedis jedis = getJedisConnection()) {
+            Map<String,String> playerString = jedis.hgetAll("players:" + id);
+            return new Player(
+                    playerString.get("id"),
+                    playerString.get("name"),
+                    playerString.get("region"),
+                    LocalDate.parse(playerString.get("creationDate"))
+            );
+        }
+    }
+
 }
