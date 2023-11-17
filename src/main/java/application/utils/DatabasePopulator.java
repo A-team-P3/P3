@@ -2,6 +2,7 @@ package application.utils;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
 import java.util.*;
 
 public class DatabasePopulator {
@@ -10,7 +11,7 @@ public class DatabasePopulator {
 
     public DatabasePopulator(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
-        //populateDatabase(3, 5);
+        populateDatabase(3, 5);
     }
 
     public void populateDatabase(int leaderboardId, int numberOfUsers) {

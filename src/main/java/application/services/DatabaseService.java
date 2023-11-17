@@ -2,9 +2,11 @@ package application.services;
 
 import application.models.Player;
 import application.utils.DatabasePopulator;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
@@ -23,6 +25,7 @@ public class DatabaseService {
         this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
         new DatabasePopulator(jedisPool);
     }
+
 
     public Jedis getJedisConnection() {
         Jedis jedis = jedisPool.getResource();
