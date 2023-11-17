@@ -60,4 +60,58 @@ public class DatabaseService {
         }
         return null;
     }
+
+    public String setScore(String playerId, int newScore, int leaderboardId) {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        try (Jedis jedis = getJedisConnection()) {
+            if(isPlayerExisting(playerId, leaderboardId)) {
+                // Get value of playerId from hashSet leaderboard
+                String initialHashValue = jedis.hget("hashLeaderboard:" + leaderboardId, playerId);
+
+                // Use hashValue value to get the existing score of the playerId
+                List<Double> existingScore = jedis.zmscore("sortedLeaderboard:" + leaderboardId, initialHashValue);
+                if (existingScore.get(0) < newScore) {
+                    // Update leaderboard hash with score
+
+                    jedis.hset("hashLeaderboard:" + leaderboardId, playerId, newScore + ":" + timestamp + ":" + playerId);
+
+                    // Remove existing score in sorted set with initial hashValue
+                    jedis.zrem("sortedLeaderboard:" + leaderboardId, initialHashValue);
+
+                    // Get the new hashValue
+                    String newHashValue = jedis.hget("hashLeaderboard:" + leaderboardId, playerId);
+
+                    // Update sortedSet leaderboard with new HashValue
+                    jedis.zadd("sortedLeaderboard:" + leaderboardId, newScore, newHashValue);
+                    return "Score changed";
+                }
+                else
+                    return "The player's existing score is higher!";
+            }
+            else {
+                // Add non-existing player to the leaderboard
+                jedis.hset("leaderboard:" + leaderboardId, playerId, newScore + ":" + timestamp + ":" + playerId);
+                jedis.zadd("sortedLeaderboard:" + leaderboardId, newScore, newScore + ":" + timestamp + ":" + playerId);
+                return "Player does not exist and is therefore added to the leaderboard";
+            }
+        }
+        catch (JedisException e) {
+            System.out.println(e + ": error setting score!");
+        }
+        return null;
+    }
+
+    public boolean isPlayerExisting(String playerId, int leaderboardId) {
+        try (Jedis jedis = getJedisConnection()) {
+            if (jedis.hexists("leaderboard:" + leaderboardId, playerId)) {
+                return true;
+            }
+        }
+        catch (JedisException e) {
+            System.err.println(e + ": error checking if player exists!");
+        }
+        return false;
+    }
+
 }

@@ -27,6 +27,11 @@ public class MainController {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, min, max), HttpStatus.OK);
     }
 
+    @GetMapping("/setScore")
+    ResponseEntity<String> setScore(@RequestParam String playerId, int newScore, int leaderboardId) {
+        // Sends back a string with the new score
+        return new ResponseEntity<>(databaseService.setScore(playerId, newScore, leaderboardId), HttpStatus.OK);
+    }
     /*
     getUsersByRank(int min, int max, String region)
         list of users
