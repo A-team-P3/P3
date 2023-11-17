@@ -20,6 +20,7 @@ dependencies {
 	// tag::tests[]
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	// end::tests[]
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 test {
