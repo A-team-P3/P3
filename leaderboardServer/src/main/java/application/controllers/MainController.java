@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.resps.Tuple;
@@ -27,7 +28,7 @@ public class MainController {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, min, max), HttpStatus.OK);
     }
 
-    @GetMapping("/setScore")
+    @PostMapping("/setScore")
     ResponseEntity<String> setScore(@RequestParam String playerId, int newScore, int leaderboardId) {
         // Sends back a string with the new score
         return new ResponseEntity<>(databaseService.setScore(playerId, newScore, leaderboardId), HttpStatus.OK);
