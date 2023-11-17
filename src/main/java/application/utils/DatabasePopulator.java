@@ -10,7 +10,7 @@ public class DatabasePopulator {
 
     public DatabasePopulator(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
-        //populateDatabase(3, 5);
+        //populateDatabase(2, 7);
     }
 
     public void populateDatabase(int leaderboardId, int numberOfUsers) {
@@ -23,7 +23,8 @@ public class DatabasePopulator {
                 String id = userIdGenerator();
                 member = member.concat(score + ":" + timestamp + ":" + id);
 
-                jedis.zadd("leaderboard:" + leaderboardId, score, member);
+                jedis.zadd("sortedLeaderboard:" + leaderboardId, score, member);
+                jedis.hset("hashLeaderboard:" + leaderboardId, id, score + ":" + timestamp + ":" + id);
             }
         }
         catch (Exception e) {
