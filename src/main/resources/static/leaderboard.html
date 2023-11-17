@@ -45,9 +45,16 @@
     function handleSubmit(e){
         e.preventDefault();
 
-        let input = document.getElementById("leaderboardId");
+        let input = parseInt(document.getElementById("leaderboardId").value);
+        if (isNaN(input)) {
+            return;
+        }
+        if (input < 1) {
+            alert("LeaderboardID below 1 does not exist");
+            return;
+        }
 
-        leaderboardId = input.value;
+        leaderboardId = input;
         tableClear();
         tableInsert(0, playersPerFetch - 1);
     }
@@ -62,6 +69,10 @@
         getNumberOfPlayers()
         if (input > numberOfPlayers) {
             alert(`Search Failed: Lowest Rank: ${numberOfPlayers}`);
+            return;
+        }
+        if (input < 1) {
+            alert("Rank below 1 does not exist");
             return;
         }
         tableClear();
