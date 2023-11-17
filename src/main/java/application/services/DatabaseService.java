@@ -49,9 +49,10 @@ public class DatabaseService {
         return null;
     }
 
-    public Integer getSize() {
+    public Integer getSize(int leaderboardId) {
+        String leaderboardKey = leaderboardKeyString(leaderboardId);
         try (Jedis jedis = getJedisConnection()) {
-            return Math.toIntExact(jedis.zcard("leaderboard:1"));
+            return Math.toIntExact(jedis.zcard(leaderboardKey));
         }
         catch(JedisException e) {
             // TODO: implement correct exception handling

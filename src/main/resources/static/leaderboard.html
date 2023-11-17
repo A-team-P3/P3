@@ -69,7 +69,7 @@
     }
 
     async function getNumberOfPlayers() {
-        const response2 = await fetch(url + 'size');
+        const response2 = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
         numberOfPlayers = parseInt(await response2.json());
     }
 

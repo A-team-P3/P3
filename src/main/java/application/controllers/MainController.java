@@ -41,8 +41,8 @@ public class MainController {
         number of players
      */
     @GetMapping("/size")
-    ResponseEntity<Integer> size() {
-        return new ResponseEntity<>(databaseService.getSize(), HttpStatus.OK);
+    ResponseEntity<Integer> size(@RequestParam int leaderboardId) {
+        return new ResponseEntity<>(databaseService.getSize(leaderboardId), HttpStatus.OK);
     }
 
 
