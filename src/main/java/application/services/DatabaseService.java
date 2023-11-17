@@ -63,27 +63,28 @@ public class DatabaseService {
 
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
-
+        String hashKey = "hashLeaderboard:" + leaderboardId;
+        String sortedSetKey = "sortedLeaderboard:" + leaderboardId;
         try (Jedis jedis = getJedisConnection()) {
             if(isPlayerExisting(playerId, leaderboardId)) {
                 // Get value of playerId from hashSet leaderboard
-                String initialHashValue = jedis.hget("hashLeaderboard:" + leaderboardId, playerId);
+                String initialHashValue = jedis.hget(hashKey, playerId);
 
                 // Use hashValue value to get the existing score of the playerId
-                List<Double> existingScore = jedis.zmscore("sortedLeaderboard:" + leaderboardId, initialHashValue);
+                List<Double> existingScore = jedis.zmscore(sortedSetKey, initialHashValue);
                 if (existingScore.get(0) < newScore) {
                     // Update leaderboard hash with score
 
-                    jedis.hset("hashLeaderboard:" + leaderboardId, playerId, newScore + ":" + timestamp + ":" + playerId);
+                    jedis.hset(hashKey, playerId, newScore + ":" + timestamp + ":" + playerId);
 
                     // Remove existing score in sorted set with initial hashValue
-                    jedis.zrem("sortedLeaderboard:" + leaderboardId, initialHashValue);
+                    jedis.zrem(sortedSetKey, initialHashValue);
 
                     // Get the new hashValue
-                    String newHashValue = jedis.hget("hashLeaderboard:" + leaderboardId, playerId);
+                    String newHashValue = jedis.hget(hashKey, playerId);
 
                     // Update sortedSet leaderboard with new HashValue
-                    jedis.zadd("sortedLeaderboard:" + leaderboardId, newScore, newHashValue);
+                    jedis.zadd(sortedSetKey, newScore, newHashValue);
                     return "Score changed";
                 }
                 else
