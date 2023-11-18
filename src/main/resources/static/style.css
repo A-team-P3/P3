@@ -157,6 +157,10 @@ thead tr th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+tr:nth-child(odd){
+    color: #dddddd;
+}
 table.no {
     margin: auto;
 }
