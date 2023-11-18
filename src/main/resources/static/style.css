@@ -1,18 +1,24 @@
+@font-face {
+    font-family: Montserrat;
+    src: url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;900&family=Open+Sans&family=Play&display=swap');
+}
+
 :root {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    --primary: #c77e19;
-    --primary-hover: #e7a03e;
-    --secondary: crimson;
-    --background: #221a1a;
-    --dark: #2d2626;
+    font-family: Montserrat, sans-serif;
+    --primary: #3663a9;
+    --primary-hover: #427bce;
+    --secondary: #4c625c;
+    --background: #252525;
+    --dark: #232f44;
     --white: #ececec;
     --gray: #b6b6b6;
+    --black: black;
 }
 
 html, body{
-    overflow-x: hidden;
     background-color: var(--background);
 
 }
@@ -24,7 +30,7 @@ a, button {
 header{
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     width: 100%;
     height: auto;
     padding: 1rem 0 1rem 0;
@@ -32,6 +38,10 @@ header{
     border: orange 1px solid;
     font-size: 2rem;
     color: var(--primary);
+}
+
+#index-header{
+    justify-content: center;
 }
 
 #index-buttons{
@@ -62,7 +72,7 @@ header{
 }
 
 .back-button{
-    margin-right: 25rem;
+    margin: 0 2rem 0 2rem;
     padding: 8px;
     font-size: 1rem;
     border: none;
@@ -80,12 +90,15 @@ header{
 }
 
  #slideContainer{
+     border: orange 1px solid;
      height: 50vh;
      width: 170vh;
      overflow: auto;
      text-align: -webkit-center;
  }
  .pageControls{
+     border: orange 1px solid;
+
      padding-bottom: 1vh;
      height: 5vh;
      width: 170vh;
