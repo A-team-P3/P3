@@ -90,18 +90,20 @@ header{
 }
 
  #slideContainer{
-     border: orange 1px solid;
+     display: flex;
+     border: red 1px solid;
      height: 50vh;
-     width: 170vh;
+     width: 90%;
+     margin: 0 auto;
      overflow: auto;
      text-align: -webkit-center;
  }
  .pageControls{
      border: orange 1px solid;
-
      padding-bottom: 1vh;
      height: 5vh;
-     width: 170vh;
+     width: 90%;
+     margin: 0 auto;
      position: relative;
      text-align: -webkit-center;
  }
@@ -126,9 +128,8 @@ form {
 }
 
 table{
-    font-family: cursive;
     border-collapse: collapse;
-    width: 150vh;
+    width: 100%;
     margin-top:  20px;
     display: table;
 
