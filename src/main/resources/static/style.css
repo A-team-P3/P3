@@ -1,46 +1,109 @@
+@font-face {
+    font-family: Montserrat;
+    src: url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;900&family=Open+Sans&family=Play&display=swap');
+}
+
+:root {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Montserrat, sans-serif;
+    --primary: #3663a9;
+    --primary-hover: #427bce;
+    --secondary: #4c625c;
+    --background: #252525;
+    --dark: #232f44;
+    --white: #ececec;
+    --gray: #b6b6b6;
+    --black: black;
+}
+
+html, body{
+    background-color: var(--background);
+
+}
+
+a, button {
+    text-decoration: none;
+}
+
 header{
-    height: 10vh;
-    padding-bottom: 15px;
-    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-    font-size: 10vh;
-    line-height: normal;
-    background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 0%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.topHeader{
-    font-size: 6vh;
-    width: 120vh;
-    color:yellow;
-    background:#062235;
-    text-shadow: 0 0px 0px rgba(0, 0, 0, 0);
-    -webkit-text-fill-color:yellow;
-}
-body{
-    background: #062235;
-    height: 99vh;
-    width: 200vh;
     display: flex;
-    overflow: hidden;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    padding: 1rem 0 1rem 0;
+    text-align: center;
+    border: orange 1px solid;
+    font-size: 2rem;
+    color: var(--primary);
 }
-div.Center {
-    height: 99vh;
-    text-align: -webkit-center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+
+#index-header{
+    justify-content: center;
 }
+
+#index-buttons{
+    border: orange 1px solid;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 250px;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+#index-buttons button{
+    padding: 10px;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 3px;
+    transition: all 0.3s ease 0s;
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+#index-buttons button:hover{
+    background-color: var(--primary-hover);
+    color: white;
+    cursor: pointer;
+    scale: 1.05;
+}
+
+.back-button{
+    margin: 0 2rem 0 2rem;
+    padding: 8px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 2px;
+    transition: all 0.3s ease 0s;
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+.back-button:hover{
+    background-color: var(--primary-hover);
+    color: white;
+    cursor: pointer;
+    scale: 1.05;
+}
+
  #slideContainer{
+     display: flex;
+     border: red 1px solid;
      height: 50vh;
-     width: 170vh;
+     width: 90%;
+     margin: 0 auto;
      overflow: auto;
      text-align: -webkit-center;
  }
  .pageControls{
+     border: orange 1px solid;
      padding-bottom: 1vh;
      height: 5vh;
-     width: 170vh;
+     width: 90%;
+     margin: 0 auto;
      position: relative;
      text-align: -webkit-center;
  }
@@ -55,25 +118,6 @@ div.Center {
     background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 100%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
 }
 
-button{
-    font-family: cursive;
-    font-size: 30px;
-    display: inline-block;
-    background: transparent;
-    color: yellow;
-    cursor: pointer;
-    width: 400px;
-    margin: 50px;
-    border-radius: 10px;
-}
-#back {
-    position: absolute;
-    font-size: 2vh;
-    left: 0;
-    top: 0;
-    width: 10vh;
-    border-radius: 10px;
-}
 .button-group{
     position: absolute;
     top: 30%;
@@ -84,9 +128,8 @@ form {
 }
 
 table{
-    font-family: cursive;
     border-collapse: collapse;
-    width: 150vh;
+    width: 100%;
     margin-top:  20px;
     display: table;
 
@@ -113,6 +156,10 @@ thead tr th {
 
 tr:nth-child(even) {
     background-color: #dddddd;
+}
+
+tr:nth-child(odd){
+    color: #dddddd;
 }
 table.no {
     margin: auto;
