@@ -122,11 +122,9 @@
     //inserts data from API fetch into table rows
     async function tableInsert(startRange, endRange) {
         players = [];
-        //console.log(`fi: ${startRange}, li: ${endRange}`)
         if (startRange < 0) {
             startRange = 0;
             if (endRange < 0) {
-                //console.log("Both indexes less then 0");
                 return;
             }
         }
@@ -147,16 +145,12 @@
         let counter = startRange;
         let rows = table.rows.length
         if (startRange < lowestIndex) {
-            //console.log("XDDDDDDDDDDD");
             rows = 1;
         }
         for (let i = 0; i < players.length; i++) {
-            //console.log("index: " + i);
             counter++;
             table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].element + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
         }
-        console.log(table.rows.length);
-        //console.log(`li: ${lowestIndex}, hi: ${highestIndex}`)
         if (startRange < lowestIndex) {
             lowestIndex = startRange;
         }
@@ -177,15 +171,10 @@
     div.addEventListener("scroll", async () => {
             //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
             if (Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < 1) {
-                console.log("ftw???");
-                //console.log("highest index: " + highestIndex);
                 await tableInsert(highestIndex, highestIndex + playersPerFetch - 1);
             }
             if (div.scrollTop < 1 && lowestIndex > playersPerFetch / 2) {
-                console.log("wtf??");
                 div.scrollTop = 75;
-                //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
-                //console.log(table.rows[10].scrollTop);
                 await tableInsert(lowestIndex - playersPerFetch, lowestIndex - 1);
                 scrollToRow(playersPerFetch);
             }
