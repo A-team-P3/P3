@@ -25,7 +25,10 @@
         </form>
     </div>
     <div id="slideContainer">
-        <table id="leaderboard"></table>
+        <table id="leaderboard">
+            <thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">Score</th></tr></thead>
+            <tbody></tbody>
+        </table>
     </div>
 <script>
     const url = 'http://localhost:7070/';
@@ -160,8 +163,6 @@
 
 
     }
-
-    table.insertRow(0).innerHTML = '<thead><tr><th>Rank</th><th>Name</th><th onclick="switchOrder()">' + "score" + '</th></tr></thead><tbody></tbody>'
 
     //lowestIndex = 299; highestIndex = 299+usersPerFetch;
     tableInsert(0, playersPerFetch - 1);

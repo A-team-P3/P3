@@ -80,12 +80,11 @@ header{
     transition: all 0.3s ease 0s;
     background-color: var(--primary);
     color: var(--white);
+    cursor: pointer;
 }
 
 .back-button:hover{
     background-color: var(--primary-hover);
-    color: white;
-    cursor: pointer;
     scale: 1.05;
 }
 
@@ -115,7 +114,7 @@ header{
       border-radius: 6px;
   }
 ::-webkit-scrollbar-thumb:hover{
-    background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 100%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
+    background: var(--primary);
 }
 
 .button-group{
@@ -130,9 +129,12 @@ form {
 table{
     border-collapse: collapse;
     width: 100%;
-    margin-top:  20px;
     display: table;
+}
 
+thead{
+    background-color: var(--background);
+    height: 2rem;
 }
 
 td, th {
@@ -140,24 +142,22 @@ td, th {
     text-align: center;
     padding: 2px;
     margin-top: -20px;
-
-
-}
-th{
-    color: white;
 }
 
 th {
-    background: cornflowerblue;
+    border-collapse: separate; !important;
+    background: var(--primary);
     position: sticky;
     top: 0;
+    padding: 0.5rem;
+    z-index: 99;
 }
 
 thead tr th {
-    background: cornflowerblue;
+    background: var(--primary);
+    border: solid green;
     position: sticky;
     top: 0;
-    z-index: 99;
 }
 
 tr:nth-child(even) {
