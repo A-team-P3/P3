@@ -101,7 +101,7 @@ header{
  .pageControls{
      border: orange 1px solid;
      padding-bottom: 1vh;
-     height: 5vh;
+     height: 3rem;
      width: 90%;
      margin: 0 auto;
      position: relative;
@@ -145,6 +145,12 @@ td, th {
 }
 th{
     color: white;
+}
+
+th {
+    background: cornflowerblue;
+    position: sticky;
+    top: 0;
 }
 
 thead tr th {
