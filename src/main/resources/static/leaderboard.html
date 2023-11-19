@@ -25,7 +25,7 @@
         </form>
     </div>
     <div id="slideContainer">
-        <table id="leaderboard"> </table>
+        <table id="leaderboard"></table>
     </div>
 <script>
     const url = 'http://localhost:7070/';
@@ -41,6 +41,14 @@
 
     form.addEventListener("submit",  handleSubmit);
     form2.addEventListener("submit",  handleSubmitRank);
+
+    function scrollToRow(rowNumber) {
+        let row = table.rows[rowNumber];
+        console.log(row.innerHTML);
+        if (row) {
+            row.scrollIntoView({ block: 'start', inline: "nearest"});
+        }
+    }
 
     function handleSubmit(e){
         e.preventDefault();
@@ -59,14 +67,14 @@
         tableInsert(0, playersPerFetch - 1);
     }
 
-    function handleSubmitRank(e){
+    async function handleSubmitRank(e) {
         e.preventDefault();
         let input = parseInt(document.getElementById("rank").value);
         if (isNaN(input)) {
             return;
         }
 
-        getNumberOfPlayers()
+        await getNumberOfPlayers()
         if (input > numberOfPlayers) {
             alert(`Search Failed: Lowest Rank: ${numberOfPlayers}`);
             return;
@@ -76,7 +84,13 @@
             return;
         }
         tableClear();
-        tableInsert(input-1, input+playersPerFetch-1);
+        await tableInsert(input - 1 - playersPerFetch, input + playersPerFetch - 1);
+        if (input > playersPerFetch) {
+            scrollToRow(playersPerFetch+1);
+        } else {
+            scrollToRow(input);
+        }
+
     }
 
     async function getNumberOfPlayers() {
@@ -97,6 +111,7 @@
     }
 
     function tableClear(){
+        players = [];
         let tableHeader = table.rows[0].innerHTML;
         table.innerHTML = "";
         table.insertRow(0).innerHTML = tableHeader;
@@ -106,11 +121,10 @@
 
     //inserts data from API fetch into table rows
     async function tableInsert(startRange, endRange) {
-        //console.log(`fi: ${startRange}, li: ${endRange}`)
+        players = [];
         if (startRange < 0) {
             startRange = 0;
             if (endRange < 0) {
-                //console.log("Both indexes less then 0");
                 return;
             }
         }
@@ -131,15 +145,12 @@
         let counter = startRange;
         let rows = table.rows.length
         if (startRange < lowestIndex) {
-            //console.log("XDDDDDDDDDDD");
             rows = 1;
         }
         for (let i = 0; i < players.length; i++) {
-            //console.log("index: " + i);
             counter++;
             table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].element + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
         }
-        //console.log(`li: ${lowestIndex}, hi: ${highestIndex}`)
         if (startRange < lowestIndex) {
             lowestIndex = startRange;
         }
@@ -157,17 +168,15 @@
 
     const div = document.querySelector("#slideContainer")
 
-    div.addEventListener("scroll", () => {
+    div.addEventListener("scroll", async () => {
             //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
             if (Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < 1) {
-                //console.log("highest index: " + highestIndex);
-                tableInsert(highestIndex, highestIndex+playersPerFetch-1);
+                await tableInsert(highestIndex, highestIndex + playersPerFetch - 1);
             }
-            if (div.scrollTop < 1 && lowestIndex > playersPerFetch/2) {
-                //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
+            if (div.scrollTop < 1 && lowestIndex > playersPerFetch / 2) {
                 div.scrollTop = 75;
-                //console.log(table.rows[10].scrollTop);
-                tableInsert(lowestIndex-playersPerFetch, lowestIndex-1);
+                await tableInsert(lowestIndex - playersPerFetch, lowestIndex - 1);
+                scrollToRow(playersPerFetch);
             }
         },
         {
