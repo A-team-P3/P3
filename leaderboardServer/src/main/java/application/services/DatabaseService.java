@@ -41,10 +41,12 @@ public class DatabaseService {
     private String leaderboardSortedKeyString(int leaderboardId) {
         return "leaderboardSorted:" + leaderboardId;
     }
-    private String leaderboardHashMapKeyString (int leaderboardId) {
+
+    private String leaderboardHashMapKeyString(int leaderboardId) {
         return "leaderboardHashMap:" + leaderboardId;
     }
-    private String leaderboardScoreKeyString (int score, String timestamp, String playerId) {
+
+    private String leaderboardScoreKeyString(int score, String timestamp, String playerId) {
         return score + ":" + timestamp + ":" + playerId;
     }
 
@@ -59,8 +61,7 @@ public class DatabaseService {
                     return jedis.zrangeWithScores(leaderboardKey, stop, start);
                 }
             }
-        }
-        catch(JedisException e) {
+        } catch (JedisException e) {
             // TODO: implement correct exception handling
             System.out.println("Error getting scores");
 
@@ -71,8 +72,7 @@ public class DatabaseService {
     public Integer getSize(int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
             return Math.toIntExact(jedis.zcard(leaderboardSortedKeyString(leaderboardId)));
-        }
-        catch(JedisException e) {
+        } catch (JedisException e) {
             // TODO: implement correct exception handling
             System.out.println("Error getting size");
         }
@@ -82,7 +82,7 @@ public class DatabaseService {
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
         try (Jedis jedis = getJedisConnection()) {
-            if(isPlayerExisting(playerId, leaderboardId)) {
+            if (isPlayerExisting(playerId, leaderboardId)) {
                 // Get value of playerId from hashSet leaderboard
                 String initialHashValue = jedis.hget(leaderboardHashMapKeyString(leaderboardId), playerId);
 
@@ -102,18 +102,15 @@ public class DatabaseService {
                     // Update sortedSet leaderboard with new HashValue
                     jedis.zadd(leaderboardSortedKeyString(leaderboardId), newScore, newHashValue);
                     return "Score changed";
-                }
-                else
+                } else
                     return "The player's existing score is higher!";
-            }
-            else {
+            } else {
                 // Add non-existing player to the leaderboard
                 jedis.hset(leaderboardHashMapKeyString(leaderboardId), playerId, leaderboardScoreKeyString(newScore, timestamp, playerId));
                 jedis.zadd(leaderboardSortedKeyString(leaderboardId), newScore, leaderboardScoreKeyString(newScore, timestamp, playerId));
                 return "Player does not exist and is therefore added to the leaderboard";
             }
-        }
-        catch (JedisException e) {
+        } catch (JedisException e) {
             System.out.println(e + ": error setting score!");
         }
         return null;
@@ -124,12 +121,12 @@ public class DatabaseService {
             if (jedis.hexists(leaderboardSortedKeyString(leaderboardId), playerId)) {
                 return true;
             }
-        }
-        catch (JedisException e) {
+        } catch (JedisException e) {
             System.err.println(e + ": error checking if player exists!");
         }
         return false;
     }
+
     public void setPlayer(Player playerObject) {
         try (Jedis jedis = getJedisConnection()) {
             String key = "players:" + playerObject.getId();
@@ -141,9 +138,10 @@ public class DatabaseService {
             jedis.hset(key, hash);
         }
     }
+
     public Player getPlayer(String id) {
         try (Jedis jedis = getJedisConnection()) {
-            Map<String,String> playerString = jedis.hgetAll("players:" + id);
+            Map<String, String> playerString = jedis.hgetAll("players:" + id);
             return new Player(
                     playerString.get("id"),
                     playerString.get("name"),
