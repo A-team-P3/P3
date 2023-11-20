@@ -1,0 +1,172 @@
+@font-face {
+    font-family: Montserrat;
+    src: url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;900&family=Open+Sans&family=Play&display=swap');
+}
+
+:root {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Montserrat, sans-serif;
+    --primary: #3663a9;
+    --primary-hover: #427bce;
+    --secondary: #4c625c;
+    --background: #252525;
+    --dark: #232f44;
+    --white: #ececec;
+    --gray: #b6b6b6;
+    --black: black;
+}
+
+html, body{
+    background-color: var(--background);
+
+}
+
+a, button {
+    text-decoration: none;
+}
+
+header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    padding: 1rem 0 1rem 0;
+    text-align: center;
+    border: orange 1px solid;
+    font-size: 2rem;
+    color: var(--primary);
+}
+
+#index-header{
+    justify-content: center;
+}
+
+#index-buttons{
+    border: orange 1px solid;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 250px;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+#index-buttons button{
+    padding: 10px;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 3px;
+    transition: all 0.3s ease 0s;
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+#index-buttons button:hover{
+    background-color: var(--primary-hover);
+    color: white;
+    cursor: pointer;
+    scale: 1.05;
+}
+
+.back-button{
+    margin: 0 2rem 0 2rem;
+    padding: 8px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 2px;
+    transition: all 0.3s ease 0s;
+    background-color: var(--primary);
+    color: var(--white);
+    cursor: pointer;
+}
+
+.back-button:hover{
+    background-color: var(--primary-hover);
+    scale: 1.05;
+}
+
+ #slideContainer{
+     display: flex;
+     border: red 1px solid;
+     height: 50vh;
+     width: 90%;
+     margin: 0 auto;
+     overflow: auto;
+     text-align: -webkit-center;
+ }
+ .pageControls{
+     border: orange 1px solid;
+     padding-bottom: 1vh;
+     height: 3rem;
+     width: 90%;
+     margin: 0 auto;
+     position: relative;
+     text-align: -webkit-center;
+ }
+ ::-webkit-scrollbar{
+     width: 15px;
+ }
+::-webkit-scrollbar-thumb{
+      background: linear-gradient(transparent,white);
+      border-radius: 6px;
+  }
+::-webkit-scrollbar-thumb:hover{
+    background: var(--primary);
+}
+
+.button-group{
+    position: absolute;
+    top: 30%;
+    display: table;
+}
+form {
+    color: white;
+}
+
+table{
+    border-collapse: collapse;
+    width: 100%;
+    display: table;
+}
+
+thead{
+    background-color: var(--background);
+    height: 2rem;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 2px;
+    margin-top: -20px;
+}
+
+th {
+    border-collapse: separate; !important;
+    background: var(--primary);
+    position: sticky;
+    top: 0;
+    padding: 0.5rem;
+    z-index: 99;
+}
+
+thead tr th {
+    background: var(--primary);
+    border: solid green;
+    position: sticky;
+    top: 0;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+tr:nth-child(odd){
+    color: #dddddd;
+}
+table.no {
+    margin: auto;
+}
