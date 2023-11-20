@@ -3,10 +3,10 @@ package application.models;
 import java.util.List;
 
 public class Leaderboard {
-    private int id;
-    private String name;
-    private int size;
-    private List<PlayerScore> playerScores;
+    public int id;
+    public String name;
+    public int size;
+    public List<PlayerScore> playerScores;
 
     // Constructor, getters, and setters
     public Leaderboard(int id, String name, int size, List<PlayerScore> playerScores) {

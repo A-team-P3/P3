@@ -1,10 +1,10 @@
 package application.models;
 
 public class PlayerScore {
-    private int score;
-    private String name;
-    private String region;
-    private int rank;
+    public int score;
+    public String name;
+    public String region;
+    public int rank;
 
     // Constructor, getters, and setters
     public PlayerScore(int score, String name, String region, int rank) {

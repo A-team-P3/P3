@@ -37,7 +37,7 @@ public class DevToolsAPI {
         }
         return new ResponseEntity<Player>(player, HttpStatus.OK);
     }
-    @GetMapping("getScoresByRange")
+    @GetMapping("/getScoresByRange")
     ResponseEntity<Leaderboard> getScoresByRange(
             @RequestParam int leaderboardId,
             @RequestParam int start,
