@@ -1,8 +1,10 @@
 package application.services;
 
 import application.models.Player;
-import application.utils.DatabasePopulator;
+import application.utils.*;
+
 import org.springframework.stereotype.Service;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
@@ -16,7 +18,7 @@ import java.util.Map;
 
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
-
+    private final DatabaseConventions databaseConventions = new DatabaseConventions();
     private JedisPool jedisPool;
 
     private final String AAU_SERVER_IP = "130.225.39.42";
@@ -30,7 +32,7 @@ public class DatabaseService {
     public DatabaseService() {
         //this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
         this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
-        new DatabasePopulator(jedisPool);
+
     }
 
     public Jedis getJedisConnection() {
@@ -39,15 +41,18 @@ public class DatabaseService {
     }
 
     private String leaderboardSortedKeyString(int leaderboardId) {
-        return "leaderboardSorted:" + leaderboardId;
+        return databaseConventions.leaderboardSortedKeyString(leaderboardId);
     }
 
     private String leaderboardHashMapKeyString(int leaderboardId) {
-        return "leaderboardHashMap:" + leaderboardId;
+        return databaseConventions.leaderboardHashMapKeyString(leaderboardId);
     }
 
     private String leaderboardScoreKeyString(int score, String timestamp, String playerId) {
-        return score + ":" + timestamp + ":" + playerId;
+        return databaseConventions.leaderboardScoreKeyString(score, timestamp, playerId);
+    }
+    private String playerObjectKeyString(String playerId) {
+        return databaseConventions.playerObjectKeyString(playerId);
     }
 
     // Returns a list of the members with the highest scores
@@ -64,7 +69,6 @@ public class DatabaseService {
         } catch (JedisException e) {
             // TODO: implement correct exception handling
             System.out.println("Error getting scores");
-
         }
         return null;
     }
@@ -127,7 +131,7 @@ public class DatabaseService {
         return false;
     }
 
-    public void setPlayer(Player playerObject) {
+    public void setPlayerObject(Player playerObject) {
         try (Jedis jedis = getJedisConnection()) {
             String key = "players:" + playerObject.getId();
             Map<String, String> hash = new HashMap<>();
@@ -139,15 +143,26 @@ public class DatabaseService {
         }
     }
 
-    public Player getPlayer(String id) {
+    public Player getPlayerObject(String id) {
         try (Jedis jedis = getJedisConnection()) {
-            Map<String, String> playerString = jedis.hgetAll("players:" + id);
+            Map<String, String> playerString = jedis.hgetAll(playerObjectKeyString(id));
+            if (playerString.isEmpty()) {
+                return null;
+            } //TODO: Implement correct exception handling
             return new Player(
                     playerString.get("id"),
                     playerString.get("name"),
                     playerString.get("region"),
                     LocalDate.parse(playerString.get("creationDate"))
             );
+        }
+    }
+    public void populateLeaderboard(int leaderboardId, int numberOfUsers) {
+        try (Jedis jedis = getJedisConnection()) {
+            DatabasePopulator databasePopulator = new DatabasePopulator(jedis);
+            databasePopulator.populateDatabase(leaderboardId, numberOfUsers);
+        } catch (Exception e) {
+            System.err.println(e + ": error populating database!");
         }
     }
 }

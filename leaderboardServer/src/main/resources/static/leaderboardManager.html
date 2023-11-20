@@ -155,7 +155,7 @@
         function populateDatabase() {
             const leaderboardId = document.getElementById('populateLeaderboardId').value;
             const numberOfUsers = document.getElementById('populateNumberOfUsers').value;
-            fetch(`/populateDatabase?leaderboardId=${leaderboardId}&numberOfUsers=${numberOfUsers}`)
+            fetch(`/populateDatabase?leaderboardId=${leaderboardId}&numberOfScores=${numberOfUsers}`)
                 .then(handleResponse)
                 .then(data => {
                     document.getElementById('response').textContent = data;
@@ -182,7 +182,7 @@
             const leaderboardId = document.getElementById('rangeLeaderboardId').value;
             const start = document.getElementById('rangeStart').value;
             const stop = document.getElementById('rangeStop').value;
-            fetch(`/getScoresByRange?leaderboardId=${leaderboardId}&start=${start}&stop=${stop}`)
+            fetch(`/players?leaderboardId=${leaderboardId}&start=${start}&stop=${stop}`)
                 .then(handleResponse)
                 .then(data => {
                     document.getElementById('response').textContent = data;
@@ -192,6 +192,37 @@
                     document.getElementById('response').textContent = 'Error occurred';
                 });
         }
+        function setPlayer() {
+            const id = document.getElementById('setPlayerId').value;
+            const name = document.getElementById('setPlayerName').value;
+            const region = document.getElementById('setPlayerRegion').value;
+            fetch(`/setPlayerObject?id=${id}&name=${name}&region=${region}`)
+                .then(handleResponse)
+                .then(data => {
+                    document.getElementById('response').textContent = data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('response').textContent = 'Error occurred';
+                });
+        }
+        function getPlayer() {
+            const id = document.getElementById('getPlayerId').value;
+            fetch(`/getPlayerObject?id=${id}`)
+                .then(response => response.json())
+                .then(player => {
+                    // Create a formatted string with player's properties
+                    let playerInfo = `ID: ${player.id}\nName: ${player.name}\nRegion: ${player.region}\nCreation Date: ${player.creationDate}`;
+                    document.getElementById('response').textContent = playerInfo;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('response').textContent = 'Error occurred';
+                });
+        }
+
+
+
 
     </script>
 </head>
@@ -240,6 +271,23 @@
         <input type="text" id="findUserUserId" name="userId" required>
         <button class="button" onclick="findUser()">FIND USER</button>
     </div>
+    <div class="tile">
+        <label for="setPlayerId">Player ID:</label>
+        <input type="text" id="setPlayerId" name="playerId" required>
+        <label for="setPlayerName">Name:</label>
+        <input type="text" id="setPlayerName" name="name" required>
+        <label for="setPlayerRegion">Region:</label>
+        <input type="text" id="setPlayerRegion" name="region" required>
+        <button class="button" onclick="setPlayer()">SET PLAYER</button>
+    </div>
+    <div class="tile">
+        <label for="getPlayerId">Player ID:</label>
+        <input type="text" id="getPlayerId" name="playerId" required>
+        <button class="button" onclick="getPlayer()">GET PLAYER</button>
+        <pre id="playerInfo"></pre> <!-- Area to display player information -->
+    </div>
+
+
 
     <!-- Add more tiles as needed -->
 </div>

@@ -2,34 +2,31 @@ package application.utils;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import application.utils.DatabaseConventions;
+import redis.clients.jedis.Transaction;
+
 import java.util.*;
 
 public class DatabasePopulator {
     private Random rand = new Random();
-    private JedisPool jedisPool;
+    private final DatabaseConventions databaseConventions = new DatabaseConventions();
+    private Jedis jedis;
+    public DatabasePopulator(Jedis jedis) {
+        this.jedis = jedis;
 
-    public DatabasePopulator(JedisPool jedisPool) {
-        this.jedisPool = jedisPool;
         //populateDatabase(2, 7);
     }
 
     public void populateDatabase(int leaderboardId, int numberOfUsers) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            for (int i = 0; i < numberOfUsers; i++) {
-
-                String member = "";
-                int score = randomScore(1000);
-                String timestamp = String.valueOf(randomTimestamp());
-                String id = userIdGenerator();
-                member = member.concat(score + ":" + timestamp + ":" + id);
-
-                jedis.zadd("sortedLeaderboard:" + leaderboardId, score, member);
-                jedis.hset("hashLeaderboard:" + leaderboardId, id, score + ":" + timestamp + ":" + id);
-            }
+        Transaction transaction = jedis.multi();
+        for (int i = 0; i < numberOfUsers; i++) {
+            int score = randomScore(numberOfUsers*100);
+            String timestamp = String.valueOf(randomTimestamp());
+            String id = userIdGenerator();
+            transaction.zadd(databaseConventions.leaderboardSortedKeyString(leaderboardId), score, databaseConventions.leaderboardScoreKeyString(score, timestamp, id));
+            transaction.hset(databaseConventions.leaderboardHashMapKeyString(leaderboardId), id, databaseConventions.leaderboardScoreKeyString(score, timestamp, id));
         }
-        catch (Exception e) {
-            System.err.println(e + ": error populating database!");
-        }
+        transaction.exec();
     }
 
     private String userIdGenerator() {
