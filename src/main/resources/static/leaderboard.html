@@ -41,13 +41,13 @@
     const form2 = document.getElementById("frm2");
     let leaderboardId = 1;
     let table = document.getElementById("leaderboard");
+    let isEventProcessing = false;
 
     form.addEventListener("submit",  handleSubmit);
     form2.addEventListener("submit",  handleSubmitRank);
 
     function scrollToRow(rowNumber) {
         let row = table.rows[rowNumber];
-        console.log(row.innerHTML);
         if (row) {
             row.scrollIntoView({ block: 'start', inline: "nearest"});
         }
@@ -64,10 +64,12 @@
             alert("LeaderboardID below 1 does not exist");
             return;
         }
+        isEventProcessing = true;
 
         leaderboardId = input;
         tableClear();
         tableInsert(0, playersPerFetch - 1);
+        isEventProcessing = false;
     }
 
     async function handleSubmitRank(e) {
@@ -154,6 +156,7 @@
             counter++;
             table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].element + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
         }
+        console.log(`Inserted ${startRange+1} to ${counter}`);
         if (startRange < lowestIndex) {
             lowestIndex = startRange;
         }
@@ -170,20 +173,26 @@
     const div = document.querySelector("#slideContainer")
 
     div.addEventListener("scroll", async () => {
-            //console.log(div.scrollHeight + ", " + div.clientHeight + ", " + div.scrollTop);
+        if (isEventProcessing) {
+            return; // If the event is already being processed, exit early
+        }
+
+        isEventProcessing = true;
+
+        try {
             if (Math.abs(div.scrollHeight - div.clientHeight - div.scrollTop) < 1) {
                 await tableInsert(highestIndex, highestIndex + playersPerFetch - 1);
             }
             if (div.scrollTop < 1 && lowestIndex > playersPerFetch / 2) {
-                div.scrollTop = 75;
                 await tableInsert(lowestIndex - playersPerFetch, lowestIndex - 1);
                 scrollToRow(playersPerFetch);
             }
-        },
-        {
-            passive: true
+        } finally {
+            isEventProcessing = false;
         }
-    );
+    }, {
+        passive: true
+    });
 
 
 
