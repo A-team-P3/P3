@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.models.Leaderboard;
 import application.models.Player;
 import application.services.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,13 @@ public class DevToolsAPI {
             return new ResponseEntity<Player>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<Player>(player, HttpStatus.OK);
+    }
+    @GetMapping("getScoresByRange")
+    ResponseEntity<Leaderboard> getScoresByRange(
+            @RequestParam int leaderboardId,
+            @RequestParam int start,
+            @RequestParam int stop) throws Exception {
+        return new ResponseEntity<Leaderboard>(databaseService.getScoresByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
     @GetMapping("/addScoreToLeaderboard")
     String addScoreToLeaderboard(

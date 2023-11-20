@@ -182,7 +182,7 @@
             const leaderboardId = document.getElementById('rangeLeaderboardId').value;
             const start = document.getElementById('rangeStart').value;
             const stop = document.getElementById('rangeStop').value;
-            fetch(`/players?leaderboardId=${leaderboardId}&start=${start}&stop=${stop}`)
+            fetch(`/getScoresByRange?leaderboardId=${leaderboardId}&start=${start}&stop=${stop}`)
                 .then(handleResponse)
                 .then(data => {
                     document.getElementById('response').textContent = data;

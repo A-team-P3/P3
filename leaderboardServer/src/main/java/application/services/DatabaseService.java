@@ -1,16 +1,21 @@
 package application.services;
 
+import application.models.Leaderboard;
 import application.models.Player;
+import application.models.PlayerScore;
 import application.utils.*;
 
 import org.springframework.stereotype.Service;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +56,7 @@ public class DatabaseService {
     private String leaderboardScoreKeyString(int score, String timestamp, String playerId) {
         return databaseConventions.leaderboardScoreKeyString(score, timestamp, playerId);
     }
+
     private String playerObjectKeyString(String playerId) {
         return databaseConventions.playerObjectKeyString(playerId);
     }
@@ -157,6 +163,7 @@ public class DatabaseService {
             );
         }
     }
+
     public void populateLeaderboard(int leaderboardId, int numberOfUsers) {
         try (Jedis jedis = getJedisConnection()) {
             DatabasePopulator databasePopulator = new DatabasePopulator(jedis);
@@ -165,4 +172,60 @@ public class DatabaseService {
             System.err.println(e + ": error populating database!");
         }
     }
+/* Old code, creates a request to redis for each player in the range
+    public Leaderboard getScoreByRange(int leaderboardId, int start, int stop) {
+        try (Jedis jedis = getJedisConnection()) {
+            List<PlayerScore> scores = new ArrayList<>();
+            List<String> result = jedis.zrevrange(leaderboardSortedKeyString(leaderboardId), start - 1, stop - 1);
+
+            for (int i = 0; i < result.size(); i++) {
+                String[] parts = result.get(i).split(":");
+                int playerScore = Integer.parseInt(parts[0]);
+                String userId = parts[2];
+
+                // Fetch additional player data like region
+                String region = jedis.hget("players:" + userId, "region");
+
+                // Rank is the index + 1
+                int rank = start + i;
+
+                PlayerScore playerScoreObj = new PlayerScore(playerScore, userId, region, rank);
+                scores.add(playerScoreObj);
+            }
+            return new Leaderboard(leaderboardId, "Leaderboard Name", scores.size(), scores);
+        }
+        // Handle exceptions if necessary
+    } */
+public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
+    try (Jedis jedis = getJedisConnection()) {
+        List<PlayerScore> scores = new ArrayList<>();
+        List<String> result = jedis.zrevrange(leaderboardSortedKeyString(leaderboardId), start - 1, stop - 1);
+
+        Pipeline pipeline = jedis.pipelined();
+        Map<String, Response<String>> regionResponses = new HashMap<>();
+
+        for (String member : result) {
+            String[] parts = member.split(":");
+            String userId = parts[2];
+            regionResponses.put(userId, pipeline.hget("players:" + userId, "region"));
+        }
+
+        pipeline.sync();
+
+        int rankCounter = start;
+        for (String member : result) {
+            String[] parts = member.split(":");
+            int playerScore = Integer.parseInt(parts[0]);
+            String userId = parts[2];
+            String region = regionResponses.get(userId).get();
+
+            PlayerScore playerScoreObj = new PlayerScore(playerScore, userId, region, rankCounter);
+            scores.add(playerScoreObj);
+            rankCounter++;
+        }
+
+        return new Leaderboard(leaderboardId, "Leaderboard Name", scores.size(), scores);
+    }
+    // Handle exceptions if necessary
+}
 }
