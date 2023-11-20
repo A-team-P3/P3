@@ -33,7 +33,11 @@ public class DatabaseService {
     }
 
     private String leaderboardKeyString (int leaderboardId) {
-        String key = "leaderboard:" + leaderboardId;
+        String key = "leaderboardSorted:" + leaderboardId;
+        return key;
+    }
+    private String leaderboardHashMapKeyString (int leaderboardId) {
+        String key = "leaderboardHashMap:" + leaderboardId;
         return key;
     }
 
