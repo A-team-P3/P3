@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  app:
+    build: ..
+    ports:
+      - "7070:7070"
+    volumes:
+      - /opt/docker/spring-boot:/opt/docker/spring-boot
+    environment:
+      - JAVA_HOME=/opt/java/openjdk

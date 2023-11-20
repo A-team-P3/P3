@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Submission</title>
+</head>
+<body>
+
+<h2>Submit Data to Server</h2>
+
+<form id="dataForm">
+    <label for="score">Score:</label>
+    <input type="text" id="score" name="score" required>
+
+    <label for="leaderboardId">LeaderboardId:</label>
+    <input type="text" id="leaderboardId" name="leaderboardId" required>
+
+    <label for="userId">User ID:</label>
+    <input type="text" id="userId" name="userId" required>
+
+    <button type="button" onclick="submitData()">Submit</button>
+</form>
+
+<script>
+
+    const url = "http://localhost:7071";
+
+    function submitData() {
+        // Get input values
+        var score = document.getElementById("score").value;
+        var leaderboardId = document.getElementById("leaderboardId").value;
+        var userId = document.getElementById("userId").value;
+
+        fetch(url + "/submitScore", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `playerId=${userId}&newScore=${score}&leaderboardId=${leaderboardId}`
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        }).then(data => {
+            console.log('Success:', data);
+            // Handle success as needed
+        }).catch(error => {
+            console.error('Error:', error);
+            // Handle error as needed
+        });
+
+
+        // Create data object
+        var data = {
+            score: score,
+            leaderboardId: leaderboardId,
+            userId: userId
+        };
+
+    }
+</script>
+
+</body>
