@@ -1,0 +1,119 @@
+header{
+    height: 10vh;
+    padding-bottom: 15px;
+    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 10vh;
+    line-height: normal;
+    background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 0%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.topHeader{
+    font-size: 6vh;
+    width: 120vh;
+    color:yellow;
+    background:#062235;
+    text-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    -webkit-text-fill-color:yellow;
+}
+body{
+    background: #062235;
+    height: 99vh;
+    width: 200vh;
+    display: flex;
+    overflow: hidden;
+}
+div.Center {
+    height: 99vh;
+    text-align: -webkit-center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+ #slideContainer{
+     height: 50vh;
+     width: 170vh;
+     overflow: auto;
+     text-align: -webkit-center;
+ }
+ .pageControls{
+     padding-bottom: 1vh;
+     height: 5vh;
+     width: 170vh;
+     position: relative;
+     text-align: -webkit-center;
+ }
+ ::-webkit-scrollbar{
+     width: 15px;
+ }
+::-webkit-scrollbar-thumb{
+      background: linear-gradient(transparent,white);
+      border-radius: 6px;
+  }
+::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(transparent, rgba(213, 182, 19, 0.90) 100%, rgba(242, 14, 14, 0.00) 100%, rgba(242, 28, 14, 0.00) 100%);
+}
+
+button{
+    font-family: cursive;
+    font-size: 30px;
+    display: inline-block;
+    background: transparent;
+    color: yellow;
+    cursor: pointer;
+    width: 400px;
+    margin: 50px;
+    border-radius: 10px;
+}
+#back {
+    position: absolute;
+    font-size: 2vh;
+    left: 0;
+    top: 0;
+    width: 10vh;
+    border-radius: 10px;
+}
+.button-group{
+    position: absolute;
+    top: 30%;
+    display: table;
+}
+form {
+    color: white;
+}
+
+table{
+    font-family: cursive;
+    border-collapse: collapse;
+    width: 150vh;
+    margin-top:  20px;
+    display: table;
+
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 2px;
+    margin-top: -20px;
+
+
+}
+th{
+    color: white;
+}
+
+thead tr th {
+    background: cornflowerblue;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+table.no {
+    margin: auto;
+}
