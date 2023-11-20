@@ -2,11 +2,9 @@ package application.services;
 
 import application.models.Player;
 import application.utils.DatabasePopulator;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
@@ -32,18 +30,19 @@ public class DatabaseService {
         return jedis;
     }
 
-    private String leaderboardKeyString (int leaderboardId) {
-        String key = "leaderboardSorted:" + leaderboardId;
-        return key;
+    private String leaderboardSortedKeyString(int leaderboardId) {
+        return "leaderboardSorted:" + leaderboardId;
     }
     private String leaderboardHashMapKeyString (int leaderboardId) {
-        String key = "leaderboardHashMap:" + leaderboardId;
-        return key;
+        return "leaderboardHashMap:" + leaderboardId;
+    }
+    private String leaderboardScoreKeyString (int score, String timestamp, String playerId) {
+        return score + ":" + timestamp + ":" + playerId;
     }
 
     // Returns a list of the members with the highest scores
     public List<Tuple> getMembersByRange(int leaderboardId, int start, int stop) {
-        String leaderboardKey = leaderboardKeyString(leaderboardId);
+        String leaderboardKey = leaderboardSortedKeyString(leaderboardId);
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.exists(leaderboardKey)) {
                 if (start < stop) {
@@ -63,7 +62,7 @@ public class DatabaseService {
 
     public Integer getSize(int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
-            return Math.toIntExact(jedis.zcard(leaderboardKeyString(leaderboardId)));
+            return Math.toIntExact(jedis.zcard(leaderboardSortedKeyString(leaderboardId)));
         }
         catch(JedisException e) {
             // TODO: implement correct exception handling
@@ -74,28 +73,26 @@ public class DatabaseService {
 
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
-        String hashKey = "hashLeaderboard:" + leaderboardId;
-        String sortedSetKey = "sortedLeaderboard:" + leaderboardId;
         try (Jedis jedis = getJedisConnection()) {
             if(isPlayerExisting(playerId, leaderboardId)) {
                 // Get value of playerId from hashSet leaderboard
-                String initialHashValue = jedis.hget(hashKey, playerId);
+                String initialHashValue = jedis.hget(leaderboardHashMapKeyString(leaderboardId), playerId);
 
                 // Use hashValue value to get the existing score of the playerId
-                List<Double> existingScore = jedis.zmscore(sortedSetKey, initialHashValue);
+                List<Double> existingScore = jedis.zmscore(leaderboardSortedKeyString(leaderboardId), initialHashValue);
                 if (existingScore.get(0) < newScore) {
                     // Update leaderboard hash with score
 
-                    jedis.hset(hashKey, playerId, newScore + ":" + timestamp + ":" + playerId);
+                    jedis.hset(leaderboardHashMapKeyString(leaderboardId), playerId, leaderboardScoreKeyString(newScore, timestamp, playerId));
 
                     // Remove existing score in sorted set with initial hashValue
-                    jedis.zrem(sortedSetKey, initialHashValue);
+                    jedis.zrem(leaderboardSortedKeyString(leaderboardId), initialHashValue);
 
                     // Get the new hashValue
-                    String newHashValue = jedis.hget(hashKey, playerId);
+                    String newHashValue = jedis.hget(leaderboardHashMapKeyString(leaderboardId), playerId);
 
                     // Update sortedSet leaderboard with new HashValue
-                    jedis.zadd(sortedSetKey, newScore, newHashValue);
+                    jedis.zadd(leaderboardSortedKeyString(leaderboardId), newScore, newHashValue);
                     return "Score changed";
                 }
                 else
@@ -103,8 +100,8 @@ public class DatabaseService {
             }
             else {
                 // Add non-existing player to the leaderboard
-                jedis.hset("leaderboard:" + leaderboardId, playerId, newScore + ":" + timestamp + ":" + playerId);
-                jedis.zadd("sortedLeaderboard:" + leaderboardId, newScore, newScore + ":" + timestamp + ":" + playerId);
+                jedis.hset(leaderboardHashMapKeyString(leaderboardId), playerId, leaderboardScoreKeyString(newScore, timestamp, playerId));
+                jedis.zadd(leaderboardSortedKeyString(leaderboardId), newScore, leaderboardScoreKeyString(newScore, timestamp, playerId));
                 return "Player does not exist and is therefore added to the leaderboard";
             }
         }
@@ -116,7 +113,7 @@ public class DatabaseService {
 
     public boolean isPlayerExisting(String playerId, int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
-            if (jedis.hexists("leaderboard:" + leaderboardId, playerId)) {
+            if (jedis.hexists(leaderboardSortedKeyString(leaderboardId), playerId)) {
                 return true;
             }
         }
