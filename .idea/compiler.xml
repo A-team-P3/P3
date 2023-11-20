@@ -2,6 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="gameInputServer" target="21" />
+      <module name="gameInputServer.main" target="21" />
+      <module name="gameInputServer.test" target="21" />
       <module name="src" target="17" />
       <module name="src.main" target="17" />
       <module name="src.test" target="17" />
