@@ -17,14 +17,24 @@ public class DatabasePopulator {
         //populateDatabase(2, 7);
     }
 
-    public void populateDatabase(int leaderboardId, int numberOfUsers) {
+    public void populateDatabase(int leaderboardId, int numberOfPlayers) {
         Transaction transaction = jedis.multi();
-        for (int i = 0; i < numberOfUsers; i++) {
-            int score = randomScore(numberOfUsers*100);
+        for (int i = 0; i < numberOfPlayers; i++) {
+            int score = randomScore(numberOfPlayers * 100);
             String timestamp = String.valueOf(randomTimestamp());
             String id = userIdGenerator();
+
             transaction.zadd(databaseConventions.leaderboardSortedKeyString(leaderboardId), score, databaseConventions.leaderboardScoreKeyString(score, timestamp, id));
             transaction.hset(databaseConventions.leaderboardHashMapKeyString(leaderboardId), id, databaseConventions.leaderboardScoreKeyString(score, timestamp, id));
+
+            // Add player as individual HashMap
+            Map<String, String> fields = new HashMap<>();
+                fields.put("id", id);
+                fields.put("name", randomName());
+                fields.put("region", randomRegion());
+                fields.put("creationDate", timestamp);
+                transaction.hmset(databaseConventions.playerObjectKeyString(id), fields);
+
         }
         transaction.exec();
     }
