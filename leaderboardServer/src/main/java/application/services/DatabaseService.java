@@ -233,12 +233,12 @@ public class DatabaseService {
 
     // TODO: include score and rank
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
-    public List<Player> findPlayersByName(String name, int leaderboardId) {
+    public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
 
         try (Jedis jedis = getJedisConnection()) {
             List<Player> matchingPlayers = new ArrayList<>();
 
-            // List of all players in the specified leaderboardHashMap
+            // List of all players (stringified) in the specified leaderboardHashMap
             List<String> leaderboard = jedis.hvals(leaderboardHashMapKeyString(leaderboardId));
 
             // For each player in this leaderboard, check if the name contains the specified name
@@ -252,7 +252,7 @@ public class DatabaseService {
                 String playerHashName = jedis.hget("player:" + userId, "name");
 
                 // Add player to list if his name contains the specified name
-                if (playerHashName.toLowerCase().contains(name.toLowerCase())) {
+                if (playerHashName.toLowerCase().contains(specifiedName.toLowerCase())) {
                     String region = jedis.hget("player:" + userId, "region");
                     matchingPlayers.add(new Player(userId, playerHashName, region));
                 }
