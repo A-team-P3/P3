@@ -1,1 +1,3 @@
 rootProject.name = 'P3'
+include 'gameInputServer'
+include 'leaderboardServer'
