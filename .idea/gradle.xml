@@ -8,6 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/gameInputServer" />
+            <option value="$PROJECT_DIR$/leaderboardServer" />
           </set>
         </option>
       </GradleProjectSettings>
