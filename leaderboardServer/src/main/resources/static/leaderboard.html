@@ -24,13 +24,13 @@
                 <th>
                     <form id="frm" >
                         <label for="leaderboardId"></label>
-                        <input placeholder="Rank" value="" id="leaderboardId" name="leaderboardId">
+                        <input placeholder="Rank" value="" id="rank" name="rank">
                     </form>
                 </th>
                 <th>
                     <form id="frm2" >
                         <label for="rank"></label>
-                        <input placeholder="Name" value="" id="rank" name="rank">
+                        <input placeholder="Name" value="" id="leaderboardId" name="leaderboardId">
                     </form>
                 </th>
                 <th>
@@ -65,8 +65,8 @@
     let table = document.getElementById("leaderboard");
     let isEventProcessing = false;
 
-    form.addEventListener("submit",  handleSubmit);
-    form2.addEventListener("submit",  handleSubmitRank);
+    form2.addEventListener("submit",  handleSubmit);
+    form.addEventListener("submit",  handleSubmitRank);
 
     function scrollToRow(rowNumber) {
         let row = table.rows[rowNumber];
@@ -119,9 +119,9 @@
         tableClear();
         await tableInsert(input - 1 - playersPerFetch, input + playersPerFetch - 1);
         if (input > playersPerFetch) {
-            scrollToRow(playersPerFetch+1);
+            scrollToRow(playersPerFetch-1);
         } else {
-            scrollToRow(input);
+            scrollToRow(input-2);
         }
 
     }
