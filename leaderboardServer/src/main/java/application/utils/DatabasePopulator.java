@@ -1,5 +1,6 @@
 package application.utils;
 
+import application.services.DatabaseService;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import application.utils.DatabaseConventions;
@@ -10,15 +11,19 @@ import java.util.*;
 public class DatabasePopulator {
     private Random rand = new Random();
     private final DatabaseConventions databaseConventions = new DatabaseConventions();
+    private final DatabaseService databaseService = new DatabaseService();
     private Jedis jedis;
+
     public DatabasePopulator(Jedis jedis) {
         this.jedis = jedis;
-
-        //populateDatabase(2, 7);
     }
 
     public void populateDatabase(int leaderboardId, int numberOfPlayers) {
+        // Select logical Redis database
+        jedis = databaseService.selectDatabase(leaderboardId);
+
         Transaction transaction = jedis.multi();
+
         for (int i = 0; i < numberOfPlayers; i++) {
             int score = randomScore(numberOfPlayers * 100);
             String timestamp = String.valueOf(randomTimestamp());
@@ -31,10 +36,10 @@ public class DatabasePopulator {
             Map<String, String> fields = new HashMap<>();
                 fields.put("id", id);
                 fields.put("name", randomName());
+                fields.put("score", String.valueOf(score));
                 fields.put("region", randomRegion());
                 fields.put("creationDate", timestamp);
                 transaction.hmset(databaseConventions.playerObjectKeyString(id), fields);
-
         }
         transaction.exec();
     }

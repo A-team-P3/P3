@@ -7,10 +7,8 @@ import application.utils.*;
 
 import org.springframework.stereotype.Service;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
+import redis.clients.jedis.*;
+import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
@@ -35,10 +33,14 @@ public class DatabaseService {
     private final String CLOUD_SERVER_PASSWORD = "MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9";
 
     public DatabaseService() {
-        //this.jedisPool = new JedisPool("130.225.39.42", 6379, "default", "tJ1Y37fGm5c2A2m6jCE0");
-        this.jedisPool = new JedisPool("redis-12618.c304.europe-west1-2.gce.cloud.redislabs.com", 12618, "default", "MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9");
-        //this.jedisPool = new JedisPool("localhost", 6379);
-        //new DatabasePopulator(jedisPool);
+        // AAU Server
+        //this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
+
+        // Redis Cloud
+        //this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
+
+        // LocalHost
+        this.jedisPool = new JedisPool("localhost", 6379);
     }
 
     public Jedis getJedisConnection() {
@@ -144,6 +146,7 @@ public class DatabaseService {
             Map<String, String> hash = new HashMap<>();
             hash.put("id", playerObject.getId());
             hash.put("name", playerObject.getName());
+            hash.put("score", playerObject.getScore());
             hash.put("region", playerObject.getRegion());
             hash.put("creationDate", playerObject.getCreationDate().toString());
             jedis.hset(key, hash);
@@ -159,6 +162,7 @@ public class DatabaseService {
             return new Player(
                     playerString.get("id"),
                     playerString.get("name"),
+                    playerString.get("score"),
                     playerString.get("region"),
                     LocalDate.parse(playerString.get("creationDate"))
             );
@@ -235,11 +239,14 @@ public class DatabaseService {
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
 
-        try (Jedis jedis = getJedisConnection()) {
+        try (Jedis jedis = selectDatabase(leaderboardId)) {
+
+            //selectDatabase(leaderboardId);
             List<Player> matchingPlayers = new ArrayList<>();
 
             // List of all players (stringified) in the specified leaderboardHashMap
             List<String> leaderboard = jedis.hvals(leaderboardHashMapKeyString(leaderboardId));
+
 
             // For each player in this leaderboard, check if the name contains the specified name
             for (String playerString : leaderboard) {
@@ -253,11 +260,47 @@ public class DatabaseService {
 
                 // Add player to list if his name contains the specified name
                 if (playerHashName.toLowerCase().contains(specifiedName.toLowerCase())) {
+                    // TODO: next two lines can be optimized (with use of transaction?)
                     String region = jedis.hget("player:" + userId, "region");
-                    matchingPlayers.add(new Player(userId, playerHashName, region));
+                    String score = jedis.hget("player:" + userId, "score");
+                    matchingPlayers.add(new Player(userId, playerHashName, score, region));
                 }
             }
             return matchingPlayers;
+        }
+    }
+
+    // Select logical Redis database (indexed 0-15)
+    public Jedis selectDatabase(int dbIndex) {
+
+        try (Jedis jedis = getJedisConnection()) {
+            // -1 because the index starts at 0, thus leaderboard 1 (should) be stored in 'db0'
+            jedis.select(dbIndex - 1);
+            return jedis;
+        }
+        catch (JedisException e) {
+            System.err.println(e + ": error selecting database!");
+        }
+
+        return null;
+    }
+
+    public void wipeDatabase(int dbIndex) {
+        try (Jedis jedis = getJedisConnection()) {
+            jedis.select(dbIndex - 1);
+            jedis.flushDB();
+        }
+        catch (JedisException e) {
+            System.err.println(e + ": error wiping database!");
+        }
+    }
+
+    public void wipeAllDatabases() {
+        try (Jedis jedis = getJedisConnection()) {
+            jedis.flushAll();
+        }
+        catch (JedisException e) {
+            System.err.println(e + ": error wiping all databases!");
         }
     }
 }

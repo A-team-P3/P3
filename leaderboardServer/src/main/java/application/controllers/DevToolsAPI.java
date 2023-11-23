@@ -22,9 +22,10 @@ public class DevToolsAPI {
     public ResponseEntity<String> setPlayerObject(
             @RequestParam String id,
             @RequestParam String name,
+            @RequestParam String score,
             @RequestParam String region) {
 
-        Player player = new Player(id, name, region);
+        Player player = new Player(id, name, score, region);
         databaseService.setPlayerObject(player);
 
         return ResponseEntity.ok("Player created with ID: " + id);
@@ -57,5 +58,19 @@ public class DevToolsAPI {
             @RequestParam int numberOfScores) throws Exception {
         databaseService.populateLeaderboard(leaderboardId, numberOfScores);
         return new ResponseEntity<String>(numberOfScores + "scores should be created now", HttpStatus.OK);
+    }
+
+    // Wipe specified logical database
+    @GetMapping("/wipeDatabase")
+    ResponseEntity<String> wipeDatabase(@RequestParam int leaderboardId) throws Exception {
+        databaseService.wipeDatabase(leaderboardId);
+        return new ResponseEntity<String>("Database " + leaderboardId + " wiped!", HttpStatus.OK);
+    }
+
+    // Wipe all logical databases
+    @GetMapping("/wipeAllDatabases")
+    ResponseEntity<String> wipeAllDatabases() throws Exception {
+        databaseService.wipeAllDatabases();
+        return new ResponseEntity<String>("All databases wiped!", HttpStatus.OK);
     }
 }
