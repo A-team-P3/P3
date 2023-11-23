@@ -238,7 +238,7 @@ public class DatabaseService {
         // Handle exceptions if necessary
     }
 
-    // TODO: can be optimized a bit more in terms of time complexity
+    // TODO: can be optimized a bit more in terms of time complexity: N+2M can be reduced to N+1 (N = number of players, M = number of matching players)
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
     // Note: we NEED to look at all names in the leaderboard if we want to find multiple names that CONTAIN the specified name
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
@@ -268,7 +268,7 @@ public class DatabaseService {
             }
         }
         catch (JedisException e) {
-            System.err.println(e + ": error in finding players with matching name (" + specifiedName + ")!");
+            System.err.println(e + ": error in finding players by name!");
             return null;
         }
 
@@ -277,8 +277,9 @@ public class DatabaseService {
 
     // Select logical Redis database (indexed 0-15)
     public Jedis selectDatabase(int dbIndex) {
-
         try (Jedis jedis = getJedisConnection()) {
+            jedis.auth(AAU_SERVER_PASSWORD);
+
             // -1 because the index starts at 0, thus leaderboard 1 (should) be stored in 'db0'
             jedis.select(dbIndex - 1);
             return jedis;

@@ -36,11 +36,12 @@ public class LeaderboardAPI {
             @RequestParam String name,
             @RequestParam int leaderboardId) {
 
-        List<Player> matchingPlayers = databaseService.findPlayersByName(name, leaderboardId);
-
-        if (matchingPlayers == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
+        try {
+            List<Player> matchingPlayers = databaseService.findPlayersByName(name, leaderboardId);
             return new ResponseEntity<>(matchingPlayers, HttpStatus.OK);
+        }
+        catch (NullPointerException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
