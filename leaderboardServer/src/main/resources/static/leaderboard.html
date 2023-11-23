@@ -111,7 +111,7 @@
     async function getPlayers(min, max) {
         players = [];
         //localhost:8080/players?min=15&max=5
-        const response = await fetch(`${url}players?leaderboardId=${leaderboardId}&min=${min}&max=${max}`);
+        const response = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
         const data = await response.json();
 
         for(const i in data) {
