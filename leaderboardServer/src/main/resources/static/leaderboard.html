@@ -7,34 +7,51 @@
 </head>
 <body>
 
-<header><a href="index.html">
-    <button class="back-button" type="button" id="back"> Back</button>
-</a>Leaderboard<a href="index.html">
-    <button class="back-button" type="button" id="test"> Back</button>
-</a></header>
-    <div class="pageControls">
-        <form id="frm2" >
-            <label for="rank">Rank:</label>
-            <input value="" id="rank" name="rank">
+<header>
+    <a href="index.html">
+        <button class="back-button" type="button" id="back"> Back</button>
+    </a>
+    Leaderboard
+    <a href="index.html">
+        <button class="back-button" type="button" id="test"> Back</button>
+    </a>
+</header>
 
-        </form>
-    </div>
-    <div id="leaderboard-container">
-        <table id="leaderboard">
-            <thead><tr><th>
-                <form id="frm" >
-                    <label for="leaderboardId"></label>
-                    <input value="" id="leaderboardId" name="leaderboardId">
+<div id="leaderboard-container">
+    <table id="leaderboard">
+        <thead>
+            <tr>
+                <th>
+                    <form id="frm" >
+                        <label for="leaderboardId"></label>
+                        <input placeholder="Rank" value="" id="leaderboardId" name="leaderboardId">
+                    </form>
+                </th>
+                <th>
+                    <form id="frm2" >
+                        <label for="rank"></label>
+                        <input placeholder="Name" value="" id="rank" name="rank">
+                    </form>
+                </th>
+                <th>
+                    <div id="btn-switch-wrapper">
+                        <form id="frm3" >
+                            <label for="score"></label>
+                            <input placeholder="Score" value="" id="score" name="score">
+                        </form>
+                        <form id="btn-switch-form">
+                            <button id="btn-switch" onclick="switchOrder()">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="1.2em" viewBox="0 0 576 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M151.6 42.4C145.5 35.8 137 32 128 32s-17.5 3.8-23.6 10.4l-88 96c-11.9 13-11.1 33.3 2 45.2s33.3 11.1 45.2-2L96 146.3V448c0 17.7 14.3 32 32 32s32-14.3 32-32V146.3l32.4 35.4c11.9 13 32.2 13.9 45.2 2s13.9-32.2 2-45.2l-88-96zM320 480h32c17.7 0 32-14.3 32-32s-14.3-32-32-32H320c-17.7 0-32 14.3-32 32s14.3 32 32 32zm0-128h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H320c-17.7 0-32 14.3-32 32s14.3 32 32 32zm0-128H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H320c-17.7 0-32 14.3-32 32s14.3 32 32 32zm0-128H544c17.7 0 32-14.3 32-32s-14.3-32-32-32H320c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 
-                </form>
-            </th><th>
-                Name
-            </th><th onclick="switchOrder()">
-                Score
-            </th></tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
 <script>
     const url = "http://localhost:7070/";
     let players = [];
@@ -57,6 +74,12 @@
             row.scrollIntoView({ block: 'start', inline: "nearest"});
         }
     }
+
+    document.getElementById('btn-switch').addEventListener('click', function() {
+        let svg = document.querySelector('svg');
+        svg.classList.toggle('rotate180');
+    });
+
 
     function handleSubmit(e){
         e.preventDefault();
