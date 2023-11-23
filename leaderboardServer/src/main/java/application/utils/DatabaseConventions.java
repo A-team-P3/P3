@@ -14,7 +14,7 @@ public class DatabaseConventions {
         return score + ":" + timestamp + ":" + playerId;
     }
     public String playerObjectKeyString(String playerId) {
-        return "players:" + playerId;
+        return "player:" + playerId;
     }
 }
 

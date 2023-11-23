@@ -14,7 +14,7 @@ public class HTMLController {
     }
     @GetMapping("/error")
     String error() {
-        return "Bad luck, u fucked it up";
+        return "Whoops!";
     }
 
 
