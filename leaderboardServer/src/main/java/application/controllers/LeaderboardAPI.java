@@ -38,7 +38,7 @@ public class LeaderboardAPI {
 
         List<Player> matchingPlayers = databaseService.findPlayersByName(name, leaderboardId);
 
-        if (matchingPlayers.isEmpty())
+        if (matchingPlayers == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else
             return new ResponseEntity<>(matchingPlayers, HttpStatus.OK);

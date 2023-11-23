@@ -40,6 +40,9 @@ public class DatabasePopulator {
                 fields.put("region", randomRegion());
                 fields.put("creationDate", timestamp);
                 transaction.hmset(databaseConventions.playerObjectKeyString(id), fields);
+
+            // Map player's name to their ID
+            transaction.hset("playerNames:" + leaderboardId, fields.get("name"), id);
         }
         transaction.exec();
     }

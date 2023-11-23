@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DevToolsAPI {
     private DatabaseService databaseService;
+
     @Autowired // Autowired constructor
     // to add Service to the RestController
     public DevToolsAPI(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
+
     @GetMapping("/setPlayerObject")
     public ResponseEntity<String> setPlayerObject(
             @RequestParam String id,
@@ -30,6 +32,7 @@ public class DevToolsAPI {
 
         return ResponseEntity.ok("Player created with ID: " + id);
     }
+
     @GetMapping("/getPlayerObject")
     public ResponseEntity<Player> getPlayerObject(@RequestParam String id) {
         Player player = databaseService.getPlayerObject(id);
@@ -38,6 +41,7 @@ public class DevToolsAPI {
         }
         return new ResponseEntity<Player>(player, HttpStatus.OK);
     }
+
     @GetMapping("/getScoresByRange")
     ResponseEntity<Leaderboard> getScoresByRange(
             @RequestParam int leaderboardId,
@@ -45,6 +49,7 @@ public class DevToolsAPI {
             @RequestParam int stop) throws Exception {
         return new ResponseEntity<Leaderboard>(databaseService.getScoresByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
+
     @GetMapping("/addScoreToLeaderboard")
     String addScoreToLeaderboard(
             @RequestParam int leaderboardId,

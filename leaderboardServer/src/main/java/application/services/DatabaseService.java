@@ -13,10 +13,7 @@ import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service //Service for interacting with the database to get user data
@@ -85,7 +82,8 @@ public class DatabaseService {
     public Integer getSize(int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
             return Math.toIntExact(jedis.zcard(leaderboardSortedKeyString(leaderboardId)));
-        } catch (JedisException e) {
+        }
+        catch (JedisException e) {
             // TODO: implement correct exception handling
             System.out.println("Error getting size");
         }
@@ -94,7 +92,8 @@ public class DatabaseService {
 
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
-        try (Jedis jedis = getJedisConnection()) {
+
+        try (Jedis jedis = selectDatabase(leaderboardId)) {
             if (isPlayerExisting(playerId, leaderboardId)) {
                 // Get value of playerId from hashSet leaderboard
                 String initialHashValue = jedis.hget(leaderboardHashMapKeyString(leaderboardId), playerId);
@@ -115,17 +114,21 @@ public class DatabaseService {
                     // Update sortedSet leaderboard with new HashValue
                     jedis.zadd(leaderboardSortedKeyString(leaderboardId), newScore, newHashValue);
                     return "Score changed";
-                } else
+                }
+                else
                     return "The player's existing score is higher!";
-            } else {
+            }
+            else {
                 // Add non-existing player to the leaderboard
                 jedis.hset(leaderboardHashMapKeyString(leaderboardId), playerId, leaderboardScoreKeyString(newScore, timestamp, playerId));
                 jedis.zadd(leaderboardSortedKeyString(leaderboardId), newScore, leaderboardScoreKeyString(newScore, timestamp, playerId));
                 return "Player does not exist and is therefore added to the leaderboard";
             }
-        } catch (JedisException e) {
+        }
+        catch (JedisException e) {
             System.out.println(e + ": error setting score!");
         }
+
         return null;
     }
 
@@ -235,39 +238,41 @@ public class DatabaseService {
         // Handle exceptions if necessary
     }
 
-    // TODO: include score and rank
+    // TODO: can be optimized a bit more in terms of time complexity
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
+    // Note: we NEED to look at all names in the leaderboard if we want to find multiple names that CONTAIN the specified name
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
+        List<Player> matchingPlayers = new ArrayList<>();
 
         try (Jedis jedis = selectDatabase(leaderboardId)) {
+            // Get all entries (name and id) from the playerNames HashMap
+            Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
 
-            //selectDatabase(leaderboardId);
-            List<Player> matchingPlayers = new ArrayList<>();
+            // For each entry in the map, get the name and id
+            for (Map.Entry<String, String> entry : nameAndIdMap.entrySet()) {
+                String playerName = entry.getKey();
+                String playerId = entry.getValue();
 
-            // List of all players (stringified) in the specified leaderboardHashMap
-            List<String> leaderboard = jedis.hvals(leaderboardHashMapKeyString(leaderboardId));
+                // Check if the player name contains the specified name
+                if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
+                    // Fetch score and region with ID, and using pipelining to improve performance
+                    Pipeline pipeline = jedis.pipelined();
+                    Response<String> scoreResponse = pipeline.hget("player:" + playerId, "score");
+                    Response<String> regionResponse = pipeline.hget("player:" + playerId, "region");
+                    pipeline.sync();    // Execute all commands in the pipeline
 
-
-            // For each player in this leaderboard, check if the name contains the specified name
-            for (String playerString : leaderboard) {
-                String[] parts = playerString.split(":");
-
-                // Get id
-                String userId = parts[2];
-
-                // Use id to find and get name from player's individual HashMap
-                String playerHashName = jedis.hget("player:" + userId, "name");
-
-                // Add player to list if his name contains the specified name
-                if (playerHashName.toLowerCase().contains(specifiedName.toLowerCase())) {
-                    // TODO: next two lines can be optimized (with use of transaction?)
-                    String region = jedis.hget("player:" + userId, "region");
-                    String score = jedis.hget("player:" + userId, "score");
-                    matchingPlayers.add(new Player(userId, playerHashName, score, region));
+                    String score = scoreResponse.get();
+                    String region = regionResponse.get();
+                    matchingPlayers.add(new Player(playerId, playerName, score, region));
                 }
             }
-            return matchingPlayers;
         }
+        catch (JedisException e) {
+            System.err.println(e + ": error in finding players with matching name (" + specifiedName + ")!");
+            return null;
+        }
+
+        return matchingPlayers;
     }
 
     // Select logical Redis database (indexed 0-15)
