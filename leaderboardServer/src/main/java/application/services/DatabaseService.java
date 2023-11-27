@@ -278,7 +278,7 @@ public class DatabaseService {
     // Select logical Redis database (indexed 0-15)
     public Jedis selectDatabase(int dbIndex) {
         try (Jedis jedis = getJedisConnection()) {
-            jedis.auth(AAU_SERVER_PASSWORD);
+            //jedis.auth(AAU_SERVER_PASSWORD);
 
             // -1 because the index starts at 0, thus leaderboard 1 (should) be stored in 'db0'
             jedis.select(dbIndex - 1);
