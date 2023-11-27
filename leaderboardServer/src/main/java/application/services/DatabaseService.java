@@ -31,10 +31,10 @@ public class DatabaseService {
 
     public DatabaseService() {
         // AAU Server
-        this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
+        //this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
 
         // Redis Cloud
-        //this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
+        this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
 
         // LocalHost
         //this.jedisPool = new JedisPool("localhost", 6379);
