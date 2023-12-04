@@ -247,9 +247,10 @@ public class DatabaseService {
         try (Jedis jedis = selectDatabase(leaderboardId)) {
             // Get all entries (name and id) from the playerNames HashMap
             Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
-
+            int counter = 0;
             // For each entry in the map, get the name and id
             for (Map.Entry<String, String> entry : nameAndIdMap.entrySet()) {
+                counter++;
                 String playerName = entry.getKey();
                 String playerId = entry.getValue();
 
@@ -259,11 +260,19 @@ public class DatabaseService {
                     Pipeline pipeline = jedis.pipelined();
                     Response<String> scoreResponse = pipeline.hget("player:" + playerId, "score");
                     Response<String> regionResponse = pipeline.hget("player:" + playerId, "region");
+                    Response<String> creationDateResponse = pipeline.hget("player:" + playerId, "creationDate");
                     pipeline.sync();    // Execute all commands in the pipeline
 
                     String score = scoreResponse.get();
                     String region = regionResponse.get();
-                    matchingPlayers.add(new Player(playerId, playerName, score, region));
+                    String creationDate = creationDateResponse.get();
+                    String playerValue = score + ":" + creationDate + ":" + playerId;
+                    long rank = jedis.zrank("leaderboardSorted:" + leaderboardId, playerValue);
+                    Player player = new Player(playerId, playerName, score, region, String.valueOf(rank));
+
+
+                    String playerTest = playerName + " " + playerId + " " + rank;
+                    matchingPlayers.add(player);
                 }
             }
         }
@@ -281,7 +290,7 @@ public class DatabaseService {
             //jedis.auth(AAU_SERVER_PASSWORD);
 
             // -1 because the index starts at 0, thus leaderboard 1 (should) be stored in 'db0'
-            jedis.select(dbIndex - 1);
+            //jedis.select(dbIndex - 1);
             return jedis;
         }
         catch (JedisException e) {
