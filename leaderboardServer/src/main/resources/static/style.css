@@ -86,12 +86,13 @@ a, button {
      position: relative;
      display: flex;
      flex-direction: column;
-     border: red 5px var(--dark);
+     border: 5px var(--dark);
      border-radius: 25px;
      height: 50vh;
      width: 95%;
      margin: 2rem auto;
      overflow: auto;
+     overscroll-behavior: none;
      text-align: -webkit-center;
  }
 
@@ -206,7 +207,6 @@ th {
     position: sticky;
     top: 0;
     padding: 0.5rem;
-    box-shadow: 0 4px 4px -2px black;
 }
 
 td, th {
