@@ -12,6 +12,7 @@ public class Player implements Serializable {
     private String score;
     private String region;
     private LocalDate creationDate;
+    private String rank;
 
     //Make new player constructor
     public Player(String id, String name, String score, String region) {
@@ -20,6 +21,14 @@ public class Player implements Serializable {
         this.score = score;
         this.region = region;
         this.creationDate = LocalDate.now();
+    }
+    public Player(String id, String name, String score, String region, String rank) {
+        this.id = id;
+        this.name = name;
+        this.score = score;
+        this.region = region;
+        this.creationDate = LocalDate.now();
+        this.rank = rank;
     }
 
     //Update player constructor; Used when pulling a player from Redis
@@ -49,5 +58,9 @@ public class Player implements Serializable {
 
     public LocalDate getCreationDate() {
         return creationDate;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 }
