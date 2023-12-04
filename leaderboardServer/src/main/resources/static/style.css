@@ -82,13 +82,15 @@ a, button {
 }
 
  #leaderboard-container{
+     table-layout: fixed;
      max-width: 1000px;
+     max-height: 1000px;
      position: relative;
      display: flex;
      flex-direction: column;
      border: 5px var(--dark);
      border-radius: 25px;
-     height: 50vh;
+     height: 80vh;
      width: 95%;
      margin: 2rem auto;
      overflow: auto;
@@ -180,21 +182,8 @@ form:hover{
     border: 2px solid var(--primary-hover);
 }
 
-header{
-    display: flex;
-    background-color: var(--white);
-    flex-direction: column;
-    justify-content: space-between;
-    margin: 0 auto;
-    width: 50%;
-    height: 8rem;
-    padding: 1rem 0 1rem 0;
-    text-align: center;
-    font-size: 2rem;
-    color: var(--primary);
-}
-
 table{
+    table-layout:fixed;
     position: relative;
     border-collapse: collapse;
     width: 100%;
