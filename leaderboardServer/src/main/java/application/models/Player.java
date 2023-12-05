@@ -3,7 +3,6 @@ package application.models;
 import org.springframework.data.redis.core.RedisHash;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 @RedisHash("Player")
 public class Player implements Serializable {
@@ -14,7 +13,7 @@ public class Player implements Serializable {
     private LocalDate creationDate;
     private String rank;
 
-    //Make new player constructor
+    // Make new Player constructor
     public Player(String id, String name, String score, String region) {
         this.id = id;
         this.name = name;
@@ -32,7 +31,7 @@ public class Player implements Serializable {
         this.rank = rank;
     }
 
-    //Update player constructor; Used when pulling a player from Redis
+    // Update player constructor (used when pulling a player from Redis)
     public Player(String id, String name, String score, String region, LocalDate creationDate) {
         this.id = id;
         this.name = name;
@@ -61,11 +60,11 @@ public class Player implements Serializable {
         return creationDate;
     }
 
-    public void setRank(String rank) {
-        this.rank = rank;
-    }
-
     public String getRank() {
         return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 }

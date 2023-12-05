@@ -4,9 +4,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: 'runTests = true' when running tests (leaderboardServer/gradle.properties)!
+// TODO: set 'runTests = true' before running tests! Location: leaderboardServer/gradle.properties
 
 class PlayerTest {
     Player player;
@@ -49,5 +51,21 @@ class PlayerTest {
     @Test
     void rankShouldBe69() {
         assertEquals("69", player.getRank());
+    }
+
+    @Test
+    void rankShouldBeSetTo1337() {
+        player.setRank("1337");
+        assertEquals("1337", player.getRank());
+    }
+
+    @Test
+    void creationDateShouldBeSetByDefault() {
+        assertNotNull(player.getCreationDate());
+    }
+
+    @Test
+    void creationDateShouldBeNow() {
+        assertEquals(player.getCreationDate(), LocalDate.now());
     }
 }
