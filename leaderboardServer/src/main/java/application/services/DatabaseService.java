@@ -93,7 +93,7 @@ public class DatabaseService {
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
 
-        try (Jedis jedis = selectDatabase(leaderboardId)) {
+        try (Jedis jedis = getJedisConnection()) {
             if (isPlayerExisting(playerId, leaderboardId)) {
                 // Get value of playerId from hashSet leaderboard
                 String initialHashValue = jedis.hget(leaderboardHashMapKeyString(leaderboardId), playerId);
@@ -238,13 +238,12 @@ public class DatabaseService {
         // Handle exceptions if necessary
     }
 
-    // TODO: can be optimized a bit more in terms of time complexity: N+2M can be reduced to N+1 (N = number of players, M = number of matching players)
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
     // Note: we NEED to look at all names in the leaderboard if we want to find multiple names that CONTAIN the specified name
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
         List<Player> matchingPlayers = new ArrayList<>();
 
-        try (Jedis jedis = selectDatabase(leaderboardId)) {
+        try (Jedis jedis = getJedisConnection()) {
             // Get all entries (name and id) from the playerNames HashMap
             Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
             int counter = 0;
@@ -270,7 +269,6 @@ public class DatabaseService {
                     long rank = jedis.zrank("leaderboardSorted:" + leaderboardId, playerValue);
                     Player player = new Player(playerId, playerName, score, region, String.valueOf(rank));
 
-
                     String playerTest = playerName + " " + playerId + " " + rank;
                     matchingPlayers.add(player);
                 }
@@ -284,25 +282,8 @@ public class DatabaseService {
         return matchingPlayers;
     }
 
-    // Select logical Redis database (indexed 0-15)
-    public Jedis selectDatabase(int dbIndex) {
-        try (Jedis jedis = getJedisConnection()) {
-            //jedis.auth(AAU_SERVER_PASSWORD);
-
-            // -1 because the index starts at 0, thus leaderboard 1 (should) be stored in 'db0'
-            //jedis.select(dbIndex - 1);
-            return jedis;
-        }
-        catch (JedisException e) {
-            System.err.println(e + ": error selecting database!");
-        }
-
-        return null;
-    }
-
     public void wipeDatabase(int dbIndex) {
         try (Jedis jedis = getJedisConnection()) {
-            jedis.select(dbIndex - 1);
             jedis.flushDB();
         }
         catch (JedisException e) {
