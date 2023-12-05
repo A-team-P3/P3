@@ -22,6 +22,7 @@ public class Player implements Serializable {
         this.region = region;
         this.creationDate = LocalDate.now();
     }
+
     public Player(String id, String name, String score, String region, String rank) {
         this.id = id;
         this.name = name;
@@ -62,5 +63,9 @@ public class Player implements Serializable {
 
     public void setRank(String rank) {
         this.rank = rank;
+    }
+
+    public String getRank() {
+        return rank;
     }
 }
