@@ -19,9 +19,6 @@ public class DatabasePopulator {
     }
 
     public void populateDatabase(int leaderboardId, int numberOfPlayers) {
-        // Select logical Redis database
-        //jedis = databaseService.selectDatabase(leaderboardId);
-
         Transaction transaction = jedis.multi();
 
         for (int i = 0; i < numberOfPlayers; i++) {
