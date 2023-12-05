@@ -16,5 +16,6 @@ public class DatabaseConventions {
     public String playerObjectKeyString(String playerId) {
         return "player:" + playerId;
     }
+
 }
 

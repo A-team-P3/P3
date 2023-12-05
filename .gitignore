@@ -39,3 +39,10 @@ out/
 
 ### VS Code ###
 .vscode/
+*.lock
+*.lock
+leaderboardServer/.gradle/8.3/fileHashes/fileHashes.bin
+leaderboardServer/.gradle/8.3/executionHistory/executionHistory.bin
+leaderboardServer/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+leaderboardServer/.gradle/8.3/fileHashes/resourceHashesCache.bin
+leaderboardServer/.gradle/buildOutputCleanup/outputFiles.bin

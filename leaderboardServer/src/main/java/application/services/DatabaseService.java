@@ -62,14 +62,16 @@ public class DatabaseService {
     }
 
     // Returns a list of the members with the highest scores
-    public List<Tuple> getMembersByRange(int leaderboardId, int start, int stop) {
+    public List<Player> getMembersByRange(int leaderboardId, int start, int stop) {
         String leaderboardKey = leaderboardSortedKeyString(leaderboardId);
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.exists(leaderboardKey)) {
                 if (start < stop) {
-                    return jedis.zrevrangeWithScores(leaderboardKey, start, stop);
+                    List<Tuple> playerTuple = jedis.zrevrangeWithScores(leaderboardKey, start, stop);
+                    return tupleToPlayerObject(playerTuple, jedis);
                 } else {
-                    return jedis.zrangeWithScores(leaderboardKey, stop, start);
+                    List<Tuple> playerTuple = jedis.zrangeWithScores(leaderboardKey, stop, start);
+                    return tupleToPlayerObject(playerTuple, jedis);
                 }
             }
         } catch (JedisException e) {
@@ -77,6 +79,40 @@ public class DatabaseService {
             System.out.println("Error getting scores");
         }
         return null;
+    }
+
+    private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis) {
+        List<Player> players = new ArrayList<>();
+
+        Pipeline pipeline = jedis.pipelined();
+
+        for (Tuple tuple : tuples) {
+            String[] parts = tuple.getElement().split(":");
+            String userId = parts[2];
+
+            // Add hmget commands to the pipeline
+            pipeline.hmget("player:" + userId, "name", "region");
+        }
+
+        // Execute pipeline commands and retrieve responses
+        List<Object> responses = pipeline.syncAndReturnAll();
+
+        // Process responses and create Player objects
+        for (int i = 0; i < tuples.size(); i++) {
+            Tuple tuple = tuples.get(i);
+            String[] parts = tuple.getElement().split(":");
+            String userScore = parts[0];
+            String userCreationDate = parts[1];
+            String userId = parts[2];
+
+            List<String> responseValues = (List<String>) responses.get(i); //TODO Exception her
+            String name = responseValues.get(0);
+            String region = responseValues.get(1);
+
+            players.add(new Player(userId, name, userScore, region, userCreationDate));
+        }
+
+        return players;
     }
 
     public Integer getSize(int leaderboardId) {
@@ -151,7 +187,7 @@ public class DatabaseService {
             hash.put("name", playerObject.getName());
             hash.put("score", playerObject.getScore());
             hash.put("region", playerObject.getRegion());
-            hash.put("creationDate", playerObject.getCreationDate().toString());
+            hash.put("creationDate", playerObject.getCreationDate());
             jedis.hset(key, hash);
         }
     }
@@ -167,7 +203,7 @@ public class DatabaseService {
                     playerString.get("name"),
                     playerString.get("score"),
                     playerString.get("region"),
-                    LocalDate.parse(playerString.get("creationDate"))
+                    playerString.get("creationDate")
             );
         }
     }
@@ -247,14 +283,13 @@ public class DatabaseService {
         try (Jedis jedis = selectDatabase(leaderboardId)) {
             // Get all entries (name and id) from the playerNames HashMap
             Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
-            int counter = 0;
             // For each entry in the map, get the name and id
             for (Map.Entry<String, String> entry : nameAndIdMap.entrySet()) {
-                counter++;
                 String playerName = entry.getKey();
                 String playerId = entry.getValue();
 
                 // Check if the player name contains the specified name
+                //TODO: make faster (sync?)
                 if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
                     // Fetch score and region with ID, and using pipelining to improve performance
                     Pipeline pipeline = jedis.pipelined();
@@ -267,14 +302,14 @@ public class DatabaseService {
                     String region = regionResponse.get();
                     String creationDate = creationDateResponse.get();
                     String playerValue = score + ":" + creationDate + ":" + playerId;
-                    long rank = jedis.zrank("leaderboardSorted:" + leaderboardId, playerValue);
-                    Player player = new Player(playerId, playerName, score, region, String.valueOf(rank));
+                    long rank = jedis.zrevrank("leaderboardSorted:" + leaderboardId, playerValue);
+                    Player player = new Player(playerId, playerName, score, region, creationDate, String.valueOf(rank+1));
 
-
-                    String playerTest = playerName + " " + playerId + " " + rank;
                     matchingPlayers.add(player);
                 }
             }
+            Comparator<Player> byScore = Comparator.comparingInt(player -> Integer.parseInt(player.getScore()));
+            matchingPlayers.sort(byScore.reversed());
         }
         catch (JedisException e) {
             System.err.println(e + ": error in finding players by name!");
