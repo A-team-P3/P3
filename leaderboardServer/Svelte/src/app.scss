@@ -23,7 +23,8 @@ $barlow: "Barlow", sans-serif;
 
 html,
 body {
-  background-color: $black;
+  background: rgb(56,56,56);
+  background: linear-gradient(307deg, rgba(56,56,56,1) 0%, rgba(36,72,110,1) 100%);
   transition: ease all 500ms;
   min-height: 100vh;
   padding: 0px;
