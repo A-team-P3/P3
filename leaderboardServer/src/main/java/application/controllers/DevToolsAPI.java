@@ -62,20 +62,20 @@ public class DevToolsAPI {
             @RequestParam int leaderboardId,
             @RequestParam int numberOfScores) throws Exception {
         databaseService.populateLeaderboard(leaderboardId, numberOfScores);
-        return new ResponseEntity<String>(numberOfScores + "scores should be created now", HttpStatus.OK);
+        return new ResponseEntity<>(numberOfScores + "scores should be created now", HttpStatus.OK);
     }
 
-    // Wipe specified logical database
+    // Wipe specified leaderboard
+    @GetMapping("/wipeLeaderboard")
+    ResponseEntity<String> wipeLeaderboard(@RequestParam int leaderboardId) {
+        databaseService.wipeLeaderboard(leaderboardId);
+        return new ResponseEntity<>("Leaderboard " + leaderboardId + " wiped!", HttpStatus.OK);
+    }
+
+    // Wipe entire database
     @GetMapping("/wipeDatabase")
-    ResponseEntity<String> wipeDatabase(@RequestParam int leaderboardId) throws Exception {
-        databaseService.wipeDatabase(leaderboardId);
-        return new ResponseEntity<String>("Database " + leaderboardId + " wiped!", HttpStatus.OK);
-    }
-
-    // Wipe all logical databases
-    @GetMapping("/wipeAllDatabases")
-    ResponseEntity<String> wipeAllDatabases() throws Exception {
-        databaseService.wipeAllDatabases();
-        return new ResponseEntity<String>("All databases wiped!", HttpStatus.OK);
+    ResponseEntity<String> wipeDatabase() {
+        databaseService.wipeDatabase();
+        return new ResponseEntity<>("Entire databases wiped!", HttpStatus.OK);
     }
 }
