@@ -68,10 +68,10 @@ public class DatabaseService {
             if (jedis.exists(leaderboardKey)) {
                 if (start < stop) {
                     List<Tuple> playerTuple = jedis.zrevrangeWithScores(leaderboardKey, start, stop);
-                    return tupleToPlayerObject(playerTuple, jedis);
+                    return tupleToPlayerObject(playerTuple, jedis, start);
                 } else {
                     List<Tuple> playerTuple = jedis.zrangeWithScores(leaderboardKey, stop, start);
-                    return tupleToPlayerObject(playerTuple, jedis);
+                    return tupleToPlayerObject(playerTuple, jedis, start);
                 }
             }
         } catch (JedisException e) {
@@ -81,7 +81,7 @@ public class DatabaseService {
         return null;
     }
 
-    private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis) {
+    private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis, int start) {
         List<Player> players = new ArrayList<>();
 
         Pipeline pipeline = jedis.pipelined();
@@ -97,8 +97,11 @@ public class DatabaseService {
         // Execute pipeline commands and retrieve responses
         List<Object> responses = pipeline.syncAndReturnAll();
 
+        int counter = start;
+
         // Process responses and create Player objects
         for (int i = 0; i < tuples.size(); i++) {
+            counter++;
             Tuple tuple = tuples.get(i);
             String[] parts = tuple.getElement().split(":");
             String userScore = parts[0];
@@ -109,7 +112,7 @@ public class DatabaseService {
             String name = responseValues.get(0);
             String region = responseValues.get(1);
 
-            players.add(new Player(userId, name, userScore, region, userCreationDate));
+            players.add(new Player(userId, name, userScore, region, userCreationDate, String.valueOf(counter)));
         }
 
         return players;
