@@ -19,7 +19,7 @@ import java.util.*;
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
     private final DatabaseConventions databaseConventions = new DatabaseConventions();
-    private JedisPool jedisPool;
+    JedisPool jedisPool;    // Made package-private for testing purposes (was private)
 
     private final String AAU_SERVER_IP = "130.225.39.42";
     private final int AAU_PORT = 6379;
