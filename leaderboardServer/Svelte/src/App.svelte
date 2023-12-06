@@ -8,6 +8,8 @@
   let lowestIndex;
   let highestIndex;
   let playersPerFetch = 50;
+  let rankForm;
+  let nameForm;
 
   // elements
   let table;
@@ -69,33 +71,44 @@
 <div id="leaderboard-container">
   <!--HEADER-->
   <nav id="leaderboard-header">
-    <div class="header-elm flex-row-center">
-      Rank
-    </div>
     <div class="header-elm">
-      Username
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <form id="form-rank" bind:this={rankForm}>
+        <label for="score"></label>
+        <input placeholder="RANK" value="" id="score" name="score">
+      </form>
     </div>
-    <div class="header-elm flex-row-center">
-        Region
+    <hr>
+    <div class="header-elm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <form id="form-name" bind:this={nameForm}>
+        <label for="name"></label>
+        <input placeholder="NAME" value="" id="name" name="name">
+      </form>
     </div>
-    <div class="header-elm flex-row-center">
-      Highscore
+    <hr>
+    <div class="header-elm">
+      REGION
+    </div>
+    <hr>
+    <div class="header-elm">
+      HIGHSCORE
     </div>
   </nav>
   <!--TABLE-->
   <div id="leaderboard-body" bind:this={table}>
     {#each players as player}
       <li>
-        <div class="score-info flex-row-center">
+        <div class="score-info">
           {player.rank}
         </div>
-        <div class="score-info">
+        <div class="score-info justify-flex-start">
           {player.name}  <div class="idTag">#{player.id}</div>
         </div>
-        <div class="score-info flex-row-center">
+        <div class="score-info">
           {player.region}
         </div>
-        <div class="score-info flex-row-center">
+        <div class="score-info">
           {player.score}
         </div>
       </li>
@@ -120,13 +133,44 @@
       justify-content: space-evenly;
       color: $white;
       background-color: $indigo-black;
-      height: 25rem;
       border-radius: 0.25rem;
       .header-elm{
-        overflow: hidden;
+        overflow-x: hidden;
+        height: 3rem;
+        text-align: center;
+        font-weight: 900;
         width: 100%;
         display: flex;
-        justify-content: flex-start;
+        align-items: center;
+        justify-content: center;
+        form{
+          transition: ease all 300ms;
+          border-radius: 0.25rem;
+          input{
+            font-size: 1rem;
+            font-weight: 900;
+            color: $white;
+            height: 2rem;
+            width: 4rem;
+            border: none;
+            outline: none ! important;
+            padding: 5px;
+            background: transparent;
+            transition: ease all 300ms;
+            border-radius: 0.25rem;
+          }
+          :hover{
+            cursor: pointer;
+            background-color: $indigo-dark;
+            color: $primary-hover;
+          }
+        }
+        #form-name input{
+          width: 8rem;
+        }
+        svg{
+          margin-right: 0.2rem;
+        }
       }
     }
     #leaderboard-body{
@@ -147,7 +191,7 @@
           overflow: hidden;
           width: 100%;
           display: flex;
-          justify-content: flex-start;
+          justify-content: center;
         }
         .idTag{
           text-align: center;
@@ -164,8 +208,11 @@
 
     }
   }
-  .flex-row-center{
-    flex-direction: column;
+  .justify-flex-start{
+    justify-content: flex-start !important;
+  }
+  hr{
+    color: lightslategrey;
   }
  
 </style>

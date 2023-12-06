@@ -1,13 +1,11 @@
 $primary: #5989b1;
 $primary-hover: #77b4e7;
-$white: #e0dddd;
+$white: #ffffff;
 $black: #292929;
 $indigo: #303044;
 $indigo-dark: #232334;
 $indigo-ultradark: #1c1c2a;
 $indigo-black: #14141d;
-
-$box-shadow-primary: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
 $breakpoint-desktop: 1200px;
 
@@ -37,10 +35,24 @@ body {
   margin: 0 auto;
   padding: 2rem;
   height: 100vh;
-  border: 3px solid orange;
   text-align: center;
 }
 
 li {
   list-style: none;
+}
+
+// Firefox
+::placeholder {
+  font-size: 1rem;
+  font-weight: 900;
+  color: $white;
+  opacity: 1;
+}
+
+// Edge 12 -18
+::-ms-input-placeholder {
+  font-size: 1rem;
+  font-weight: 900;
+  color: $white;;
 }
