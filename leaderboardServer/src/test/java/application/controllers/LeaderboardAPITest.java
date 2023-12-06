@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import redis.clients.jedis.resps.Tuple;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,17 +26,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(LeaderboardAPI.class)
 class LeaderboardAPITest {
 
-    // MockMvc is a Spring class that allows us to test Spring MVC web application
+    // This annotation injects a MockMvc instance for testing HTTP layer,
+    // enabling sending HTTP requests and asserting responses.
     @Autowired
     private MockMvc mockMvc;
 
-    // MockBean allows us to mock and inject a bean.
-    // A bean is an object that is instantiated, assembled, and managed by a Spring IoC container.
+    // @MockBean is used to create a mock instance of DatabaseService for testing, isolating the
+    // LeaderboardAPI from actual database interactions.
     @MockBean
     private DatabaseService databaseService;
 
-    // Simulates a GET request to the /findPlayer endpoint and asserts a 200 (OK) status code,
-    // and the expected JSON response.
+    // /findPlayer end-point
+    // Simulate a GET request to the end-point, assert a 200 (OK) status code and expected JSON response.
     @Test
     void findPlayerShouldReturnMatchingPlayer() throws Exception {
         // Arrange
@@ -45,11 +47,13 @@ class LeaderboardAPITest {
         List<Player> matchingPlayers = List.of(player);
 
         // Act
-        // Mocking the databaseService.findPlayersByName() method with when() from the Mockito library
+        // Mock findPlayersByName() with when() from the Mockito library
+        // This isolates the unit of code being tested, removing dependencies and allowing control over external
+        // system behavior. This ensures tests are reliable, fast and focused on the unit's behavior.
         when(databaseService.findPlayersByName(name, leaderboardId)).thenReturn(matchingPlayers);
 
         // Assert
-        // Simulating the HTTP GET request to the /findPlayer endpoint
+        // Simulate the HTTP GET request to the /findPlayer end-point
         mockMvc.perform(MockMvcRequestBuilders.get("/findPlayer")   // Building the request
             .param("name", name)
             .param("leaderboardId", String.valueOf(leaderboardId))
@@ -64,5 +68,31 @@ class LeaderboardAPITest {
                     "'rank':'1'" +
                     "}]"
             ));
+    }
+
+    // /players end-point
+    @Test
+    void playersShouldReturnExpectedResponse() throws Exception {
+        // Arrange
+        int leaderboardId = 1;
+        int start = 0;
+        int stop = 10;
+        Tuple tuple = new Tuple("Batman", 1337.0);
+        List<Tuple> members = List.of(tuple);
+
+        // Act
+        when(databaseService.getMembersByRange(leaderboardId, start, stop)).thenReturn(members);
+
+        // Assert
+        mockMvc.perform(MockMvcRequestBuilders.get("/players")
+            .param("leaderboardId", String.valueOf(leaderboardId))
+            .param("start", String.valueOf(start))
+            .param("stop", String.valueOf(stop))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().json("[{" +
+                    "'element':'Batman'," +
+                    "'score':1337.0" +
+            "}]"));
     }
 }
