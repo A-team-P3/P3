@@ -76,9 +76,6 @@
       Username
     </div>
     <div class="header-elm flex-row-center">
-      UserId
-    </div>
-    <div class="header-elm flex-row-center">
         Region
     </div>
     <div class="header-elm flex-row-center">
@@ -93,10 +90,7 @@
           {player.rank}
         </div>
         <div class="score-info">
-          {player.name}
-        </div>
-        <div class="score-info flex-row-center">
-          {player.id}
+          {player.name}  <div class="idTag">#{player.id}</div>
         </div>
         <div class="score-info flex-row-center">
           {player.region}
@@ -114,46 +108,58 @@
   #leaderboard-container{
     display: flex;
     flex-direction: column;
-    background-color: red;
+    background-color: $indigo;
+    border-radius: 0.5rem;
+    padding: 1rem;
     height: 100%;
     width: 100%;
     #leaderboard-header{
+      margin-bottom: 0.5rem;
       display: flex;
       flex-direction: row;
       justify-content: space-evenly;
-      color: red;
-      background-color: $grey-ultradark;
-      border: 1px solid green;
-      height: 15rem;
+      color: $white;
+      background-color: $indigo-black;
+      height: 25rem;
+      border-radius: 0.25rem;
       .header-elm{
         overflow: hidden;
         width: 100%;
-        border: 1px red solid;
         display: flex;
         justify-content: flex-start;
       }
     }
     #leaderboard-body{
-      background-color: $grey-dark;
-      border: 1px solid yellow;
       overflow-y: scroll;
       li{
+        box-shadow: inset 0 0 5px black;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        margin: 0.5rem 0 0.5rem 0;
+        background-color: $indigo-dark;
         display: flex;
         flex-direction: row;
         justify-content: space-evenly;
-        color: red;
+        color: $white;
         .score-info{
+          color: inherit;
           background-color: inherit;
           overflow: hidden;
           width: 100%;
-          border: 1px red solid;
           display: flex;
           justify-content: flex-start;
         }
+        .idTag{
+          text-align: center;
+          font-size: 0.8rem;
+          padding-left: 0.5rem;
+          background-color: inherit;
+          color: lightslategrey;
+        }
       }
       :nth-child(odd){
-        background-color: $grey-ultradark;
-        color: blueviolet;
+        background-color: $indigo-ultradark;
+        color: $primary;
       }
 
     }
