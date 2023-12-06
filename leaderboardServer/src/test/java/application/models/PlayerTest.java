@@ -11,16 +11,20 @@ import static org.junit.jupiter.api.Assertions.*;
 // TODO: set 'runTests = true' before running tests! Location: leaderboardServer/gradle.properties
 
 class PlayerTest {
-    Player player;
+    Player player, player2, player3;
 
     @BeforeEach
     void setUp() {
-        player = new Player("ABCD123", "Tester", "42", "EU", "69");
+        player = new Player("A1B2C3D", "Tester", "1337", "NA");
+        player2 = new Player("ABCD123", "Tester2", "42", "EU", "2022-08-29");
+        player3 = new Player("1A2B3C4", "Tester3", "69", "AS", "2023-12-24", "314");
     }
 
     @AfterEach
     void tearDown() {
         player = null;
+        player2 = null;
+        player3 = null;
     }
 
     @Test
@@ -29,8 +33,18 @@ class PlayerTest {
     }
 
     @Test
+    void player2ShouldExist() {
+        assertNotNull(player2);
+    }
+
+    @Test
+    void player3ShouldExist() {
+        assertNotNull(player3);
+    }
+
+    @Test
     void idShouldBeABCD123() {
-        assertEquals("ABCD123", player.getId());
+        assertEquals("A1B2C3D", player.getId());
     }
 
     @Test
@@ -40,17 +54,17 @@ class PlayerTest {
 
     @Test
     void scoreShouldBe42() {
-        assertEquals("42", player.getScore());
+        assertEquals("1337", player.getScore());
     }
 
     @Test
     void regionShouldBeEU() {
-        assertEquals("EU", player.getRegion());
+        assertEquals("NA", player.getRegion());
     }
 
     @Test
     void rankShouldBe69() {
-        assertEquals("69", player.getRank());
+        assertEquals("314", player3.getRank());
     }
 
     @Test
@@ -59,7 +73,7 @@ class PlayerTest {
     }
 
     @Test
-    void creationDateShouldBeNow() {
-        assertEquals(player.getCreationDate(), LocalDate.now());
+    void creationDateShouldBeCorrect() {
+        assertEquals(player3.getCreationDate(), "2023-12-24");
     }
 }

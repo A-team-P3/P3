@@ -15,12 +15,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// Auto-configures a MockMvc instance, used for Spring Boot tests,
-// and only loads the web layer context of the LeaderboardAPI class.
+// Auto-configures a MockMvc instance, used for Spring MVC tests, and only loads the web layer context of the class.
+// This lets us use the LeaderboardAPI controller without requiring the entire application to be running.
 @WebMvcTest(LeaderboardAPI.class)
 class LeaderboardAPITest {
     Player player, player2;
@@ -34,17 +35,25 @@ class LeaderboardAPITest {
     @AfterEach
     void tearDown() {
         player = null;
+        player2 = null;
     }
 
-    // This annotation injects a MockMvc instance for testing HTTP layer,
-    // enabling sending HTTP requests and asserting responses.
+    // Injects a MockMvc instance for testing HTTP end-points, enabling sending HTTP requests and asserting responses.
     @Autowired
     private MockMvc mockMvc;
 
-    // @MockBean is used to create a mock instance of DatabaseService for testing, isolating the
-    // LeaderboardAPI from actual database interactions.
+    // Similar to instantiating a LeaderboardAPI object, but Spring Boot handles this for us.
+    @Autowired
+    private LeaderboardAPI leaderboardAPI;
+
+    // Used to create a mock instance of DatabaseService for testing, isolating the LeaderboardAPI from actual database interactions.
     @MockBean
     private DatabaseService databaseService;
+
+    @Test
+    void leaderboardApiShouldExist() {
+        assertNotNull(leaderboardAPI);
+    }
 
     // /findPlayer end-point
     // Simulate a GET request to the end-point, assert a 200 (OK) status code and expected JSON response.
@@ -80,7 +89,7 @@ class LeaderboardAPITest {
 
     // /players end-point
     @Test
-    void playersShouldReturnExpectedResponse() throws Exception {
+    void playersShouldReturnBatmanAndRobin() throws Exception {
         // Arrange
         int leaderboardId = 1;
         int start = 0;
@@ -112,5 +121,23 @@ class LeaderboardAPITest {
                 "'creationDate':'2024-01-01'," +
                 "'rank':'2'" +
             "}]"));
+    }
+
+    // /size end-point
+    @Test
+    void sizeShouldReturn3() throws Exception {
+        // Arrange
+        int leaderboardId = 1;
+        int size = 3;
+
+        // Act
+        when(databaseService.getSize(leaderboardId)).thenReturn(size);
+
+        // Assert
+        mockMvc.perform(MockMvcRequestBuilders.get("/size")
+            .param("leaderboardId", String.valueOf(leaderboardId))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().json("3"));
     }
 }

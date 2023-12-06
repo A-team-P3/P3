@@ -21,10 +21,12 @@ public class LeaderboardAPI {
     public LeaderboardAPI(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
+
     @GetMapping("/size")
     ResponseEntity<Integer> size(@RequestParam int leaderboardId) {
         return new ResponseEntity<>(databaseService.getSize(leaderboardId), HttpStatus.OK);
     }
+
     @GetMapping("/players")
     ResponseEntity<List<Player>> players(
             @RequestParam int leaderboardId,
