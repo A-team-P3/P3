@@ -26,7 +26,11 @@ public class LeaderboardAPI {
         return new ResponseEntity<>(databaseService.getSize(leaderboardId), HttpStatus.OK);
     }
     @GetMapping("/players")
-    ResponseEntity<List<Player>> players(@RequestParam int leaderboardId, int start, int stop) {
+    ResponseEntity<List<Player>> players(
+            @RequestParam int leaderboardId,
+            @RequestParam int start,
+            @RequestParam int stop
+    ) {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
 
