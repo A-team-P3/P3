@@ -29,15 +29,27 @@ public class DatabaseService {
     private final int CLOUD_PORT = 12618;
     private final String CLOUD_SERVER_PASSWORD = "MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9";
 
+    public enum ServerType {
+        AAU, CLOUD, LOCAL
+    }
+
+    //change server here
+    private final ServerType serverType = ServerType.CLOUD;
+
     public DatabaseService() {
-        // AAU Server
-        //this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
-
-        // Redis Cloud
-        this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
-
-        // LocalHost
-        //this.jedisPool = new JedisPool("localhost", 6379);
+        switch (serverType) {
+            case AAU:
+                this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
+                break;
+            case CLOUD:
+                this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
+                break;
+            case LOCAL:
+                this.jedisPool = new JedisPool("localhost", 6379);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid server type");
+        }
     }
 
     public Jedis getJedisConnection() {
@@ -220,30 +232,6 @@ public class DatabaseService {
             System.err.println(e + ": error populating database!");
         }
     }
-/* Old code, creates a request to redis for each player in the range
-    public Leaderboard getScoreByRange(int leaderboardId, int start, int stop) {
-        try (Jedis jedis = getJedisConnection()) {
-            List<PlayerScore> scores = new ArrayList<>();
-            List<String> result = jedis.zrevrange(leaderboardSortedKeyString(leaderboardId), start - 1, stop - 1);
-
-            for (int i = 0; i < result.size(); i++) {
-                String[] parts = result.get(i).split(":");
-                int playerScore = Integer.parseInt(parts[0]);
-                String userId = parts[2];
-
-                // Fetch additional player data like region
-                String region = jedis.hget("player:" + userId, "region");
-
-                // Rank is the index + 1
-                int rank = start + i;
-
-                PlayerScore playerScoreObj = new PlayerScore(playerScore, userId, region, rank);
-                scores.add(playerScoreObj);
-            }
-            return new Leaderboard(leaderboardId, "Leaderboard Name", scores.size(), scores);
-        }
-        // Handle exceptions if necessary
-    } */
     public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
         try (Jedis jedis = getJedisConnection()) {
             List<PlayerScore> scores = new ArrayList<>();
