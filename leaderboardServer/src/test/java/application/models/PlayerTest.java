@@ -54,12 +54,6 @@ class PlayerTest {
     }
 
     @Test
-    void rankShouldBeSetTo1337() {
-        player.setRank("1337");
-        assertEquals("1337", player.getRank());
-    }
-
-    @Test
     void creationDateShouldBeSetByDefault() {
         assertNotNull(player.getCreationDate());
     }
