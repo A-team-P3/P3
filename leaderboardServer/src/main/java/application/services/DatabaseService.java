@@ -29,15 +29,27 @@ public class DatabaseService {
     private final int CLOUD_PORT = 12618;
     private final String CLOUD_SERVER_PASSWORD = "MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9";
 
+    public enum ServerType {
+        AAU, CLOUD, LOCAL
+    }
+
+    //change server here
+    private final ServerType serverType = ServerType.CLOUD;
+
     public DatabaseService() {
-        // AAU Server
-        //this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
-
-        // Redis Cloud
-        this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
-
-        // LocalHost
-        //this.jedisPool = new JedisPool("localhost", 6379);
+        switch (serverType) {
+            case AAU:
+                this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
+                break;
+            case CLOUD:
+                this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
+                break;
+            case LOCAL:
+                this.jedisPool = new JedisPool("localhost", 6379);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid server type");
+        }
     }
 
     public Jedis getJedisConnection() {
@@ -62,14 +74,16 @@ public class DatabaseService {
     }
 
     // Returns a list of the members with the highest scores
-    public List<Tuple> getMembersByRange(int leaderboardId, int start, int stop) {
+    public List<Player> getMembersByRange(int leaderboardId, int start, int stop) {
         String leaderboardKey = leaderboardSortedKeyString(leaderboardId);
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.exists(leaderboardKey)) {
                 if (start < stop) {
-                    return jedis.zrevrangeWithScores(leaderboardKey, start, stop);
+                    List<Tuple> playerTuple = jedis.zrevrangeWithScores(leaderboardKey, start, stop);
+                    return tupleToPlayerObject(playerTuple, jedis, start);
                 } else {
-                    return jedis.zrangeWithScores(leaderboardKey, stop, start);
+                    List<Tuple> playerTuple = jedis.zrangeWithScores(leaderboardKey, stop, start);
+                    return tupleToPlayerObject(playerTuple, jedis, start);
                 }
             }
         } catch (JedisException e) {
@@ -77,6 +91,43 @@ public class DatabaseService {
             System.out.println("Error getting scores");
         }
         return null;
+    }
+
+    private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis, int start) {
+        List<Player> players = new ArrayList<>();
+
+        Pipeline pipeline = jedis.pipelined();
+
+        for (Tuple tuple : tuples) {
+            String[] parts = tuple.getElement().split(":");
+            String userId = parts[2];
+
+            // Add hmget commands to the pipeline
+            pipeline.hmget("player:" + userId, "name", "region");
+        }
+
+        // Execute pipeline commands and retrieve responses
+        List<Object> responses = pipeline.syncAndReturnAll();
+
+        int counter = start;
+
+        // Process responses and create Player objects
+        for (int i = 0; i < tuples.size(); i++) {
+            counter++;
+            Tuple tuple = tuples.get(i);
+            String[] parts = tuple.getElement().split(":");
+            String userScore = parts[0];
+            String userCreationDate = parts[1];
+            String userId = parts[2];
+
+            List<String> responseValues = (List<String>) responses.get(i); //TODO Exception her
+            String name = responseValues.get(0);
+            String region = responseValues.get(1);
+
+            players.add(new Player(userId, name, userScore, region, userCreationDate, String.valueOf(counter)));
+        }
+
+        return players;
     }
 
     public Integer getSize(int leaderboardId) {
@@ -151,7 +202,7 @@ public class DatabaseService {
             hash.put("name", playerObject.getName());
             hash.put("score", playerObject.getScore());
             hash.put("region", playerObject.getRegion());
-            hash.put("creationDate", playerObject.getCreationDate().toString());
+            hash.put("creationDate", playerObject.getCreationDate());
             jedis.hset(key, hash);
         }
     }
@@ -167,7 +218,7 @@ public class DatabaseService {
                     playerString.get("name"),
                     playerString.get("score"),
                     playerString.get("region"),
-                    LocalDate.parse(playerString.get("creationDate"))
+                    playerString.get("creationDate")
             );
         }
     }
@@ -181,30 +232,6 @@ public class DatabaseService {
             System.err.println(e + ": error populating database!");
         }
     }
-/* Old code, creates a request to redis for each player in the range
-    public Leaderboard getScoreByRange(int leaderboardId, int start, int stop) {
-        try (Jedis jedis = getJedisConnection()) {
-            List<PlayerScore> scores = new ArrayList<>();
-            List<String> result = jedis.zrevrange(leaderboardSortedKeyString(leaderboardId), start - 1, stop - 1);
-
-            for (int i = 0; i < result.size(); i++) {
-                String[] parts = result.get(i).split(":");
-                int playerScore = Integer.parseInt(parts[0]);
-                String userId = parts[2];
-
-                // Fetch additional player data like region
-                String region = jedis.hget("player:" + userId, "region");
-
-                // Rank is the index + 1
-                int rank = start + i;
-
-                PlayerScore playerScoreObj = new PlayerScore(playerScore, userId, region, rank);
-                scores.add(playerScoreObj);
-            }
-            return new Leaderboard(leaderboardId, "Leaderboard Name", scores.size(), scores);
-        }
-        // Handle exceptions if necessary
-    } */
     public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
         try (Jedis jedis = getJedisConnection()) {
             List<PlayerScore> scores = new ArrayList<>();
@@ -238,6 +265,7 @@ public class DatabaseService {
         // Handle exceptions if necessary
     }
 
+    // TODO: can be optimized a bit more in terms of time complexity: N+2M can be reduced to N+1 (N = number of players, M = number of matching players)
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
     // Note: we NEED to look at all names in the leaderboard if we want to find multiple names that CONTAIN the specified name
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
@@ -246,14 +274,13 @@ public class DatabaseService {
         try (Jedis jedis = getJedisConnection()) {
             // Get all entries (name and id) from the playerNames HashMap
             Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
-            int counter = 0;
             // For each entry in the map, get the name and id
             for (Map.Entry<String, String> entry : nameAndIdMap.entrySet()) {
-                counter++;
                 String playerName = entry.getKey();
                 String playerId = entry.getValue();
 
                 // Check if the player name contains the specified name
+                //TODO: make faster (sync?)
                 if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
                     // Fetch score and region with ID, and using pipelining to improve performance
                     Pipeline pipeline = jedis.pipelined();
@@ -266,13 +293,14 @@ public class DatabaseService {
                     String region = regionResponse.get();
                     String creationDate = creationDateResponse.get();
                     String playerValue = score + ":" + creationDate + ":" + playerId;
-                    long rank = jedis.zrank("leaderboardSorted:" + leaderboardId, playerValue);
-                    Player player = new Player(playerId, playerName, score, region, String.valueOf(rank));
+                    long rank = jedis.zrevrank("leaderboardSorted:" + leaderboardId, playerValue);
+                    Player player = new Player(playerId, playerName, score, region, creationDate, String.valueOf(rank+1));
 
-                    String playerTest = playerName + " " + playerId + " " + rank;
                     matchingPlayers.add(player);
                 }
             }
+            Comparator<Player> byScore = Comparator.comparingInt(player -> Integer.parseInt(player.getScore()));
+            matchingPlayers.sort(byScore.reversed());
         }
         catch (JedisException e) {
             System.err.println(e + ": error in finding players by name!");

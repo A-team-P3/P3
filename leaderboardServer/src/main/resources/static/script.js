@@ -4,15 +4,25 @@ let numberOfPlayers;
 let lowestIndex;
 let highestIndex;
 let playersPerFetch = 50;
-const form = document.getElementById("frm");
-const form2 = document.getElementById("frm2");
+const rankForm = document.getElementById("rankForm");
+const nameForm = document.getElementById("nameForm");
+const div = document.querySelector("#leaderboard-container");
 let leaderboardId = 1;
+let name;
 let table = document.getElementById("leaderboard");
 let isEventProcessing = false;
+nameForm.addEventListener("submit",  handleSubmitName);
+rankForm.addEventListener("submit",  handleSubmitRank);
 
-form2.addEventListener("submit",  handleSubmit);
-form.addEventListener("submit",  handleSubmitRank);
 
+//Initial call, when site is loaded
+function initialize() {
+    tableInsert(0, playersPerFetch - 1).then(r => "init failed: " + r);
+}
+
+initialize();
+
+//scrolls to row in table
 function scrollToRow(rowNumber) {
     let row = table.rows[rowNumber];
     if (row) {
@@ -25,11 +35,11 @@ document.getElementById('btn-switch').addEventListener('click', function() {
     svg.classList.toggle('rotate180');
 });
 
-
+/*
 function handleSubmit(e){
     e.preventDefault();
 
-    let input = parseInt(document.getElementById("leaderboardId").value);
+    let input = parseInt(document.getElementById("name").value);
     if (isNaN(input)) {
         return;
     }
@@ -44,7 +54,24 @@ function handleSubmit(e){
     tableInsert(0, playersPerFetch - 1)
     isEventProcessing = false;
 }
+*/
 
+//Handle when user searches for a name in name form
+async function handleSubmitName(e) {
+    e.preventDefault();
+
+    name = document.getElementById("name").value;
+    if (name === "" || name === undefined) {
+        tableClear();
+        initialize();
+    } else {
+        tableClear();
+        await searchTableInsert();
+    }
+    console.log(name);
+}
+
+//handle when user searches for a rank in rank form
 async function handleSubmitRank(e) {
     e.preventDefault();
     let input = parseInt(document.getElementById("rank").value);
@@ -52,7 +79,7 @@ async function handleSubmitRank(e) {
         return;
     }
 
-    await getNumberOfPlayers()
+    await getNumberOfPlayers();
     if (input > numberOfPlayers) {
         alert(`Search Failed: Lowest Rank: ${numberOfPlayers}`);
         return;
@@ -71,23 +98,31 @@ async function handleSubmitRank(e) {
 
 }
 
+//updates numberOfPlayers field from backend through size endpoint
 async function getNumberOfPlayers() {
-    const response2 = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
-    numberOfPlayers = parseInt(await response2.json());
+    const response = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
+    numberOfPlayers = parseInt(await response.json());
 }
 
+//updates the players field from backend through players endpoint
+//takes range min and max
 async function getPlayers(min, max) {
     players = [];
     //localhost:8080/players?min=15&max=5
     const response = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
-    const data = await response.json();
-
-    for(const i in data) {
-        players.push(data[i]);
-    }
-
+    players = await response.json();
 }
 
+//updates the players field from backend through findPlayer endpoint
+//takes string as parameter and returns all players containing it
+async function getPlayerSearch() {
+    players = [];
+    const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
+    players = await response.json();
+    console.log(players);
+}
+
+//clears table without deleting header
 function tableClear(){
     players = [];
     let tableHeader = table.rows[0].innerHTML;
@@ -113,10 +148,11 @@ async function tableInsert(startRange, endRange) {
     if (highestIndex === undefined) {
         highestIndex = endRange+1;
     }
-    //get number of users, should be improved so its called less
-    await getNumberOfPlayers()
+
 
     await getPlayers(startRange, endRange);
+
+
     if (players.length === 0) {
         return;
     }
@@ -127,7 +163,7 @@ async function tableInsert(startRange, endRange) {
     }
     for (let i = 0; i < players.length; i++) {
         counter++;
-        table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].element + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
+        table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].name + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
     }
     console.log(`Inserted ${startRange+1} to ${counter}`);
     if (startRange < lowestIndex) {
@@ -136,15 +172,25 @@ async function tableInsert(startRange, endRange) {
     if (endRange > highestIndex) {
         highestIndex = counter;
     }
-
-
 }
 
-//lowestIndex = 299; highestIndex = 299+usersPerFetch;
-tableInsert(0, playersPerFetch - 1);
+//inserts data from findPlayers endpoint into table
+async function searchTableInsert() {
+    await getPlayerSearch();
+    for (let i = 0; i < players.length; i++) {
+        table.insertRow(i+1).innerHTML = '<tr><td>' + players[i].rank + '</td><td>' + players[i].name + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
+    }
+}
 
-const div = document.querySelector("#leaderboard-container")
 
+function drawTable(rank, name, score) {
+    for (let i = 0; i < players.length; i++) {
+        counter++;
+        table.insertRow(i+rows).innerHTML = '<tr><td>' + (counter).toLocaleString() + '</td><td>' + players[i].name + '</td><td>' + players[i].score.toLocaleString() + '</td></tr>';
+    }
+}
+//scroll event listener, calls tableInsert when scrolled to bottom
+//TODO: refactor into a separate function and add eventlistener at top
 div.addEventListener("scroll", async () => {
     if (isEventProcessing) {
         return; // If the event is already being processed, exit early

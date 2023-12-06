@@ -1,8 +1,10 @@
 package application.models;
 
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.data.redis.core.RedisHash;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 
 @RedisHash("Player")
 public class Player implements Serializable {
@@ -10,29 +12,28 @@ public class Player implements Serializable {
     private String name;
     private String score;
     private String region;
-    private LocalDate creationDate;
+    private String creationDate;
     private String rank;
 
-    // Make new Player constructor
+    //Make new player constructor
     public Player(String id, String name, String score, String region) {
         this.id = id;
         this.name = name;
         this.score = score;
         this.region = region;
-        this.creationDate = LocalDate.now();
+        this.creationDate = LocalDate.now().toString();
     }
-
-    public Player(String id, String name, String score, String region, String rank) {
+    public Player(String id, String name, String score, String region, String creationDate, String rank) {
         this.id = id;
         this.name = name;
         this.score = score;
         this.region = region;
-        this.creationDate = LocalDate.now();
+        this.creationDate = creationDate;
         this.rank = rank;
     }
 
-    // Update player constructor (used when pulling a player from Redis)
-    public Player(String id, String name, String score, String region, LocalDate creationDate) {
+    //Update player constructor; Used when pulling a player from Redis
+    public Player(String id, String name, String score, String region, String creationDate) {
         this.id = id;
         this.name = name;
         this.score = score;
@@ -56,15 +57,11 @@ public class Player implements Serializable {
         return region;
     }
 
-    public LocalDate getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 
     public String getRank() {
         return rank;
-    }
-
-    public void setRank(String rank) {
-        this.rank = rank;
     }
 }
