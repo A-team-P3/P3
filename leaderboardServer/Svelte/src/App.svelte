@@ -5,33 +5,61 @@
   let players = [];
   let leaderboardId = 1;
   let numberOfPlayers;
-  let lowestIndex;
-  let highestIndex;
+  let lowestIndex = 0;
+  let highestIndex = 0;
   let playersPerFetch = 50;
+  let searchingNameState = false;
 
   // HTML elements
   let table;
   let rankForm;
   let nameForm;
 
-  onMount(()=>{
+  let scrollProcessing = false;
 
-    const getData = async () => {
-      const res = await fetch("http://localhost:7070/players?leaderboardId=1&start=0&stop=150");
-      const data = await res.json();
-      console.log(data[2])
-      players = data;
-      return res
+  onMount( async ()=> {
+
+    // Startup tasks
+    await loadPlayers(0, 49);
+    numberOfPlayers = getNumberOfPlayers();
+
+    table.addEventListener('scroll', async() => {
+
+      if (scrollProcessing) {
+        return;
+      }
+      scrollProcessing = true;
+      try {
+        if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
+          await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
+        }
+
+
+      } finally {
+        scrollProcessing = false;
+      }
+    });
+
+
+    async function loadPlayers(start, stop) {
+      await getPlayers(start, stop)
+      if (stop > highestIndex) {
+        highestIndex = stop;
+      }
     }
 
-    getData();
+    async function getPlayers(min, max) {
+      const res = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
+      const data = await res.json();
 
+      players = players.concat(data);
+    }
 
-    console.log(getData());
-    //getData();
-    //console.log(date);
+    function clearTable(){
+      players = [];
+    }
+
     function scrollToRow(rowNumber) {
-
       const row = table.childNodes[rowNumber]
       if (row) {
         row.scrollIntoView({block: 'start', inline: "nearest"});
@@ -42,29 +70,42 @@
       const res = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
       return parseInt(await res.json());
     }
-    async function getPlayers(min, max) {
-      let players = [];
-      //localhost:8080/players?min=15&max=5
-      const res = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
-      players = await res.json();
-      return players;
-    }
-    async function getPlayerSearch() {
-      let players = [];
+
+    async function getPlayerSearch(name) {
       const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
       players = await response.json();
-      console.log(players);
-      return players;
     }
 
-    numberOfPlayers = getNumberOfPlayers();
+    rankForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      let input = parseInt(rankForm.elements.rank.value);
+      if (isNaN(input)) {
+        return;
+      }
+      clearTable();
+      await loadPlayers(input-1, input+playersPerFetch);
 
-    setTimeout(()=>{
-      console.log(numberOfPlayers);
-      scrollToRow(5);
-    }, 1000)
 
-  })
+      console.log(input);
+    })
+
+    nameForm.addEventListener("submit", async (e) =>{
+      e.preventDefault();
+      let input = nameForm.elements.name.value;
+      if (input === "") {
+        scrollProcessing = false;
+        clearTable();
+        await loadPlayers(0, 49);
+        return;
+      }
+      console.log("HALLO");
+      scrollProcessing = true;
+      await getPlayerSearch(input);
+
+    });
+
+    $: searchingNameState = nameForm.elements.name.value === "";
+  });
 </script>
 
 
@@ -74,9 +115,10 @@
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <form id="form-rank" bind:this={rankForm}>
-        <label for="score"></label>
-        <input placeholder="RANK" value="" id="score" name="score">
+        <label for="rank"></label>
+        <input placeholder="RANK" value="" id="rank" name="rank">
       </form>
+      <button></button>
     </div>
     <hr>
     <div class="header-elm">
@@ -85,6 +127,7 @@
         <label for="name"></label>
         <input placeholder="NAME" value="" id="name" name="name">
       </form>
+      <button></button>
     </div>
     <hr>
     <div class="header-elm">
