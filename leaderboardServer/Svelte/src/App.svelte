@@ -183,7 +183,9 @@
         <label for="rank"></label>
         <input bind:value={rankFormValue} placeholder="RANK" id="rank" name="rank">
         {#if rankFormValue !== ""}
-          <button type="button" on:click={handleRankClear}>X</button>
+          <button type="button" on:click={handleRankClear}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         {/if}
       </form>
     </div>
@@ -194,7 +196,9 @@
         <label for="name"></label>
         <input bind:value={nameFormValue} placeholder="NAME" id="name" name="name">
         {#if nameFormValue !== ""}
-          <button type="button" on:click={handleNameClear}>X</button>
+          <button type="button" on:click={handleNameClear}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         {/if}
       </form>
 
@@ -286,24 +290,23 @@
             transition: ease all 300ms;
             border-radius: 0.25rem;
           }
-          :hover{
+          input:hover{
             cursor: pointer;
             background-color: $indigo-dark;
             color: $primary-hover;
           }
           button{
+            transition: ease all 300ms;
             background-color: #ff5d69;
-            color: white;
+            color: $white;
             border: none;
-            padding: 3px 9px;
+            padding: 0.25rem;
             cursor: pointer;
-            border-radius: 5px;
-            font-size: 20px;
-            :hover{
-              cursor: pointer;
-              background-color: firebrick;
-              color: gray;
-            }
+            border-radius: 0.25rem;
+          }
+          button:hover{
+            cursor: pointer;
+            scale: 1.15;
           }
         }
         #form-name input{
