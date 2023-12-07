@@ -17,7 +17,7 @@ import java.util.*;
 @Service //Service for interacting with the database to get user data
 public class DatabaseService {
     private final DatabaseConventions databaseConventions = new DatabaseConventions();
-    JedisPool jedisPool;    // Made package-private for testing purposes (was private)
+    private JedisPool jedisPool;
 
     private final String AAU_SERVER_IP = "130.225.39.42";
     private final int AAU_PORT = 6379;
@@ -53,6 +53,11 @@ public class DatabaseService {
     public Jedis getJedisConnection() {
         Jedis jedis = jedisPool.getResource();
         return jedis;
+    }
+
+    // For testing purposes
+    public void setJedisPool(JedisPool jedisPool) {
+        this.jedisPool = jedisPool;
     }
 
     private String leaderboardSortedKeyString(int leaderboardId) {
@@ -230,6 +235,7 @@ public class DatabaseService {
             System.err.println(e + ": error populating database!");
         }
     }
+
     public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
         try (Jedis jedis = getJedisConnection()) {
             List<PlayerScore> scores = new ArrayList<>();

@@ -9,7 +9,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class DatabaseServiceTest {
     DatabaseService databaseService;
@@ -22,10 +22,12 @@ class DatabaseServiceTest {
         // Create mock objects using Mockito to control their behavior and isolate tested methods
         jedisPoolMock = Mockito.mock(JedisPool.class);
         jedisMock = Mockito.mock(Jedis.class);
+
+        // Define the behavior of the mock objects
         when(jedisPoolMock.getResource()).thenReturn(jedisMock);
 
         databaseService = new DatabaseService();
-        databaseService.jedisPool = jedisPoolMock;
+        databaseService.setJedisPool(jedisPoolMock);
 
         testPlayer = new Player("ABCD123", "Bruce Wayne", "1337", "NA", "1587991691");
     }
@@ -74,31 +76,4 @@ class DatabaseServiceTest {
         boolean result = databaseService.isPlayerExisting("1234ABC", 1);
         assertFalse(result);
     }
-
-    // TODO: out-commented because these methods are private and cannot be tested
-    /*@Test
-    void leaderboardSortedKeyStringShouldBeCorrect() {
-        int leaderboardId = 1;
-        String result = databaseService.leaderboardSortedKeyString(leaderboardId);
-        assertEquals("leaderboardSorted:1", result);
-    }
-
-    @Test
-    void leaderboardHashMapKeyStringShouldBeCorrect() {
-        int leaderboardId = 1;
-        String result = databaseService.leaderboardHashMapKeyString(leaderboardId);
-        assertEquals("leaderboardHashMap:1", result);
-    }
-
-    @Test
-    void leaderboardScoreKeyStringShouldBeCorrect() {
-        String result = databaseService.leaderboardScoreKeyString(Integer.parseInt(testPlayer.getScore()), testPlayer.getCreationDate(), testPlayer.getId());
-        assertEquals("1337:1587991691:ABCD123", result);
-    }
-
-    @Test
-    void playerObjectKeyStringShouldBeCorrect() {
-        String result = databaseService.playerObjectKeyString(testPlayer.getId());
-        assertEquals("player:ABCD123", result);
-    }*/
 }
