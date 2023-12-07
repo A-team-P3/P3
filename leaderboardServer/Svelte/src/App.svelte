@@ -51,6 +51,9 @@
       if (start < 0) {
         start = 0;
       }
+      if (stop > numberOfPlayers) {
+        stop = numberOfPlayers;
+      }
 
       await getPlayers(start, stop)
       if (stop > highestIndex) {
@@ -129,6 +132,8 @@
 
     numberOfPlayers = await getNumberOfPlayers();
     clearTable();
+
+    //handles end of table
     if (input > numberOfPlayers) {
       await loadPlayers(numberOfPlayers-playersPerFetch-1, numberOfPlayers-1);
       scrollToRow(players.length-1);
