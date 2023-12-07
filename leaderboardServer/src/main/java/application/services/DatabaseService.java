@@ -8,11 +8,9 @@ import application.utils.*;
 import org.springframework.stereotype.Service;
 
 import redis.clients.jedis.*;
-import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.exceptions.JedisException;
 import redis.clients.jedis.resps.Tuple;
 
-import java.time.LocalDate;
 import java.util.*;
 
 
@@ -265,42 +263,51 @@ public class DatabaseService {
         // Handle exceptions if necessary
     }
 
-    // TODO: can be optimized a bit more in terms of time complexity: N+2M can be reduced to N+1 (N = number of players, M = number of matching players)
+    // TODO: can be optimized in terms of time complexity
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
-    // Note: we NEED to look at all names in the leaderboard if we want to find multiple names that CONTAIN the specified name
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
         List<Player> matchingPlayers = new ArrayList<>();
+
+        // If the specified name is less than 3 characters, return an empty list
+        if (specifiedName.length() < 3)
+            return matchingPlayers;
 
         try (Jedis jedis = getJedisConnection()) {
             // Get all entries (name and id) from the playerNames HashMap
             Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
+
             // For each entry in the map, get the name and id
             for (Map.Entry<String, String> entry : nameAndIdMap.entrySet()) {
                 String playerName = entry.getKey();
                 String playerId = entry.getValue();
 
-                // Check if the player name contains the specified name
-                //TODO: make faster (sync?)
+                // Check if this player name contains the specified name
+                // TODO: make faster (sync?)
                 if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
-                    // Fetch score and region with ID, and using pipelining to improve performance
+                    // Fetch score and region with ID, and pipelining to improve performance
                     Pipeline pipeline = jedis.pipelined();
                     Response<String> scoreResponse = pipeline.hget("player:" + playerId, "score");
                     Response<String> regionResponse = pipeline.hget("player:" + playerId, "region");
                     Response<String> creationDateResponse = pipeline.hget("player:" + playerId, "creationDate");
                     pipeline.sync();    // Execute all commands in the pipeline
 
+                    // Get the score, region and creation date from the responses
                     String score = scoreResponse.get();
                     String region = regionResponse.get();
                     String creationDate = creationDateResponse.get();
                     String playerValue = score + ":" + creationDate + ":" + playerId;
+
+                    // Get the rank of the player
                     long rank = jedis.zrevrank("leaderboardSorted:" + leaderboardId, playerValue);
-                    Player player = new Player(playerId, playerName, score, region, creationDate, String.valueOf(rank+1));
+                    Player player = new Player(playerId, playerName, score, region, creationDate, String.valueOf(rank + 1));
 
                     matchingPlayers.add(player);
                 }
             }
+
+            // Sort the list of matching players by score
             Comparator<Player> byScore = Comparator.comparingInt(player -> Integer.parseInt(player.getScore()));
-            matchingPlayers.sort(byScore.reversed());
+            matchingPlayers.sort(byScore.reversed());       // Sort in descending order
         }
         catch (JedisException e) {
             System.err.println(e + ": error in finding players by name!");
@@ -310,21 +317,34 @@ public class DatabaseService {
         return matchingPlayers;
     }
 
-    public void wipeDatabase(int dbIndex) {
+    public void wipeLeaderboard(int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
-            jedis.flushDB();
+            // Delete all player hashes belonging to the leaderboards
+            Set<String> playerIds = jedis.hkeys(leaderboardHashMapKeyString(leaderboardId));
+
+            Pipeline pipeline = jedis.pipelined();
+            for (String playerId : playerIds) {
+                pipeline.del(playerObjectKeyString(playerId));
+            }
+
+            // Delete specified leaderboards and name-id mapping
+            pipeline.del(leaderboardSortedKeyString(leaderboardId));
+            pipeline.del(leaderboardHashMapKeyString(leaderboardId));
+            pipeline.del("playerNames:" + leaderboardId);
+
+            pipeline.sync();
         }
         catch (JedisException e) {
-            System.err.println(e + ": error wiping database!");
+            System.err.println(e + ": error wiping specified leaderboard!");
         }
     }
 
-    public void wipeAllDatabases() {
+    public void wipeDatabase() {
         try (Jedis jedis = getJedisConnection()) {
             jedis.flushAll();
         }
         catch (JedisException e) {
-            System.err.println(e + ": error wiping all databases!");
+            System.err.println(e + ": error wiping entire database!");
         }
     }
 }
