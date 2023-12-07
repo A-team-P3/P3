@@ -9,6 +9,8 @@
   let highestIndex = 0;
   let playersPerFetch = 50;
   let searchingNameState = false;
+  let rankFormValue = "";
+  let nameFormValue = "";
 
   // HTML elements
   let table;
@@ -39,6 +41,8 @@
         scrollProcessing = false;
       }
     });
+
+  });
 
 
     async function loadPlayers(start, stop) {
@@ -76,7 +80,7 @@
       players = await response.json();
     }
 
-    rankForm.addEventListener("submit", async (e) => {
+    /*rankForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       let input = parseInt(rankForm.elements.rank.value);
       if (isNaN(input)) {
@@ -87,9 +91,9 @@
 
 
       console.log(input);
-    })
+    })*/
 
-    nameForm.addEventListener("submit", async (e) =>{
+    /*nameForm.addEventListener("submit", async (e) =>{
       e.preventDefault();
       let input = nameForm.elements.name.value;
       if (input === "") {
@@ -104,8 +108,52 @@
 
     });
 
+
     $: searchingNameState = nameForm.elements.name.value === "";
-  });
+*/
+
+  async function handleRankSubmit(e) {
+    e.preventDefault();
+    let input = parseInt(rankFormValue);
+    if (isNaN(input)) {
+      clearTable();
+      await loadPlayers(0, 49);
+      return;
+    }
+
+    clearTable();
+    await loadPlayers(input-1, input+playersPerFetch);
+
+
+    console.log(input);
+  }
+  function handleRankClear(e) {
+    e.preventDefault();
+    rankFormValue = "";
+    handleRankSubmit(e);
+  }
+
+  async function handleNameSubmit(e) {
+    e.preventDefault();
+    let input = nameFormValue;
+
+    if (input === "") {
+      scrollProcessing = false;
+      clearTable();
+      await loadPlayers(0, 49);
+      return;
+    }
+    scrollProcessing = true;
+    await getPlayerSearch(input);
+  }
+
+  function handleNameClear(e) {
+    e.preventDefault();
+    nameFormValue = "";
+    handleNameSubmit(e);
+  }
+
+
 </script>
 
 
@@ -114,20 +162,25 @@
   <nav id="leaderboard-header">
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <form id="form-rank" bind:this={rankForm}>
+      <form id="form-rank" bind:this={rankForm} on:submit={handleRankSubmit}>
         <label for="rank"></label>
-        <input placeholder="RANK" value="" id="rank" name="rank">
+        <input bind:value={rankFormValue} placeholder="RANK" id="rank" name="rank">
+        {#if rankFormValue !== ""}
+          <button type="button" on:click={handleRankClear}>X</button>
+        {/if}
       </form>
-      <button></button>
     </div>
     <hr>
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <form id="form-name" bind:this={nameForm}>
+      <form id="form-name" bind:this={nameForm} on:submit={handleNameSubmit}>
         <label for="name"></label>
-        <input placeholder="NAME" value="" id="name" name="name">
+        <input bind:value={nameFormValue} placeholder="NAME" id="name" name="name">
+        {#if nameFormValue !== ""}
+          <button type="button" on:click={handleNameClear}>X</button>
+        {/if}
       </form>
-      <button></button>
+
     </div>
     <hr>
     <div class="header-elm">
@@ -206,6 +259,20 @@
             cursor: pointer;
             background-color: $indigo-dark;
             color: $primary-hover;
+          }
+          button{
+            background-color: #ff5d69;
+            color: white;
+            border: none;
+            padding: 3px 9px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 20px;
+            :hover{
+              cursor: pointer;
+              background-color: firebrick;
+              color: gray;
+            }
           }
         }
         #form-name input{
