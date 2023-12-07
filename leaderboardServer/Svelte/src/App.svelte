@@ -46,6 +46,12 @@
 
 
     async function loadPlayers(start, stop) {
+
+      //avoid negative value
+      if (start < 0) {
+        start = 0;
+      }
+
       await getPlayers(start, stop)
       if (stop > highestIndex) {
         highestIndex = stop;
@@ -121,9 +127,21 @@
       return;
     }
 
+    numberOfPlayers = await getNumberOfPlayers();
     clearTable();
-    await loadPlayers(input-1, input+playersPerFetch);
+    if (input > numberOfPlayers) {
+      await loadPlayers(numberOfPlayers-playersPerFetch-1, numberOfPlayers-1);
+      scrollToRow(players.length-1);
+      return;
+    }
 
+    //start = input - playersPerFetch, so that scroll bar is in middle
+    await loadPlayers(input - playersPerFetch, input + playersPerFetch - 1);
+    if (input > playersPerFetch) {
+      scrollToRow(playersPerFetch-1);
+    } else {
+      scrollToRow(input-1);
+    }
 
     console.log(input);
   }
