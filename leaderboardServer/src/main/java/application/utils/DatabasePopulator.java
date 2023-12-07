@@ -59,8 +59,8 @@ public class DatabasePopulator {
     }
 
     private String randomName() {
-        List<String> nouns = Arrays.asList("Gamer", "Love", "Life", "Priest", "Pilot", "Business", "Officer", "Eater", "trafficker", "Dragon", "Swan", "Season", "Hawk", "Peasant", "Lizard", "Time", "Bamboo", "Licker", "Robber", "Painter", "Bone", "Juice", "Party", "Preacher", "Picker", "King", "Lord", "Queen", "Emperor", "President", "Astronomer", "Astronaut", "Expert", "Slut", "Hunter");
-        List<String> adjectives = Arrays.asList("Mystic", "Elite", "Distinguished", "Mighty", "Big", "Tiny", "Filthy", "Lanky", "Fearful", "Slow", "Striking", "Slime", "Speedy", "Unlucky", "Sweaty", "Floppy", "Sad", "Steady", "Child", "Rat", "Lone", "Icky", "Unlawful", "Abnormal", "Friendly", "Receptive", "Maternal", "Juicy", "Grotesque", "Gimmicky", "Clumsy", "Satanic", "Unwashed", "Conservative");
+        List<String> nouns = Arrays.asList("Gamer", "Love", "Lover", "Days", "Life", "Priest", "Responsibilities", "Tendencies", "Appetite", "Jones", "Business", "Bucket", "Eater", "trafficker", "Dragon", "Years", "Season", "Way", "Exhibitionist", "Lizard", "Time", "Spirit", "Licker", "Stealer", "Dog", "Juice", "Party", "Preacher", "Picker", "King", "Lord", "Queen", "Council", "Conservative", "Expert", "Hunter");
+        List<String> adjectives = Arrays.asList("Mystic", "Elite", "In-between", "Distinguished", "Untamed", "Lazy", "Laziest", "Mighty", "Big", "Tiny", "Filthy", "Lanky", "Fearful", "Slow", "Red", "Slime", "Narrow", "Speedy", "Iridescent", "Sleepy", "Floppy", "Sad", "Rat", "Lone", "Unlawful", "Edgy", "Receptive", "Maternal", "Juicy", "Orange", "Indigo", "Clumsy", "Satanic", "Unwashed", "Smartest");
         int noun = rand.nextInt(nouns.size());
         int adjective = rand.nextInt(adjectives.size());
         int number = rand.nextInt(100);
