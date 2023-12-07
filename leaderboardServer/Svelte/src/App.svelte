@@ -14,8 +14,6 @@
 
   // HTML elements
   let table;
-  let rankForm;
-  let nameForm;
 
   let scrollProcessing = false;
 
@@ -26,7 +24,6 @@
     numberOfPlayers = getNumberOfPlayers();
 
     table.addEventListener('scroll', async() => {
-
       if (scrollProcessing) {
         return;
       }
@@ -34,7 +31,15 @@
       try {
         if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
           await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
+          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
         }
+
+        if (table.scrollTop < 500) {
+          await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
+          //scrollToRow(playersPerFetch);
+          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+        }
+
 
 
       } finally {
@@ -45,81 +50,67 @@
   });
 
 
-    async function loadPlayers(start, stop) {
+  async function loadPlayers(start, stop) {
 
-      //avoid negative value
-      if (start < 0) {
-        start = 0;
-      }
-      if (stop > numberOfPlayers) {
-        stop = numberOfPlayers;
-      }
-
-      await getPlayers(start, stop)
-      if (stop > highestIndex) {
-        highestIndex = stop;
-      }
+    //avoid negative value
+    if (start < 0) {
+      start = 0;
+    }
+    //avoid overflow (higher index then database has)
+    if (stop > numberOfPlayers) {
+      stop = numberOfPlayers;
     }
 
-    async function getPlayers(min, max) {
-      const res = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
-      const data = await res.json();
+    let rev = false;
+    if (start < lowestIndex) {
+      rev = true;
+    }
 
+    await getPlayers(start, stop, rev)
+    if (stop > highestIndex) {
+      highestIndex = stop;
+    }
+    if (start < lowestIndex) {
+      lowestIndex = start;
+    }
+  }
+
+
+  async function getPlayers(min, max, rev) {
+    const res = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
+    const data = await res.json();
+
+    if (rev) {
+      console.log("top");
+      console.log(players.unshift(data))
+      players.unshift(data);
+      console.log(players);
+    } else {
+      console.log("bot, min: " + min + ", max: " + max);
       players = players.concat(data);
     }
+  }
 
-    function clearTable(){
-      players = [];
+  function clearTable(){
+    players = [];
+  }
+
+  function scrollToRow(rowNumber) {
+    const row = table.childNodes[rowNumber]
+    if (row) {
+      row.scrollIntoView({block: 'start', inline: "nearest"});
     }
+  }
 
-    function scrollToRow(rowNumber) {
-      const row = table.childNodes[rowNumber]
-      if (row) {
-        row.scrollIntoView({block: 'start', inline: "nearest"});
-      }
-    }
+  async function getNumberOfPlayers() {
+    const res = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
+    return parseInt(await res.json());
+  }
 
-    async function getNumberOfPlayers() {
-      const res = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
-      return parseInt(await res.json());
-    }
-
-    async function getPlayerSearch(name) {
-      const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
-      players = await response.json();
-    }
-
-    /*rankForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      let input = parseInt(rankForm.elements.rank.value);
-      if (isNaN(input)) {
-        return;
-      }
-      clearTable();
-      await loadPlayers(input-1, input+playersPerFetch);
-
-
-      console.log(input);
-    })*/
-
-    /*nameForm.addEventListener("submit", async (e) =>{
-      e.preventDefault();
-      let input = nameForm.elements.name.value;
-      if (input === "") {
-        scrollProcessing = false;
-        clearTable();
-        await loadPlayers(0, 49);
-        return;
-      }
-      console.log("HALLO");
-      scrollProcessing = true;
-      await getPlayerSearch(input);
-
-    });
-
-
-    $: searchingNameState = nameForm.elements.name.value === "";
-*/
+  async function getPlayerSearch(name) {
+    const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
+    players = await response.json();
+  }
 
   async function handleRankSubmit(e) {
     e.preventDefault();
@@ -141,6 +132,7 @@
     }
 
     //start = input - playersPerFetch, so that scroll bar is in middle
+    lowestIndex = input - playersPerFetch;
     await loadPlayers(input - playersPerFetch, input + playersPerFetch - 1);
     if (input > playersPerFetch) {
       scrollToRow(playersPerFetch-1);
@@ -179,13 +171,15 @@
 
 </script>
 
-
+<button id="resetPage">Take me to the top!</button>
 <div id="leaderboard-container">
+
   <!--HEADER-->
   <nav id="leaderboard-header">
+
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <form id="form-rank" bind:this={rankForm} on:submit={handleRankSubmit}>
+      <form id="form-rank" on:submit={handleRankSubmit}>
         <label for="rank"></label>
         <input bind:value={rankFormValue} placeholder="RANK" id="rank" name="rank">
         {#if rankFormValue !== ""}
@@ -198,7 +192,7 @@
     <hr>
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <form id="form-name" bind:this={nameForm} on:submit={handleNameSubmit}>
+      <form id="form-name" on:submit={handleNameSubmit}>
         <label for="name"></label>
         <input bind:value={nameFormValue} placeholder="NAME" id="name" name="name">
         {#if nameFormValue !== ""}
@@ -241,6 +235,9 @@
 
 
 <style lang="scss">
+  #resetPage {
+    position: absolute;
+  }
   #leaderboard-container{
     display: flex;
     flex-direction: column;
