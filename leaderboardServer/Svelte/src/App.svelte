@@ -232,7 +232,18 @@
 
 <style lang="scss">
   #resetPage {
+    display: flex;
+    flex-direction: column;
     position: absolute;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    background: none;
+    width: 40px;
+    bottom: 10px;
+    right: 10px;
   }
   #leaderboard-container{
     display: flex;
