@@ -1,18 +1,12 @@
 package application.services;
 
 import application.models.Player;
-import application.utils.DatabaseConventions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Transaction;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -21,8 +15,7 @@ class DatabaseServiceTest {
     DatabaseService databaseService;
     JedisPool jedisPoolMock;
     Jedis jedisMock;
-    //Player testPlayer;
-    //DatabaseConventions databaseConventions;
+    Player testPlayer;
 
     @BeforeEach
     void setUp() {
@@ -34,7 +27,7 @@ class DatabaseServiceTest {
         databaseService = new DatabaseService();
         databaseService.jedisPool = jedisPoolMock;
 
-        //testPlayer = new Player("ABCD123", "Bruce Wayne", "1337", "NA", LocalDate.now().toString());
+        testPlayer = new Player("ABCD123", "Bruce Wayne", "1337", "NA", "1587991691");
     }
 
     @AfterEach
@@ -44,7 +37,7 @@ class DatabaseServiceTest {
         jedisMock = null;
         databaseService = null;
 
-        //testPlayer = null;
+        testPlayer = null;
     }
 
     @Test
@@ -82,47 +75,30 @@ class DatabaseServiceTest {
         assertFalse(result);
     }
 
-    // Test that the testPlayer is actually added to the database
-    // TODO: Fix this test (or maybe remove it entirely?)
+    // TODO: out-commented because these methods are private and cannot be tested
     /*@Test
-    void playerShouldBeAdded() {
-        databaseConventions = new DatabaseConventions();
+    void leaderboardSortedKeyStringShouldBeCorrect() {
         int leaderboardId = 1;
+        String result = databaseService.leaderboardSortedKeyString(leaderboardId);
+        assertEquals("leaderboardSorted:1", result);
+    }
 
-        int score = 1337;
-        String id = testPlayer.getId();
-        String name = testPlayer.getName();
-        String region = testPlayer.getRegion();
-        String timestamp = testPlayer.getCreationDate();
+    @Test
+    void leaderboardHashMapKeyStringShouldBeCorrect() {
+        int leaderboardId = 1;
+        String result = databaseService.leaderboardHashMapKeyString(leaderboardId);
+        assertEquals("leaderboardHashMap:1", result);
+    }
 
-        Transaction transaction = jedisMock.multi();
+    @Test
+    void leaderboardScoreKeyStringShouldBeCorrect() {
+        String result = databaseService.leaderboardScoreKeyString(Integer.parseInt(testPlayer.getScore()), testPlayer.getCreationDate(), testPlayer.getId());
+        assertEquals("1337:1587991691:ABCD123", result);
+    }
 
-        transaction.zadd(databaseConventions.leaderboardSortedKeyString(leaderboardId), score, databaseConventions.leaderboardScoreKeyString(score, timestamp, id));
-        transaction.hset(databaseConventions.leaderboardHashMapKeyString(leaderboardId), id, databaseConventions.leaderboardScoreKeyString(score, timestamp, id));
-
-        // Add player as individual HashMap
-        Map<String, String> fields = new HashMap<>();
-        fields.put("id", id);
-        fields.put("name", name);
-        fields.put("score", String.valueOf(score));
-        fields.put("region", region);
-        fields.put("creationDate", timestamp);
-        fields.put("rank", null);
-        transaction.hmset(databaseConventions.playerObjectKeyString(id), fields);
-
-        // Map player's name to their ID
-        transaction.hset("playerNames:" + leaderboardId, fields.get("name"), id);
-
-        transaction.exec();
-
-        //when(jedisMock.hexists("leaderboardSorted:1", "ABCD123")).thenReturn(true);
-        boolean result = databaseService.isPlayerExisting("ABCD123", 1);
-        assertTrue(result);
-
-        // Remove testPlayer from database
-        jedisMock.del("leaderboardSorted:1", "1337:" + timestamp + ":ABCD123");
-        jedisMock.del("leaderboardHashMap:1", "ABCD123");
-        jedisMock.del("player:ABCD123");
-        jedisMock.hdel("playerNames:1", "Bruce Wayne");
+    @Test
+    void playerObjectKeyStringShouldBeCorrect() {
+        String result = databaseService.playerObjectKeyString(testPlayer.getId());
+        assertEquals("player:ABCD123", result);
     }*/
 }

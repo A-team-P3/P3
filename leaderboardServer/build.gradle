@@ -34,3 +34,8 @@ tasks.named('test') {
     }
 }
 
+test {
+    // Suppress harmless warning messages when unit testing (only affects tests)
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
+    jvmArgs '-XX:+EnableDynamicAgentLoading', '-Xshare:off'
+}
