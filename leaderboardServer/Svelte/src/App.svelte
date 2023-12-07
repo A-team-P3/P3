@@ -8,11 +8,11 @@
   let lowestIndex;
   let highestIndex;
   let playersPerFetch = 50;
+
+  // HTML elements
+  let table;
   let rankForm;
   let nameForm;
-
-  // elements
-  let table;
 
   onMount(()=>{
 
