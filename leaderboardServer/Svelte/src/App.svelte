@@ -11,6 +11,9 @@
   let searchingNameState = false;
   let rankFormValue = "";
   let nameFormValue = "";
+  let loading = false;
+  let scrollTop = 0;
+  let menuOpen = false;
 
   // HTML elements
   let table;
@@ -22,32 +25,31 @@
     // Startup tasks
     await loadPlayers(0, 49);
     numberOfPlayers = getNumberOfPlayers();
-
-    table.addEventListener('scroll', async() => {
-      if (scrollProcessing) {
-        return;
-      }
-      scrollProcessing = true;
-      try {
-        if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
-          await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
-          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
-        }
-
-        if (table.scrollTop < 500) {
-          await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
-          //scrollToRow(playersPerFetch);
-          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
-        }
-
-
-
-      } finally {
-        scrollProcessing = false;
-      }
-    });
-
   });
+
+  async function handleScroll(){
+    scrollTop = table.scrollTop;
+    if (scrollProcessing) {
+      return;
+    }
+    scrollProcessing = true;
+    try {
+      if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
+        await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
+        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+      }
+
+      if (table.scrollTop < 500) {
+        await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
+        //scrollToRow(playersPerFetch);
+        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+      }
+
+
+    } finally {
+      scrollProcessing = false;
+    }
+  }
 
 
   async function loadPlayers(start, stop) {
@@ -73,13 +75,14 @@
       direction = "up";
     }
 
-    await getPlayers(start, stop, direction)
+    await getPlayers(start, stop, direction);
     if (stop > highestIndex) {
       highestIndex = stop;
     }
     if (start < lowestIndex) {
       lowestIndex = start;
     }
+    loading = false;
   }
 
 
@@ -116,11 +119,19 @@
   async function getPlayerSearch(name) {
     const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
     players = await response.json();
+    loading = false; //TODO evt gør til exception
   }
 
   async function handleRankSubmit(e) {
     e.preventDefault();
+
+    loading = true;
+
     let input = parseInt(rankFormValue);
+
+    //Reset rankValue when name searching
+    nameFormValue = "";
+
     if (isNaN(input)) {
       clearTable();
       await loadPlayers(0, 49);
@@ -156,7 +167,18 @@
 
   async function handleNameSubmit(e) {
     e.preventDefault();
+
     let input = nameFormValue;
+
+    if (input.length < 3 && !(input === "")) {
+      alert("too few characters, use 3 or more");
+      return;
+    }
+
+    loading = true;
+
+    //Reset rankValue when name searching
+    rankFormValue = "";
 
     if (input === "") {
       scrollProcessing = false;
@@ -170,19 +192,55 @@
 
   function handleNameClear(e) {
     e.preventDefault();
+    scrollProcessing = false;
     nameFormValue = "";
     handleNameSubmit(e);
+  }
+  async function resetPage() { //TODO Skal fixes
+    scrollProcessing = false;
+    scrollTop = 0;
+    rankFormValue = "";
+    nameFormValue = "";
+    clearTable();
+    await loadPlayers(0, 49);
+    loading = true;
+  }
+
+  function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
   }
 
 
 </script>
-
-<button id="resetPage">Take me to the top!</button>
+<!---
+<div class="dropdown">
+  <button on:click={() => menuOpen = !menuOpen} {menuOpen} />
+  <div id="myDropdown" class="dropdown-content">
+    <a href="#">Link 1</a>
+    <a href="#">Link 2</a>
+    <a href="#">Link 3</a>
+  </div>
+</div>
+-->
 <div id="leaderboard-container">
 
+  <!--ResetPage button-->
+  <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
   <!--HEADER-->
   <nav id="leaderboard-header">
-
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <form id="form-rank" on:submit={handleRankSubmit}>
@@ -190,7 +248,7 @@
         <input bind:value={rankFormValue} placeholder="RANK" id="rank" name="rank">
         {#if rankFormValue !== ""}
           <button type="button" on:click={handleRankClear}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         {/if}
       </form>
@@ -207,7 +265,6 @@
           </button>
         {/if}
       </form>
-
     </div>
     <hr>
     <div class="header-elm">
@@ -219,41 +276,52 @@
     </div>
   </nav>
   <!--TABLE-->
-  <div id="leaderboard-body" bind:this={table}>
-    {#each players as player}
-      <li>
-        <div class="score-info">
-          {player.rank}
-        </div>
-        <div class="score-info justify-flex-start">
-          {player.name}  <div class="idTag">#{player.id}</div>
-        </div>
-        <div class="score-info">
-          {player.region}
-        </div>
-        <div class="score-info">
-          {player.score}
-        </div>
-      </li>
-    {/each}
-  </div>
+  {#if loading}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="#232334" stroke="%235989B1" stroke-width="15" transform-origin="center" d="m148 84.7 13.8-8-10-17.3-13.8 8a50 50 0 0 0-27.4-15.9v-16h-20v16A50 50 0 0 0 63 67.4l-13.8-8-10 17.3 13.8 8a50 50 0 0 0 0 31.7l-13.8 8 10 17.3 13.8-8a50 50 0 0 0 27.5 15.9v16h20v-16a50 50 0 0 0 27.4-15.9l13.8 8 10-17.3-13.8-8a50 50 0 0 0 0-31.7Zm-47.5 50.8a35 35 0 1 1 0-70 35 35 0 0 1 0 70Z"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="0;120" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></path></svg>
+  {:else}
+    <div id="leaderboard-body" bind:this={table} on:scroll={handleScroll}>
+      {#each players as player}
+        <li>
+          <div class="score-info">
+            {player.rank}
+          </div>
+          <div class="score-info justify-flex-start">
+            {player.name}  <div class="idTag">#{player.id}</div>
+          </div>
+          <div class="score-info">
+            {player.region}
+          </div>
+          <div class="score-info">
+            {player.score}
+          </div>
+        </li>
+      {/each}
+    </div>
+  {/if}
 </div>
+
 
 
 <style lang="scss">
   #resetPage {
-    display: flex;
-    flex-direction: column;
+
     position: absolute;
-    border: none;
+    bottom: 100px;
+    right: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+
+    border: 3px solid white;
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
     font-size: 16px;
+    color: #3a6688;
     background: none;
-    width: 40px;
-    bottom: 10px;
-    right: 10px;
+    width: 102px;
   }
   #leaderboard-container{
     display: flex;
@@ -355,7 +423,6 @@
         background-color: $indigo-ultradark;
         color: $primary;
       }
-
     }
   }
   .justify-flex-start{
