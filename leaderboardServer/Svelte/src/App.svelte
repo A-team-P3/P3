@@ -76,7 +76,7 @@
       direction = "up";
     }
 
-    await getPlayers(start, stop, direction)
+    await getPlayers(start, stop, direction);
     if (stop > highestIndex) {
       highestIndex = stop;
     }
@@ -169,7 +169,6 @@
   async function handleNameSubmit(e) {
     e.preventDefault();
 
-
     let input = nameFormValue;
 
     if (input.length < 3 && !(input === "")) {
@@ -191,7 +190,6 @@
     scrollProcessing = true;
     await getPlayerSearch(input);
   }
-
   function handleNameClear(e) {
     e.preventDefault();
     scrollProcessing = false;
@@ -236,8 +234,8 @@
     <a href="#">Link 3</a>
   </div>
 </div>
-<div id="leaderboard-container">
 -->
+<div id="leaderboard-container">
 
   <!--ResetPage button-->
   <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>

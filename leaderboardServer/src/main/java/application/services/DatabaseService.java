@@ -287,7 +287,7 @@ public class DatabaseService {
                 // TODO: make faster (sync?)
                 if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
                     counter++;
-                    if (counter > 250) {
+                    if (counter > 50) {
                         break;
                     }
                     // Fetch score and region with ID, and pipelining to improve performance
