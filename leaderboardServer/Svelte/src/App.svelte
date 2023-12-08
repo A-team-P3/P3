@@ -25,32 +25,31 @@
     // Startup tasks
     await loadPlayers(0, 49);
     numberOfPlayers = getNumberOfPlayers();
-
-    table.addEventListener('scroll', async() => {
-      scrollTop = table.scrollTop;
-      if (scrollProcessing) {
-        return;
-      }
-      scrollProcessing = true;
-      try {
-        if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
-          await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
-          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
-        }
-
-        if (table.scrollTop < 500) {
-          await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
-          //scrollToRow(playersPerFetch);
-          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
-        }
-
-
-      } finally {
-        scrollProcessing = false;
-      }
-    });
-
   });
+
+  async function handleScroll(){
+    scrollTop = table.scrollTop;
+    if (scrollProcessing) {
+      return;
+    }
+    scrollProcessing = true;
+    try {
+      if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
+        await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
+        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+      }
+
+      if (table.scrollTop < 500) {
+        await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
+        //scrollToRow(playersPerFetch);
+        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+      }
+
+
+    } finally {
+      scrollProcessing = false;
+    }
+  }
 
 
   async function loadPlayers(start, stop) {
@@ -190,6 +189,7 @@
     scrollProcessing = true;
     await getPlayerSearch(input);
   }
+
   function handleNameClear(e) {
     e.preventDefault();
     scrollProcessing = false;
@@ -241,8 +241,6 @@
   <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
   <!--HEADER-->
   <nav id="leaderboard-header">
-
-
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <form id="form-rank" on:submit={handleRankSubmit}>
@@ -267,7 +265,6 @@
           </button>
         {/if}
       </form>
-
     </div>
     <hr>
     <div class="header-elm">
@@ -279,8 +276,10 @@
     </div>
   </nav>
   <!--TABLE-->
-  {#if loading === false}
-    <div id="leaderboard-body" bind:this={table}>
+  {#if loading}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="#232334" stroke="%235989B1" stroke-width="15" transform-origin="center" d="m148 84.7 13.8-8-10-17.3-13.8 8a50 50 0 0 0-27.4-15.9v-16h-20v16A50 50 0 0 0 63 67.4l-13.8-8-10 17.3 13.8 8a50 50 0 0 0 0 31.7l-13.8 8 10 17.3 13.8-8a50 50 0 0 0 27.5 15.9v16h20v-16a50 50 0 0 0 27.4-15.9l13.8 8 10-17.3-13.8-8a50 50 0 0 0 0-31.7Zm-47.5 50.8a35 35 0 1 1 0-70 35 35 0 0 1 0 70Z"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="0;120" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></path></svg>
+  {:else}
+    <div id="leaderboard-body" bind:this={table} on:scroll={handleScroll}>
       {#each players as player}
         <li>
           <div class="score-info">
@@ -298,10 +297,9 @@
         </li>
       {/each}
     </div>
-  {:else}
-    <h1 style="display: flex; align-self: center; justify-self: center;">LOADING MAKKER</h1>
   {/if}
 </div>
+
 
 
 <style lang="scss">
@@ -425,7 +423,6 @@
         background-color: $indigo-ultradark;
         color: $primary;
       }
-
     }
   }
   .justify-flex-start{
