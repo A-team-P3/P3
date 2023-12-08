@@ -236,15 +236,12 @@
     <a href="#">Link 3</a>
   </div>
 </div>
-<div id="leaderboard-container">
 -->
-
+<div id="leaderboard-container">
   <!--ResetPage button-->
   <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
   <!--HEADER-->
   <nav id="leaderboard-header">
-
-
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <form id="form-rank" on:submit={handleRankSubmit}>
@@ -269,7 +266,6 @@
           </button>
         {/if}
       </form>
-
     </div>
     <hr>
     <div class="header-elm">
@@ -304,6 +300,7 @@
     </div>
   {/if}
 </div>
+
 
 
 <style lang="scss">
@@ -427,7 +424,6 @@
         background-color: $indigo-ultradark;
         color: $primary;
       }
-
     }
   }
   .justify-flex-start{
