@@ -1,6 +1,7 @@
 <script>
   import {onMount} from "svelte";
   import Button from "./lib/Button.svelte";
+  import ResetPageButton from "./lib/ResetPageButton.svelte";
 
 
   const url = "http://localhost:7070/";
@@ -18,8 +19,8 @@
 
   // Leaderboard dropdown
   let showLBDropdown = false;
-  let leaderboardItems = ["Leaderboard 1", "Leaderboard 2", "Leaderboard 3", "Leaderboard 4"]; //TODO lav en get som får id fra alle leaderboards
-  let currentLeaderboard = 2;
+  let leaderboardItems = [];
+  let currentLeaderboard = 1;
   // HTML elements
   let table;
 
@@ -29,8 +30,9 @@
 
     // Tasks when component gets re-rendered
     table = document.getElementById("leaderboard-body"); //re-bind table... bind:this={table} binding gets lost
-    await loadPlayers(0, 49);
+    resetPage();
     numberOfPlayers = getNumberOfPlayers();
+    leaderboardItems = await getLeaderboardAmount();
   });
 
   async function handleScroll(){
@@ -103,6 +105,16 @@
     }
   }
 
+  async function getLeaderboardAmount() {
+    let items = [];
+    const res = await fetch(`${url}leaderboards`);
+    const data = await res.json();
+    for(let i in data) {
+      items[i] = "Leaderboard " + data[i];
+    }
+    return items;
+  }
+
   function clearTable(){
     players = [];
     lowestIndex = undefined;
@@ -138,8 +150,7 @@
     nameFormValue = "";
 
     if (isNaN(input)) {
-      clearTable();
-      await loadPlayers(0, 49);
+      resetPage();
       return;
     }
 
@@ -166,7 +177,7 @@
   }
   function handleRankClear(e) {
     e.preventDefault();
-    rankFormValue = "";
+    resetPage();
     handleRankSubmit(e);
   }
 
@@ -187,8 +198,7 @@
 
     if (input === "") {
       scrollProcessing = false;
-      clearTable();
-      await loadPlayers(0, 49);
+      await resetPage();
       return;
     }
     scrollProcessing = true;
@@ -197,8 +207,7 @@
 
   function handleNameClear(e) {
     e.preventDefault();
-    scrollProcessing = false;
-    nameFormValue = "";
+    resetPage();
     handleNameSubmit(e);
   }
   async function resetPage() { //TODO Skal fixes
@@ -207,8 +216,9 @@
     rankFormValue = "";
     nameFormValue = "";
     clearTable();
-    await loadPlayers(0, 49);
     loading = true;
+    await loadPlayers(0, 49);
+
   }
 
 
@@ -219,9 +229,9 @@
       return;
     }
 
+
     currentLeaderboard = splitted[1];
-    clearTable();
-    loadPlayers(0,49);
+    resetPage();
   }
   $: console.log(currentLeaderboard);
 
@@ -245,7 +255,8 @@
 <div id="leaderboard-container">
 
   <!--ResetPage button-->
-  <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
+  <ResetPageButton on:click={resetPage} input="Take me to the top!" />
+
   <!--HEADER-->
   <nav id="leaderboard-header">
     <div class="header-elm">
@@ -333,29 +344,9 @@
     border: 1px solid #ddd;
     z-index: 1;
   }
-
   /* Show the dropdown menu */
   .show {display:block;}
-  #resetPage {
 
-    position: absolute;
-    bottom: 100px;
-    right: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-
-
-    border: 3px solid white;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    color: #3a6688;
-    background: none;
-    width: 102px;
-  }
   #leaderboard-container{
     display: flex;
     flex-direction: column;
