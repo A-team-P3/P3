@@ -25,32 +25,31 @@
     // Startup tasks
     await loadPlayers(0, 49);
     numberOfPlayers = getNumberOfPlayers();
-
-    table.addEventListener('scroll', async() => {
-      scrollTop = table.scrollTop;
-      if (scrollProcessing) {
-        return;
-      }
-      scrollProcessing = true;
-      try {
-        if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
-          await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
-          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
-        }
-
-        if (table.scrollTop < 500) {
-          await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
-          //scrollToRow(playersPerFetch);
-          console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
-        }
-
-
-      } finally {
-        scrollProcessing = false;
-      }
-    });
-
   });
+
+  async function handleScroll(){
+    scrollTop = table.scrollTop;
+    if (scrollProcessing) {
+      return;
+    }
+    scrollProcessing = true;
+    try {
+      if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
+        await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
+        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+      }
+
+      if (table.scrollTop < 500) {
+        await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
+        //scrollToRow(playersPerFetch);
+        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
+      }
+
+
+    } finally {
+      scrollProcessing = false;
+    }
+  }
 
 
   async function loadPlayers(start, stop) {
@@ -280,7 +279,7 @@
   {#if loading}
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="#232334" stroke="%235989B1" stroke-width="15" transform-origin="center" d="m148 84.7 13.8-8-10-17.3-13.8 8a50 50 0 0 0-27.4-15.9v-16h-20v16A50 50 0 0 0 63 67.4l-13.8-8-10 17.3 13.8 8a50 50 0 0 0 0 31.7l-13.8 8 10 17.3 13.8-8a50 50 0 0 0 27.5 15.9v16h20v-16a50 50 0 0 0 27.4-15.9l13.8 8 10-17.3-13.8-8a50 50 0 0 0 0-31.7Zm-47.5 50.8a35 35 0 1 1 0-70 35 35 0 0 1 0 70Z"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="2" values="0;120" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></path></svg>
   {:else}
-    <div id="leaderboard-body" bind:this={table}>
+    <div id="leaderboard-body" bind:this={table} on:scroll={handleScroll}>
       {#each players as player}
         <li>
           <div class="score-info">
