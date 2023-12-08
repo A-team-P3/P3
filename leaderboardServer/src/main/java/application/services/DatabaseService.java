@@ -276,6 +276,8 @@ public class DatabaseService {
             // Get all entries (name and id) from the playerNames HashMap
             Map<String, String> nameAndIdMap = jedis.hgetAll("playerNames:" + leaderboardId);
 
+            int counter = 0;
+
             // For each entry in the map, get the name and id
             for (Map.Entry<String, String> entry : nameAndIdMap.entrySet()) {
                 String playerName = entry.getKey();
@@ -284,6 +286,10 @@ public class DatabaseService {
                 // Check if this player name contains the specified name
                 // TODO: make faster (sync?)
                 if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
+                    counter++;
+                    if (counter > 250) {
+                        break;
+                    }
                     // Fetch score and region with ID, and pipelining to improve performance
                     Pipeline pipeline = jedis.pipelined();
                     Response<String> scoreResponse = pipeline.hget("player:" + playerId, "score");

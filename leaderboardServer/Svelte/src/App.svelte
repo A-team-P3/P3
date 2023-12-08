@@ -13,6 +13,7 @@
   let nameFormValue = "";
   let loading = false;
   let scrollTop = 0;
+  let menuOpen = false;
 
   // HTML elements
   let table;
@@ -42,7 +43,6 @@
           //scrollToRow(playersPerFetch);
           console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
         }
-
 
 
       } finally {
@@ -169,9 +169,16 @@
   async function handleNameSubmit(e) {
     e.preventDefault();
 
-    loading = true;
 
     let input = nameFormValue;
+
+    if (input.length < 3 && !(input === "")) {
+      alert("too few characters, use 3 or more");
+      return;
+    }
+
+    loading = true;
+
     //Reset rankValue when name searching
     rankFormValue = "";
 
@@ -187,6 +194,7 @@
 
   function handleNameClear(e) {
     e.preventDefault();
+    scrollProcessing = false;
     nameFormValue = "";
     handleNameSubmit(e);
   }
@@ -200,15 +208,42 @@
     loading = true;
   }
 
+  function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }
+
 
 </script>
-
-
+<!---
+<div class="dropdown">
+  <button on:click={() => menuOpen = !menuOpen} {menuOpen} />
+  <div id="myDropdown" class="dropdown-content">
+    <a href="#">Link 1</a>
+    <a href="#">Link 2</a>
+    <a href="#">Link 3</a>
+  </div>
+</div>
 <div id="leaderboard-container">
+-->
+
   <!--ResetPage button-->
   <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
   <!--HEADER-->
   <nav id="leaderboard-header">
+
 
     <div class="header-elm">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
