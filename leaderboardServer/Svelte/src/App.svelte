@@ -11,6 +11,8 @@
   let searchingNameState = false;
   let rankFormValue = "";
   let nameFormValue = "";
+  let loading = false;
+  let scrollTop = 0;
 
   // HTML elements
   let table;
@@ -24,6 +26,7 @@
     numberOfPlayers = getNumberOfPlayers();
 
     table.addEventListener('scroll', async() => {
+      scrollTop = table.scrollTop;
       if (scrollProcessing) {
         return;
       }
@@ -73,6 +76,7 @@
     if (start < lowestIndex) {
       lowestIndex = start;
     }
+    loading = false;
   }
 
 
@@ -83,7 +87,9 @@
     if (rev) {
       console.log("top");
       console.log(players.unshift(data))
-      players.unshift(data);
+      players = [data, players]
+      //players.unshift(data); //TODO Fix // if broken call players.flat() afterwards
+
       console.log(players);
     } else {
       console.log("bot, min: " + min + ", max: " + max);
@@ -110,14 +116,23 @@
   async function getPlayerSearch(name) {
     const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
     players = await response.json();
+    loading = false; //TODO evt gør til exception
   }
 
   async function handleRankSubmit(e) {
     e.preventDefault();
+
+    loading = true;
+
     let input = parseInt(rankFormValue);
+
+    //Reset rankValue when name searching
+    nameFormValue = "";
+
     if (isNaN(input)) {
       clearTable();
-      await loadPlayers(0, 49);
+      loadPlayers(0, 49);//TODO skal udskiftes med resetPage()
+      //resetPage();
       return;
     }
 
@@ -150,12 +165,18 @@
 
   async function handleNameSubmit(e) {
     e.preventDefault();
+
+    loading = true;
+
     let input = nameFormValue;
+    //Reset rankValue when name searching
+    rankFormValue = "";
 
     if (input === "") {
       scrollProcessing = false;
       clearTable();
-      await loadPlayers(0, 49);
+      loadPlayers(0, 49);
+      //resetPage();//TODO skal udskiftes med resetPage()
       return;
     }
     scrollProcessing = true;
@@ -167,13 +188,23 @@
     nameFormValue = "";
     handleNameSubmit(e);
   }
+  async function resetPage() { //TODO Skal fixes
+    scrollProcessing = false;
+    scrollTop = 0;
+    rankFormValue = "";
+    nameFormValue = "";
+    clearTable();
+    await loadPlayers(0, 49);
+    loading = true;
+  }
 
 
 </script>
 
-<button id="resetPage">Take me to the top!</button>
-<div id="leaderboard-container">
 
+<div id="leaderboard-container">
+  <!--ResetPage button-->
+  <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
   <!--HEADER-->
   <nav id="leaderboard-header">
 
@@ -184,7 +215,7 @@
         <input bind:value={rankFormValue} placeholder="RANK" id="rank" name="rank">
         {#if rankFormValue !== ""}
           <button type="button" on:click={handleRankClear}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         {/if}
       </form>
@@ -213,41 +244,51 @@
     </div>
   </nav>
   <!--TABLE-->
-  <div id="leaderboard-body" bind:this={table}>
-    {#each players as player}
-      <li>
-        <div class="score-info">
-          {player.rank}
-        </div>
-        <div class="score-info justify-flex-start">
-          {player.name}  <div class="idTag">#{player.id}</div>
-        </div>
-        <div class="score-info">
-          {player.region}
-        </div>
-        <div class="score-info">
-          {player.score}
-        </div>
-      </li>
-    {/each}
-  </div>
+  {#if loading === false}
+    <div id="leaderboard-body" bind:this={table}>
+      {#each players as player}
+        <li>
+          <div class="score-info">
+            {player.rank}
+          </div>
+          <div class="score-info justify-flex-start">
+            {player.name}  <div class="idTag">#{player.id}</div>
+          </div>
+          <div class="score-info">
+            {player.region}
+          </div>
+          <div class="score-info">
+            {player.score}
+          </div>
+        </li>
+      {/each}
+    </div>
+  {:else}
+    <h1 style="display: flex; align-self: center; justify-self: center;">LOADING MAKKER</h1>
+  {/if}
 </div>
 
 
 <style lang="scss">
   #resetPage {
-    display: flex;
-    flex-direction: column;
+
     position: absolute;
-    border: none;
+    bottom: 100px;
+    right: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+
+    border: 3px solid white;
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
     font-size: 16px;
+    color: #3a6688;
     background: none;
-    width: 40px;
-    bottom: 10px;
-    right: 10px;
+    width: 102px;
   }
   #leaderboard-container{
     display: flex;
