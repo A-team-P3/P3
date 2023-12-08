@@ -84,7 +84,7 @@
       direction = "up";
     }
 
-    await getPlayers(start, stop, direction)
+    await getPlayers(start, stop, direction);
     if (stop > highestIndex) {
       highestIndex = stop;
     }
@@ -177,7 +177,6 @@
   async function handleNameSubmit(e) {
     e.preventDefault();
 
-
     let input = nameFormValue;
 
     if (input.length < 3 && !(input === "")) {
@@ -245,6 +244,7 @@
 </div>
 
 <div id="leaderboard-container">
+
   <!--ResetPage button-->
   <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
   <!--HEADER-->
