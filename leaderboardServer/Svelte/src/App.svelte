@@ -169,9 +169,16 @@
   async function handleNameSubmit(e) {
     e.preventDefault();
 
-    loading = true;
 
     let input = nameFormValue;
+
+    if (input.length < 3 && !(input === "")) {
+      alert("too few characters, use 3 or more");
+      return;
+    }
+
+    loading = true;
+
     //Reset rankValue when name searching
     rankFormValue = "";
 
@@ -187,6 +194,7 @@
 
   function handleNameClear(e) {
     e.preventDefault();
+    scrollProcessing = false;
     nameFormValue = "";
     handleNameSubmit(e);
   }
