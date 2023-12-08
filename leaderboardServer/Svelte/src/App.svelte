@@ -1,5 +1,9 @@
 <script>
   import {onMount} from "svelte";
+  import Link from "./lib/Link.svelte";
+  import Button from "./lib/Button.svelte";
+  import Input from "./lib/Input.svelte";
+
 
   const url = "http://localhost:7070/";
   let players = [];
@@ -13,16 +17,22 @@
   let nameFormValue = "";
   let loading = false;
   let scrollTop = 0;
-  let menuOpen = false;
+
+  // Leaderboard dropdown
+  let showLBDropdown = false;
+  let leaderboardDropdownInput = "";
+  let leaderboardItems = ["Leaderboard 1", "Leaderboard 2", "Leaderboard 3", "Leaderboard 4"];
+  let leaderboardFilteredItems = [];
 
   // HTML elements
   let table;
 
   let scrollProcessing = false;
 
-  onMount( async ()=> {
+  onMount(async ()=> {
 
-    // Startup tasks
+    // Tasks when component gets re-rendered
+    table = document.getElementById("leaderboard-body"); //re-bind table... bind:this={table} binding gets lost
     await loadPlayers(0, 49);
     numberOfPlayers = getNumberOfPlayers();
   });
@@ -50,7 +60,6 @@
       scrollProcessing = false;
     }
   }
-
 
   async function loadPlayers(start, stop) {
 
@@ -207,35 +216,34 @@
     loading = true;
   }
 
-  function myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
-  }
 
-  window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
-      }
-    }
+  const handleLeaderboardChange = () => {
+    return leaderboardFilteredItems = leaderboardItems.filter(item => item.toLowerCase().match(leaderboardDropdownInput.toLowerCase()));
   }
 
 
 </script>
-<!---
-<div class="dropdown">
-  <button on:click={() => menuOpen = !menuOpen} {menuOpen} />
-  <div id="myDropdown" class="dropdown-content">
-    <a href="#">Link 1</a>
-    <a href="#">Link 2</a>
-    <a href="#">Link 3</a>
+
+<div class="leaderboardDropdownMenu">
+    <Button on:click={() => showLBDropdown = !showLBDropdown}
+            menuOpen={showLBDropdown}
+            showOpen="Switch Leaderboard"
+            showClosed="Close Leaderboard"
+             />
+  <div id="leaderboardDropdown" class:show={showLBDropdown} class="dropdown-content">
+    <Input bind:leaderboardDropdownInput on:input={handleLeaderboardChange}/>
+    {#if leaderboardFilteredItems.length > 0}
+      {#each leaderboardFilteredItems as item}
+        <Link link={item} />
+      {/each}
+    {:else}
+      {#each leaderboardItems as item}
+        <Link link={item} />
+      {/each}
+    {/if}
   </div>
 </div>
--->
+
 <div id="leaderboard-container">
   <!--ResetPage button-->
   <button id="resetPage" type="button" on:click={resetPage}>Take me to the top!</button>
@@ -303,6 +311,24 @@
 
 
 <style lang="scss">
+  .leaderboardDropdownMenu {
+    transition: ease all 500ms;
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-content {
+    transition: ease all 500ms;
+    position: absolute;
+    display: none;
+    background-color: #f6f6f6;
+    min-width: 230px;
+    border: 1px solid #ddd;
+    z-index: 1;
+  }
+
+  /* Show the dropdown menu */
+  .show {display:block;}
   #resetPage {
 
     position: absolute;
