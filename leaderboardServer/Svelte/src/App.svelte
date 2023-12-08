@@ -5,8 +5,8 @@
   let players = [];
   let leaderboardId = 1;
   let numberOfPlayers;
-  let lowestIndex = 0;
-  let highestIndex = 0;
+  let lowestIndex;
+  let highestIndex;
   let playersPerFetch = 50;
   let searchingNameState = false;
   let rankFormValue = "";
@@ -64,12 +64,19 @@
       stop = numberOfPlayers;
     }
 
-    let rev = false;
-    if (start < lowestIndex) {
-      rev = true;
+    if (lowestIndex === undefined) {
+      lowestIndex = start;
+    }
+    if (highestIndex === undefined) {
+      highestIndex = stop+1;
     }
 
-    await getPlayers(start, stop, rev)
+    let direction = "down";
+    if (start < lowestIndex) {
+      direction = "up";
+    }
+
+    await getPlayers(start, stop, direction)
     if (stop > highestIndex) {
       highestIndex = stop;
     }
@@ -80,25 +87,22 @@
   }
 
 
-  async function getPlayers(min, max, rev) {
+  async function getPlayers(min, max, direction) {
     const res = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
     const data = await res.json();
 
-    if (rev) {
-      console.log("top");
-      console.log(players.unshift(data))
-      players = [data, players]
-      //players.unshift(data); //TODO Fix // if broken call players.flat() afterwards
-
-      console.log(players);
-    } else {
-      console.log("bot, min: " + min + ", max: " + max);
+    if (direction === "up") {
+      players = data.concat(players);
+      scrollToRow(playersPerFetch+8);
+    } else if (direction === "down") {
       players = players.concat(data);
     }
   }
 
   function clearTable(){
     players = [];
+    lowestIndex = undefined;
+    highestIndex = undefined;
   }
 
   function scrollToRow(rowNumber) {
@@ -131,8 +135,7 @@
 
     if (isNaN(input)) {
       clearTable();
-      loadPlayers(0, 49);//TODO skal udskiftes med resetPage()
-      //resetPage();
+      await loadPlayers(0, 49);
       return;
     }
 
@@ -147,7 +150,7 @@
     }
 
     //start = input - playersPerFetch, so that scroll bar is in middle
-    lowestIndex = input - playersPerFetch;
+    //lowestIndex = input - playersPerFetch;
     await loadPlayers(input - playersPerFetch, input + playersPerFetch - 1);
     if (input > playersPerFetch) {
       scrollToRow(playersPerFetch-1);
@@ -175,8 +178,7 @@
     if (input === "") {
       scrollProcessing = false;
       clearTable();
-      loadPlayers(0, 49);
-      //resetPage();//TODO skal udskiftes med resetPage()
+      await loadPlayers(0, 49);
       return;
     }
     scrollProcessing = true;
