@@ -8,6 +8,7 @@
         padding: 12px 16px;
         text-decoration: none;
         display: block;
+        width: 20rem;
     }
 
     a:hover {background-color: #ddd}

@@ -315,6 +315,7 @@
     transition: ease all 500ms;
     position: relative;
     display: inline-block;
+
   }
 
   .dropdown-content {

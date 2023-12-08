@@ -7,17 +7,26 @@
 <style>
     /* Dropdown Button */
     .dropbtn {
-        background-color: darkblue;
-        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: ease all 500ms;
+        background-color: transparent;
+        border: 0.25rem solid #5989b1;
+        border-radius: 0.25rem;
+        color: #5989b1;
         padding: 16px;
         font-size: 16px;
-        border: none;
         cursor: pointer;
+        width: 20rem;
+        height: 2rem;
     }
 
     /* Dropdown button on hover & focus */
     .dropbtn:hover, .dropbtn:focus {
-        background-color: #3e8e41;
+        background-color: rgba(89, 137, 177, 0.25);
+        border: 0.25rem solid #77b4e7;
+        color: #77b4e7;
     }
 
 </style>
