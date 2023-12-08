@@ -57,6 +57,7 @@ public class DevToolsAPI {
             @RequestParam String playerId) throws Exception {
         return databaseService.setScore(playerId, score, leaderboardId);
     }
+
     @GetMapping("/populateDatabase")
     ResponseEntity<String> populateDatabase(
             @RequestParam int leaderboardId,
@@ -76,6 +77,6 @@ public class DevToolsAPI {
     @GetMapping("/wipeDatabase")
     ResponseEntity<String> wipeDatabase() {
         databaseService.wipeDatabase();
-        return new ResponseEntity<>("Entire databases wiped!", HttpStatus.OK);
+        return new ResponseEntity<>("Entire database wiped!", HttpStatus.OK);
     }
 }
