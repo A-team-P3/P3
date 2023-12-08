@@ -1,8 +1,6 @@
 <script>
   import {onMount} from "svelte";
-  import Link from "./lib/Link.svelte";
   import Button from "./lib/Button.svelte";
-  import Input from "./lib/Input.svelte";
 
 
   const url = "http://localhost:7070/";
@@ -20,10 +18,8 @@
 
   // Leaderboard dropdown
   let showLBDropdown = false;
-  let leaderboardDropdownInput = "";
-  let leaderboardItems = ["Leaderboard 1", "Leaderboard 2", "Leaderboard 3", "Leaderboard 4"];
-  let leaderboardFilteredItems = [];
-
+  let leaderboardItems = ["Leaderboard 1", "Leaderboard 2", "Leaderboard 3", "Leaderboard 4"]; //TODO lav en get som får id fra alle leaderboards
+  let currentLeaderboard = 2;
   // HTML elements
   let table;
 
@@ -96,7 +92,7 @@
 
 
   async function getPlayers(min, max, direction) {
-    const res = await fetch(`${url}players?leaderboardId=${leaderboardId}&start=${min}&stop=${max}`);
+    const res = await fetch(`${url}players?leaderboardId=${currentLeaderboard}&start=${min}&stop=${max}`);
     const data = await res.json();
 
     if (direction === "up") {
@@ -121,12 +117,12 @@
   }
 
   async function getNumberOfPlayers() {
-    const res = await fetch(`${url}size?leaderboardId=${leaderboardId}`);
+    const res = await fetch(`${url}size?leaderboardId=${currentLeaderboard}`);
     return parseInt(await res.json());
   }
 
   async function getPlayerSearch(name) {
-    const response = await fetch(`${url}findPlayer?leaderboardId=${leaderboardId}&name=${name}`);
+    const response = await fetch(`${url}findPlayer?leaderboardId=${currentLeaderboard}&name=${name}`);
     players = await response.json();
     loading = false; //TODO evt gør til exception
   }
@@ -216,30 +212,33 @@
   }
 
 
-  const handleLeaderboardChange = () => {
-    return leaderboardFilteredItems = leaderboardItems.filter(item => item.toLowerCase().match(leaderboardDropdownInput.toLowerCase()));
-  }
+  const handleLeaderboardChange = (item) => {
+    showLBDropdown = false;
+    let splitted = item.split(" ");
+    if(currentLeaderboard === splitted[1]) {
+      return;
+    }
 
+    currentLeaderboard = splitted[1];
+    clearTable();
+    loadPlayers(0,49);
+  }
+  $: console.log(currentLeaderboard);
 
 </script>
 
 <div class="leaderboardDropdownMenu">
     <Button on:click={() => showLBDropdown = !showLBDropdown}
             menuOpen={showLBDropdown}
-            showOpen="Switch Leaderboard"
-            showClosed="Close Leaderboard"
+            showOpen={leaderboardItems[currentLeaderboard-1]}
+            showClosed={leaderboardItems[currentLeaderboard-1]}
              />
   <div id="leaderboardDropdown" class:show={showLBDropdown} class="dropdown-content">
-    <Input bind:leaderboardDropdownInput on:input={handleLeaderboardChange}/>
-    {#if leaderboardFilteredItems.length > 0}
-      {#each leaderboardFilteredItems as item}
-        <Link link={item} />
-      {/each}
-    {:else}
       {#each leaderboardItems as item}
-        <Link link={item} />
+        <button id="button" on:click={() => handleLeaderboardChange(item)}>{item}</button>
+
+        <!---<Link link={item} on:click={handleLeaderboardChange}/>--->
       {/each}
-    {/if}
   </div>
 </div>
 
@@ -315,6 +314,13 @@
     transition: ease all 500ms;
     position: relative;
     display: inline-block;
+    button {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      width: 20rem;
+    }
 
   }
 
