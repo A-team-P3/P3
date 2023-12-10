@@ -1,5 +1,9 @@
 <script>
     export let input;
+    export let scrollTop;
+    let show;
+
+    $: show = scrollTop < 400;
 </script>
 
 <style>
@@ -9,7 +13,7 @@
         position: absolute;
         bottom: 100px;
         right: 150px;
-        display: flex;
+        display: block;
         align-items: center;
         justify-content: center;
         transition: ease all 500ms;
@@ -21,7 +25,7 @@
         font-size: 16px;
         cursor: pointer;
         width: 7rem;
-        height: 6rem;
+        height: 9rem;
     }
 
     /* Dropdown button on hover & focus */
@@ -31,9 +35,14 @@
         color: #77b4e7;
     }
 
+    .show {
+        opacity: 0;
+        pointer-events: none;
+    }
+
 </style>
 
-<button on:click class="button">
-    {input}
+<button on:click class="button" class:show={show}>
     <svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="arcs"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+    {input}
 </button>

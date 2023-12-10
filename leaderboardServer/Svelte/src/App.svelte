@@ -1,7 +1,10 @@
 <script>
   import {onMount} from "svelte";
-  import Button from "./lib/Button.svelte";
+  import Button from "./lib/Dropdown.svelte";
   import ResetPageButton from "./lib/ResetPageButton.svelte";
+  import LeaderboardDropdown from "./lib/LeaderboardDropdown.svelte";
+  import Dropdown from "./lib/Dropdown.svelte";
+  import RegionDropdown from "./lib/RegionDropdown.svelte";
 
 
   const url = "http://localhost:7070/";
@@ -21,6 +24,10 @@
   let showLBDropdown = false;
   let leaderboardItems = [];
   let currentLeaderboard = 1;
+
+  // Region dropdown
+  let showRegionDropdown = false;
+
   // HTML elements
   let table;
 
@@ -30,13 +37,14 @@
 
     // Tasks when component gets re-rendered
     table = document.getElementById("leaderboard-body"); //re-bind table... bind:this={table} binding gets lost
-    resetPage();
+    await resetPage();
     numberOfPlayers = getNumberOfPlayers();
     leaderboardItems = await getLeaderboardAmount();
   });
 
   async function handleScroll(){
     scrollTop = table.scrollTop;
+
     if (scrollProcessing) {
       return;
     }
@@ -233,29 +241,24 @@
     currentLeaderboard = splitted[1];
     resetPage();
   }
+  //$: scrollY = table.scrollHeight - table.clientHeight - table.scrollTop;
+  //$: console.log(scrollY);
   $: console.log(currentLeaderboard);
 
 </script>
 
-<div class="leaderboardDropdownMenu">
-    <Button on:click={() => showLBDropdown = !showLBDropdown}
-            menuOpen={showLBDropdown}
-            showOpen={leaderboardItems[currentLeaderboard-1]}
-            showClosed={leaderboardItems[currentLeaderboard-1]}
-             />
-  <div id="leaderboardDropdown" class:show={showLBDropdown} class="dropdown-content">
-      {#each leaderboardItems as item}
-        <button id="button" on:click={() => handleLeaderboardChange(item)}>{item}</button>
+<LeaderboardDropdown bind:currentLeaderboard={currentLeaderboard} on:callResetPage={resetPage}
+                     menuOpen={showLBDropdown}
+                     showOpen={leaderboardItems[currentLeaderboard-1]}
+                     showClosed={leaderboardItems[currentLeaderboard-1]}
+                     leaderboardItems={leaderboardItems}
+/>
 
-        <!---<Link link={item} on:click={handleLeaderboardChange}/>--->
-      {/each}
-  </div>
-</div>
 
 <div id="leaderboard-container">
 
   <!--ResetPage button-->
-  <ResetPageButton on:click={resetPage} input="Take me to the top!" />
+  <ResetPageButton on:click={resetPage} input="Take me to the top!" scrollTop={scrollTop}/>
 
   <!--HEADER-->
   <nav id="leaderboard-header">
@@ -286,7 +289,9 @@
     </div>
     <hr>
     <div class="header-elm">
-      REGION
+      <div class="region">
+        REGION
+      </div>
     </div>
     <hr>
     <div class="header-elm">
@@ -321,31 +326,7 @@
 
 
 <style lang="scss">
-  .leaderboardDropdownMenu {
-    transition: ease all 500ms;
-    position: relative;
-    display: inline-block;
-    button {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      width: 20rem;
-    }
 
-  }
-
-  .dropdown-content {
-    transition: ease all 500ms;
-    position: absolute;
-    display: none;
-    background-color: #f6f6f6;
-    min-width: 230px;
-    border: 1px solid #ddd;
-    z-index: 1;
-  }
-  /* Show the dropdown menu */
-  .show {display:block;}
 
   #leaderboard-container{
     display: flex;
@@ -375,7 +356,7 @@
         form{
           transition: ease all 300ms;
           border-radius: 0.25rem;
-          input{
+          input, .region{
             font-size: 1rem;
             font-weight: 900;
             color: $white;
@@ -384,13 +365,13 @@
             border: none;
             outline: none ! important;
             padding: 5px;
-            background: transparent;
+            background: $indigo-dark;
             transition: ease all 300ms;
             border-radius: 0.25rem;
           }
           input:hover{
             cursor: pointer;
-            background-color: $indigo-dark;
+            background-color: #2f2f40;
             color: $primary-hover;
           }
           button{
