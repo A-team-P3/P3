@@ -18,6 +18,7 @@ public class DatabasePopulator {
         this.jedis = jedis;
     }
 
+    //Populates a specific leaderboard with a number of players
     public void populateDatabase(int leaderboardId, int numberOfPlayers) {
         Transaction transaction = jedis.multi();
 
@@ -45,6 +46,7 @@ public class DatabasePopulator {
         transaction.exec();
     }
 
+    //Creates an id for a new player
     private String userIdGenerator() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
         final int USER_ID_LENGTH = 7;
@@ -58,6 +60,7 @@ public class DatabasePopulator {
         return userId.toString();
     }
 
+    //Creates a random name
     private String randomName() {
         List<String> nouns = Arrays.asList("Gamer", "Love", "Lover", "Days", "Life", "Priest", "Responsibilities", "Tendencies", "Appetite", "Jones", "Business", "Bucket", "Eater", "trafficker", "Dragon", "Years", "Season", "Way", "Exhibitionist", "Lizard", "Time", "Spirit", "Licker", "Stealer", "Dog", "Juice", "Party", "Preacher", "Picker", "King", "Lord", "Queen", "Council", "Conservative", "Expert", "Hunter");
         List<String> adjectives = Arrays.asList("Mystic", "Elite", "In-between", "Distinguished", "Untamed", "Lazy", "Laziest", "Mighty", "Big", "Tiny", "Filthy", "Lanky", "Fearful", "Slow", "Red", "Slime", "Narrow", "Speedy", "Iridescent", "Sleepy", "Floppy", "Sad", "Rat", "Lone", "Unlawful", "Edgy", "Receptive", "Maternal", "Juicy", "Orange", "Indigo", "Clumsy", "Satanic", "Unwashed", "Smartest");
@@ -68,16 +71,19 @@ public class DatabasePopulator {
         return  adjectives.get(adjective) + nouns.get(noun) + number;
     }
 
+    //Random score
     private int randomScore(int bound) {
         return rand.nextInt(bound);
 
     }
 
+    //Random country
     private String randomCountry() {
         List<String> countries = Arrays.asList("DK", "SE", "GE", "UK", "US", "RU", "NO", "JP", "CH");
         return countries.get(rand.nextInt(countries.size()));
     }
 
+    //Random region
     private String randomRegion() {
         List<String> regions = Arrays.asList("EU", "NA", "AS", "SA");
         return regions.get(rand.nextInt(regions.size()));

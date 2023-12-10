@@ -30,6 +30,7 @@ public class LeaderboardAPI {
         return new ResponseEntity<>(databaseService.getLeaderboardAmount(), HttpStatus.OK);
     }
 
+    //End-point to get a list of players
     @GetMapping("/players")
     ResponseEntity<List<Player>> players(
             @RequestParam int leaderboardId,
@@ -39,7 +40,7 @@ public class LeaderboardAPI {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
 
-    // End-point to find player(s) by name
+    //End-point to find player(s) by name
     @GetMapping("/findPlayer")
     ResponseEntity<List<Player>> findPlayer(
             @RequestParam int leaderboardId,

@@ -23,6 +23,8 @@ public class Player implements Serializable {
         this.region = region;
         this.creationDate = LocalDate.now().toString();
     }
+
+    //Used to get the player with the rank
     public Player(String id, String name, String score, String region, String creationDate, String rank) {
         this.id = id;
         this.name = name;
