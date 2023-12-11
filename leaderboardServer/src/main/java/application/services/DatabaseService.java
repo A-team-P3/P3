@@ -31,7 +31,7 @@ public class DatabaseService {
         AAU, CLOUD, LOCAL
     }
 
-    //Change server here
+    //change server here
     private final ServerType serverType = ServerType.CLOUD;
 
     public DatabaseService() {
@@ -46,6 +46,11 @@ public class DatabaseService {
     public Jedis getJedisConnection() {
         Jedis jedis = jedisPool.getResource();
         return jedis;
+    }
+
+    // For testing purposes
+    public void setJedisPool(JedisPool jedisPool) {
+        this.jedisPool = jedisPool;
     }
 
     private String leaderboardSortedKeyString(int leaderboardId) {
@@ -84,7 +89,6 @@ public class DatabaseService {
         return null;
     }
 
-    //Takes the tuple we get from the redis database and makes into a playerObject
     private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis, int start) {
         List<Player> players = new ArrayList<>();
 
@@ -133,7 +137,6 @@ public class DatabaseService {
         return null;
     }
 
-    //Setting the score of a player
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
 
@@ -176,7 +179,6 @@ public class DatabaseService {
         return null;
     }
 
-    //Checking if a player exists in the database
     public boolean isPlayerExisting(String playerId, int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.hexists(leaderboardSortedKeyString(leaderboardId), playerId)) {
@@ -217,7 +219,6 @@ public class DatabaseService {
         }
     }
 
-    //Populate the leaderboard with players
     public void populateLeaderboard(int leaderboardId, int numberOfPlayers) {
         try (Jedis jedis = getJedisConnection()) {
             DatabasePopulator databasePopulator = new DatabasePopulator(jedis);
@@ -228,7 +229,6 @@ public class DatabaseService {
         }
     }
 
-    //Creating a leaderboard with scores from a specific start point and a specific end point
     public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
         try (Jedis jedis = getJedisConnection()) {
             List<PlayerScore> scores = new ArrayList<>();
@@ -322,23 +322,6 @@ public class DatabaseService {
         return matchingPlayers;
     }
 
-    public List<Integer> getLeaderboardAmount() {
-        List<Integer> leaderboardAmount = new ArrayList<>();
-        try (Jedis jedis = getJedisConnection()) {
-            Set<String> sortedSets = jedis.keys("leaderboardSorted:*");
-            for(String set : sortedSets) {
-                String[] splitted =  set.split(":");
-
-                leaderboardAmount.add(Integer.valueOf(splitted[1]));
-            }
-        } catch (JedisException e) {
-            System.err.println(e + ": error in finding leaderboard amount");
-        }
-        Collections.sort(leaderboardAmount);
-        return leaderboardAmount;
-    }
-
-    //Wipes a specific leaderboard
     public void wipeLeaderboard(int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
             // Delete all player hashes belonging to the leaderboards
@@ -361,7 +344,6 @@ public class DatabaseService {
         }
     }
 
-    //Wipes the database
     public void wipeDatabase() {
         try (Jedis jedis = getJedisConnection()) {
             jedis.flushAll();

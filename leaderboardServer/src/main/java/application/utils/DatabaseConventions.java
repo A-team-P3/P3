@@ -13,9 +13,9 @@ public class DatabaseConventions {
     public String leaderboardScoreKeyString(int score, String timestamp, String playerId) {
         return score + ":" + timestamp + ":" + playerId;
     }
+
     public String playerObjectKeyString(String playerId) {
         return "player:" + playerId;
     }
-
 }
 

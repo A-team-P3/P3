@@ -16,31 +16,25 @@ import java.util.List;
 public class LeaderboardAPI {
     private final DatabaseService databaseService;
 
-    @Autowired // Autowired constructor
-    // to add Service to the RestController
+    @Autowired // Autowired constructor to add Service to the RestController
     public LeaderboardAPI(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
+
     @GetMapping("/size")
     ResponseEntity<Integer> size(@RequestParam int leaderboardId) {
         return new ResponseEntity<>(databaseService.getSize(leaderboardId), HttpStatus.OK);
     }
-    @GetMapping("/leaderboards")
-    ResponseEntity<List<Integer>> leaderboards() {
-        return new ResponseEntity<>(databaseService.getLeaderboardAmount(), HttpStatus.OK);
-    }
 
-    //End-point to get a list of players
     @GetMapping("/players")
     ResponseEntity<List<Player>> players(
             @RequestParam int leaderboardId,
             @RequestParam int start,
-            @RequestParam int stop
-    ) {
+            @RequestParam int stop) {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
 
-    //End-point to find player(s) by name
+    // End-point to find player(s) by name
     @GetMapping("/findPlayer")
     ResponseEntity<List<Player>> findPlayer(
             @RequestParam int leaderboardId,
