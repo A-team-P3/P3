@@ -23,7 +23,7 @@
   // Leaderboard dropdown
   let showLBDropdown = false;
   let leaderboardItems = [];
-  let currentLeaderboard = 1;
+  let currentLeaderboard = 2;
 
   // Region dropdown
   let showRegionDropdown = false;
@@ -229,6 +229,14 @@
 
   }
 
+  function getLeaderboardIndex(leaderboardId) {
+    for(let i = 0; i < leaderboardItems.length; i++){
+      if(leaderboardId === leaderboardItems[i].split(" ")[1]){
+        return i;
+      }
+    }
+  }
+
 
   const handleLeaderboardChange = (item) => {
     showLBDropdown = false;
@@ -249,8 +257,8 @@
 
 <LeaderboardDropdown bind:currentLeaderboard={currentLeaderboard} on:callResetPage={resetPage}
                      menuOpen={showLBDropdown}
-                     showOpen={leaderboardItems[currentLeaderboard-1]}
-                     showClosed={leaderboardItems[currentLeaderboard-1]}
+                     showOpen={leaderboardItems[getLeaderboardIndex(currentLeaderboard)]}
+                     showClosed={leaderboardItems[getLeaderboardIndex(currentLeaderboard)]}
                      leaderboardItems={leaderboardItems}
 />
 

@@ -11,6 +11,7 @@ import Dropdown from "./Dropdown.svelte";
     const handleLeaderboardChange = (item) => {
         menuOpen = false;
         let splitted = item.split(" ");
+        console.log(splitted)
         if(currentLeaderboard === splitted[1]) {
             return;
         }
