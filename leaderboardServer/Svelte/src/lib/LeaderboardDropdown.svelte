@@ -101,7 +101,6 @@ import Dropdown from "./Dropdown.svelte";
         {#each leaderboardItems as item}
             <button id="button" on:click={() => handleLeaderboardChange(item)}>{item}</button>
 
-            <!---<Link link={item} on:click={handleLeaderboardChange}/>--->
         {/each}
     </div>
 </div>

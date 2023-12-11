@@ -9,7 +9,7 @@
 <style>
     /* Dropdown Button */
     .button {
-
+        transform: translateY(-50px);
         position: absolute;
         bottom: 100px;
         right: 150px;
@@ -37,6 +37,7 @@
 
     .show {
         opacity: 0;
+        transform: none;
         pointer-events: none;
     }
 

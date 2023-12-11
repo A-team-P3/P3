@@ -32,7 +32,7 @@ public class DatabaseService {
     }
 
     //Change server here
-    private final ServerType serverType = ServerType.AAU;
+    private final ServerType serverType = ServerType.CLOUD;
 
     public DatabaseService() {
         switch (serverType) {
