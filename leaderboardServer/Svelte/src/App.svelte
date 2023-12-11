@@ -23,7 +23,7 @@
   // Leaderboard dropdown
   let showLBDropdown = false;
   let leaderboardItems = [];
-  let currentLeaderboard = 2;
+  let currentLeaderboard = 1;
 
   // Region dropdown
   let showRegionDropdown = false;
@@ -40,6 +40,7 @@
     await resetPage();
     numberOfPlayers = getNumberOfPlayers();
     leaderboardItems = await getLeaderboardAmount();
+    handleLeaderboardChange(leaderboardItems[0]);
   });
 
   async function handleScroll(){
@@ -157,8 +158,8 @@
     //Reset rankValue when name searching
     nameFormValue = "";
 
-    if (isNaN(input)) {
-      resetPage();
+    if (isNaN(input) || input<1) {
+      await resetPage();
       return;
     }
 
@@ -167,6 +168,7 @@
 
     //handles end of table
     if (input > numberOfPlayers) {
+      alert("Input higher then number of players: " + numberOfPlayers);
       await loadPlayers(numberOfPlayers-playersPerFetch-1, numberOfPlayers-1);
       scrollToRow(players.length-1);
       return;
@@ -230,6 +232,7 @@
   }
 
   function getLeaderboardIndex(leaderboardId) {
+    console.log(leaderboardItems);
     for(let i = 0; i < leaderboardItems.length; i++){
       if(leaderboardId === leaderboardItems[i].split(" ")[1]){
         return i;
