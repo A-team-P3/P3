@@ -254,11 +254,11 @@
                      leaderboardItems={leaderboardItems}
 />
 
-
 <div id="leaderboard-container">
 
   <!--ResetPage button-->
-  <ResetPageButton on:click={resetPage} input="Take me to the top!" scrollTop={scrollTop}/>
+  <ResetPageButton on:click={resetPage} scrollTop={scrollTop}/>
+
 
   <!--HEADER-->
   <nav id="leaderboard-header">
