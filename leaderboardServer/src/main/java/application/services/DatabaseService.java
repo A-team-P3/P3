@@ -32,21 +32,14 @@ public class DatabaseService {
     }
 
     //Change server here
-    private final ServerType serverType = ServerType.AAU;
+    private final ServerType serverType = ServerType.CLOUD;
 
     public DatabaseService() {
         switch (serverType) {
-            case AAU:
-                this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
-                break;
-            case CLOUD:
-                this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
-                break;
-            case LOCAL:
-                this.jedisPool = new JedisPool("localhost", 6379);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid server type");
+            case AAU -> this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
+            case CLOUD -> this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
+            case LOCAL -> this.jedisPool = new JedisPool("localhost", 6379);
+            default -> throw new IllegalArgumentException("Invalid server type");
         }
     }
 
