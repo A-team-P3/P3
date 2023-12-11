@@ -16,8 +16,7 @@ import java.util.List;
 public class LeaderboardAPI {
     private final DatabaseService databaseService;
 
-    @Autowired // Autowired constructor
-    // to add Service to the RestController
+    @Autowired // Autowired constructor to add Service to the RestController
     public LeaderboardAPI(DatabaseService databaseService) {
         this.databaseService = databaseService;
     }
@@ -31,8 +30,7 @@ public class LeaderboardAPI {
     ResponseEntity<List<Player>> players(
             @RequestParam int leaderboardId,
             @RequestParam int start,
-            @RequestParam int stop
-    ) {
+            @RequestParam int stop) {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
 
