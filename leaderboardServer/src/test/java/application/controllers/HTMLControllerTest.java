@@ -2,14 +2,12 @@ package application.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(HTMLController.class)   // Only load the HTMLController class
 class HTMLControllerTest {
 
     @Autowired
@@ -19,7 +17,7 @@ class HTMLControllerTest {
     public void devEndPointShouldReturnCorrectHtmlString() throws Exception {
         // Simulate a GET request to the "/dev" end-point
         mockMvc.perform(MockMvcRequestBuilders.get("/dev"))
-                // Assert a 200 (OK) status code
+                // Assert a 200 (OK) status code       
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 // Assert the view name is "leaderboardManager.html" (the string returned by the end-point)
                 .andExpect(MockMvcResultMatchers.view().name("leaderboardManager.html"));
