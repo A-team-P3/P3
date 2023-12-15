@@ -12,7 +12,7 @@ public class HTMLController {
     }
 
     @GetMapping("/error")
-    public String error() {
+    String error() {
         return "Whoops!";
     }
 }

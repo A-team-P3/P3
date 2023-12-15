@@ -321,6 +321,21 @@ public class DatabaseService {
 
         return matchingPlayers;
     }
+    public List<Integer> getLeaderboardAmount() {
+        List<Integer> leaderboardAmount = new ArrayList<>();
+        try (Jedis jedis = getJedisConnection()) {
+            Set<String> sortedSets = jedis.keys("leaderboardSorted:*");
+            for(String set : sortedSets) {
+                String[] splitted =  set.split(":");
+
+                leaderboardAmount.add(Integer.valueOf(splitted[1]));
+            }
+        } catch (JedisException e) {
+            System.err.println(e + ": error in finding leaderboard amount");
+        }
+        Collections.sort(leaderboardAmount);
+        return leaderboardAmount;
+    }
 
     public void wipeLeaderboard(int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
