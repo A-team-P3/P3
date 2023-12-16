@@ -26,6 +26,7 @@ public class LeaderboardAPI {
         return new ResponseEntity<>(databaseService.getSize(leaderboardId), HttpStatus.OK);
     }
 
+    //End-point to get a list of players
     @GetMapping("/players")
     ResponseEntity<List<Player>> players(
             @RequestParam int leaderboardId,

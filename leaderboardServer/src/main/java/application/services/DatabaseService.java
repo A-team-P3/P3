@@ -89,6 +89,7 @@ public class DatabaseService {
         return null;
     }
 
+    //Takes the tuple we get from the redis database and makes into a playerObject
     private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis, int start) {
         List<Player> players = new ArrayList<>();
 
@@ -137,6 +138,7 @@ public class DatabaseService {
         return null;
     }
 
+    //Setting the score of a player
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
 
@@ -179,6 +181,7 @@ public class DatabaseService {
         return null;
     }
 
+    //Checking if a player exists in the database
     public boolean isPlayerExisting(String playerId, int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.hexists(leaderboardSortedKeyString(leaderboardId), playerId)) {
@@ -219,6 +222,7 @@ public class DatabaseService {
         }
     }
 
+    //Populate the leaderboard with players
     public void populateLeaderboard(int leaderboardId, int numberOfPlayers) {
         try (Jedis jedis = getJedisConnection()) {
             DatabasePopulator databasePopulator = new DatabasePopulator(jedis);
@@ -228,6 +232,8 @@ public class DatabaseService {
             System.err.println(e + ": error populating database!");
         }
     }
+
+    //Creating a leaderboard with scores from a specific start point and a specific end pointv
 
     public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
         try (Jedis jedis = getJedisConnection()) {
