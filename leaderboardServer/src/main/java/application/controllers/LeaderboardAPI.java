@@ -34,6 +34,7 @@ public class LeaderboardAPI {
             @RequestParam int stop) {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
+
     @GetMapping("/leaderboards")
     ResponseEntity<List<Integer>> leaderboards() {
         return new ResponseEntity<>(databaseService.getLeaderboardAmount(), HttpStatus.OK);
@@ -43,8 +44,7 @@ public class LeaderboardAPI {
     @GetMapping("/findPlayer")
     ResponseEntity<List<Player>> findPlayer(
             @RequestParam int leaderboardId,
-            @RequestParam String name
-    ) {
+            @RequestParam String name) {
         try {
             List<Player> matchingPlayers = databaseService.findPlayersByName(name, leaderboardId);
             return new ResponseEntity<>(matchingPlayers, HttpStatus.OK);

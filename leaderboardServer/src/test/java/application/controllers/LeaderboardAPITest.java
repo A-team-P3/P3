@@ -140,4 +140,19 @@ class LeaderboardAPITest {
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().json("3"));
     }
+
+    @Test
+    void leaderboardsShouldReturnCorrectAmount() throws Exception {
+        // Arrange
+        List<Integer> leaderboardAmount = List.of(1, 2, 42);
+
+        // Act
+        when(databaseService.getLeaderboardAmount()).thenReturn(leaderboardAmount);
+
+        // Assert
+        mockMvc.perform(MockMvcRequestBuilders.get("/leaderboards")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().json("[1, 2, 42]"));
+    }
 }

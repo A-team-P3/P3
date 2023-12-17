@@ -13,8 +13,7 @@ import redis.clients.jedis.resps.Tuple;
 
 import java.util.*;
 
-
-@Service //Service for interacting with the database to get user data
+@Service // Service for interacting with the database to get user data
 public class DatabaseService {
     private final DatabaseConventions databaseConventions = new DatabaseConventions();
     private JedisPool jedisPool;
@@ -28,18 +27,17 @@ public class DatabaseService {
     private final String CLOUD_SERVER_PASSWORD = "MdgWuJDGsrEQiRjP8rNawQNQ9Cls2Qp9";
 
     public enum ServerType {
-        AAU, CLOUD, LOCAL
+        AAU, CLOUD
     }
 
-    //change server here
+    // Change server here
     private final ServerType serverType = ServerType.CLOUD;
 
     public DatabaseService() {
         switch (serverType) {
             case AAU -> this.jedisPool = new JedisPool(AAU_SERVER_IP, AAU_PORT, "default", AAU_SERVER_PASSWORD);
             case CLOUD -> this.jedisPool = new JedisPool(CLOUD_SERVER_IP, CLOUD_PORT, "default", CLOUD_SERVER_PASSWORD);
-            case LOCAL -> this.jedisPool = new JedisPool("localhost", 6379);
-            default -> throw new IllegalArgumentException("Invalid server type");
+            default -> throw new IllegalArgumentException("Invalid server type!");
         }
     }
 
@@ -48,7 +46,7 @@ public class DatabaseService {
         return jedis;
     }
 
-    // For testing purposes
+    // For unit testing purposes
     public void setJedisPool(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
@@ -89,7 +87,7 @@ public class DatabaseService {
         return null;
     }
 
-    //Takes the tuple we get from the redis database and makes into a playerObject
+    // Takes the tuple we get from the redis database and makes into a playerObject
     private List<Player> tupleToPlayerObject(List<Tuple> tuples, Jedis jedis, int start) {
         List<Player> players = new ArrayList<>();
 
@@ -138,7 +136,7 @@ public class DatabaseService {
         return null;
     }
 
-    //Setting the score of a player
+    // Set the score of a player
     public String setScore(String playerId, int newScore, int leaderboardId) {
         String timestamp = String.valueOf(System.currentTimeMillis());
 
@@ -181,7 +179,7 @@ public class DatabaseService {
         return null;
     }
 
-    //Checking if a player exists in the database
+    // Check if a player exists in the database
     public boolean isPlayerExisting(String playerId, int leaderboardId) {
         try (Jedis jedis = getJedisConnection()) {
             if (jedis.hexists(leaderboardSortedKeyString(leaderboardId), playerId)) {
@@ -222,7 +220,7 @@ public class DatabaseService {
         }
     }
 
-    //Populate the leaderboard with players
+    // Populate the leaderboard with players
     public void populateLeaderboard(int leaderboardId, int numberOfPlayers) {
         try (Jedis jedis = getJedisConnection()) {
             DatabasePopulator databasePopulator = new DatabasePopulator(jedis);
@@ -233,8 +231,7 @@ public class DatabaseService {
         }
     }
 
-    //Creating a leaderboard with scores from a specific start point and a specific end pointv
-
+    // Creating a leaderboard with scores from a specific start point and a specific end-point
     public Leaderboard getScoresByRange(int leaderboardId, int start, int stop) {
         try (Jedis jedis = getJedisConnection()) {
             List<PlayerScore> scores = new ArrayList<>();
@@ -268,7 +265,6 @@ public class DatabaseService {
         // Handle exceptions if necessary
     }
 
-    // TODO: can be optimized in terms of time complexity
     // Returns a list of players with a matching name (case insensitive) from a specified leaderboard
     public List<Player> findPlayersByName(String specifiedName, int leaderboardId) {
         List<Player> matchingPlayers = new ArrayList<>();
@@ -327,19 +323,23 @@ public class DatabaseService {
 
         return matchingPlayers;
     }
+
     public List<Integer> getLeaderboardAmount() {
         List<Integer> leaderboardAmount = new ArrayList<>();
+
         try (Jedis jedis = getJedisConnection()) {
             Set<String> sortedSets = jedis.keys("leaderboardSorted:*");
+
             for(String set : sortedSets) {
                 String[] splitted =  set.split(":");
-
                 leaderboardAmount.add(Integer.valueOf(splitted[1]));
             }
-        } catch (JedisException e) {
-            System.err.println(e + ": error in finding leaderboard amount");
+        }
+        catch (JedisException e) {
+            System.err.println(e + ": error in finding leaderboard amount!");
         }
         Collections.sort(leaderboardAmount);
+
         return leaderboardAmount;
     }
 
