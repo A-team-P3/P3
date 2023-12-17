@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: set 'runTests = true' before running tests! Location: leaderboardServer/gradle.properties
-
 class PlayerTest {
     Player player, player2, player3;
 
@@ -38,6 +36,13 @@ class PlayerTest {
     @Test
     void player3ShouldExist() {
         assertNotNull(player3);
+    }
+
+    @Test
+    void idShouldNotBeNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Player(null, "Tester", "1337", "NA");
+        });
     }
 
     @Test

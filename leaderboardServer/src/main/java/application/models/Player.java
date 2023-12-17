@@ -15,8 +15,12 @@ public class Player implements Serializable {
     private String creationDate;
     private String rank;
 
-    //Make new player constructor
+    // Make new player constructor
     public Player(String id, String name, String score, String region) {
+        if (id == null) {
+            throw new IllegalArgumentException("Player ID cannot be null!");
+        }
+        
         this.id = id;
         this.name = name;
         this.score = score;
@@ -24,7 +28,7 @@ public class Player implements Serializable {
         this.creationDate = LocalDate.now().toString();
     }
 
-    //Used to get the player with the rank
+    // Used to get the player with the rank
     public Player(String id, String name, String score, String region, String creationDate, String rank) {
         this.id = id;
         this.name = name;
@@ -34,7 +38,7 @@ public class Player implements Serializable {
         this.rank = rank;
     }
 
-    //Update player constructor; Used when pulling a player from Redis
+    // Update player constructor; Used when pulling a player from Redis
     public Player(String id, String name, String score, String region, String creationDate) {
         this.id = id;
         this.name = name;
