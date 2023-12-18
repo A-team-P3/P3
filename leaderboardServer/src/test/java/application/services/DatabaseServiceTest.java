@@ -95,7 +95,7 @@ class DatabaseServiceTest {
         when(jedisMock.keys("leaderboardSorted:*")).thenReturn(keys);
 
         // Assert
-        List<Integer> actualAmount = databaseServiceMock.getLeaderboardAmount();
+        List<Integer> actualAmount = databaseServiceMock.getLeaderboardIds();
         assertEquals(expectedAmount, actualAmount);
     }
 }

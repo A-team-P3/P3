@@ -142,12 +142,12 @@ class LeaderboardAPITest {
     }
 
     @Test
-    void leaderboardsShouldReturnCorrectAmount() throws Exception {
+    void leaderboardsShouldReturnCorrectIds() throws Exception {
         // Arrange
-        List<Integer> leaderboardAmount = List.of(1, 2, 42);
+        List<Integer> leaderboardIds = List.of(1, 2, 42);
 
         // Act
-        when(databaseService.getLeaderboardAmount()).thenReturn(leaderboardAmount);
+        when(databaseService.getLeaderboardIds()).thenReturn(leaderboardIds);
 
         // Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/leaderboards")

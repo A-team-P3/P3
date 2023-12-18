@@ -324,23 +324,24 @@ public class DatabaseService {
         return matchingPlayers;
     }
 
-    public List<Integer> getLeaderboardAmount() {
-        List<Integer> leaderboardAmount = new ArrayList<>();
+    // Returns a list with leaderboard IDs
+    public List<Integer> getLeaderboardIds() {
+        List<Integer> leaderboardIds = new ArrayList<>();
 
         try (Jedis jedis = getJedisConnection()) {
             Set<String> sortedSets = jedis.keys("leaderboardSorted:*");
 
             for(String set : sortedSets) {
                 String[] splitted =  set.split(":");
-                leaderboardAmount.add(Integer.valueOf(splitted[1]));
+                leaderboardIds.add(Integer.valueOf(splitted[1]));
             }
         }
         catch (JedisException e) {
             System.err.println(e + ": error in finding leaderboard amount!");
         }
-        Collections.sort(leaderboardAmount);
+        Collections.sort(leaderboardIds);
 
-        return leaderboardAmount;
+        return leaderboardIds;
     }
 
     public void wipeLeaderboard(int leaderboardId) {

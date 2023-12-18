@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import redis.clients.jedis.resps.Tuple;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class LeaderboardAPI {
 
     @GetMapping("/leaderboards")
     ResponseEntity<List<Integer>> leaderboards() {
-        return new ResponseEntity<>(databaseService.getLeaderboardAmount(), HttpStatus.OK);
+        return new ResponseEntity<>(databaseService.getLeaderboardIds(), HttpStatus.OK);
     }
 
     // End-point to find player(s) by name
