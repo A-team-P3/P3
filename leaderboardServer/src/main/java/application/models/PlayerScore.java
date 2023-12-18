@@ -6,7 +6,7 @@ public class PlayerScore {
     public String region;
     public int rank;
 
-    // Constructor, getters, and setters
+    // Constructor
     public PlayerScore(int score, String name, String region, int rank) {
         this.score = score;
         this.name = name;
@@ -14,6 +14,4 @@ public class PlayerScore {
         this.rank = rank;
     }
 
-    // Getters and Setters
-    // ...
 }

@@ -8,7 +8,7 @@ public class Leaderboard {
     public int size;
     public List<PlayerScore> playerScores;
 
-    // Constructor, getters, and setters
+    // Constructor
     public Leaderboard(int id, String name, int size, List<PlayerScore> playerScores) {
         this.id = id;
         this.name = name;
@@ -16,6 +16,4 @@ public class Leaderboard {
         this.playerScores = playerScores;
     }
 
-    // Getters and Setters
-    // ...
 }
