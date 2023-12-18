@@ -56,3 +56,22 @@ li {
   font-weight: 900;
   color: $white;;
 }
+#Back-button{
+  height: 2rem;
+  background-color:$primary;
+  color: $white;
+  cursor: pointer;
+  padding: 16px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 2rem;
+  transition: all 0.3s ease 0s;
+  left: 4%;
+  position: absolute;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.leaderboardDropdownMenu.s-YDpsQ9hyD0s6 {
+  margin-bottom: 1.25rem;
+}
