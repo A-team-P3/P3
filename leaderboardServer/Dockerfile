@@ -2,7 +2,7 @@
 FROM eclipse-temurin:17
 
 # Set the working directory inside the container
-WORKDIR /opt/docker/spring-boot
+WORKDIR /opt/docker/spring-boot/leaderboardServer
 
 # Update package lists, install findutils, Node.js, and npm
 RUN apt-get update && \
