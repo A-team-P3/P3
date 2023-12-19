@@ -4,8 +4,11 @@ FROM eclipse-temurin:17
 # Set the working directory inside the container
 WORKDIR /opt/docker/spring-boot
 
-# Update package lists and install findutils
-RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
+# Update package lists, install findutils, Node.js, and npm
+RUN apt-get update && \
+    apt-get install -y findutils && \
+    apt-get install -y nodejs npm && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the gradle wrapper and other necessary files
 COPY gradlew .
