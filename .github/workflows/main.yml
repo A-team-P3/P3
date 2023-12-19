@@ -29,11 +29,12 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
-    - name: Build and Run Spring Boot on Server
-      run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer && ./gradlew build && docker-compose down && docker-compose up --build -d"
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+- name: Build and Run Spring Boot on Server
+  run: |
+    ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer && chmod +x ./gradlew && ./gradlew build && docker-compose down && docker-compose up --build -d"
+  env:
+    SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
 
     - name: Run Svelte Server
       run: |
