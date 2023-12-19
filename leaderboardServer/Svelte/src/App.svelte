@@ -11,14 +11,28 @@
   let players = [];
   let leaderboardId = 1;
   let numberOfPlayers;
-  let lowestIndex;
-  let highestIndex;
   let playersPerFetch = 50;
   let searchingNameState = false;
   let rankFormValue = "";
   let nameFormValue = "";
   let loading = false;
   let scrollTop = 0;
+
+  let lowestIndex;
+  let highestIndex;
+
+  $: {
+    if (players.length !== 0) {
+      lowestIndex = players[0].rank - 1;
+    }
+  }
+
+  $: {
+    if (players.length !== 0) {
+      highestIndex = players[players.length-1].rank - 1;
+    }
+  }
+
 
   // Leaderboard dropdown
   let showLBDropdown = false;
@@ -53,13 +67,11 @@
     try {
       if (Math.abs(table.scrollHeight - table.clientHeight - table.scrollTop) < 500) {
         await loadPlayers(highestIndex + 1, highestIndex + playersPerFetch);
-        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
       }
 
       if (table.scrollTop < 500) {
         await loadPlayers(lowestIndex - playersPerFetch, lowestIndex - 1);
         //scrollToRow(playersPerFetch);
-        console.log("LI: " + lowestIndex + ", HI: " + highestIndex);
       }
 
 
@@ -79,28 +91,16 @@
       stop = numberOfPlayers;
     }
 
-    if (lowestIndex === undefined) {
-      lowestIndex = start;
-    }
-    if (highestIndex === undefined) {
-      highestIndex = stop+1;
-    }
 
     let direction = "down";
-    if (start < lowestIndex) {
+    if (players.length !== 0 && start < lowestIndex) {
       direction = "up";
     }
 
     await getPlayers(start, stop, direction);
-    if (stop > highestIndex) {
-      highestIndex = stop;
-    }
-    if (start < lowestIndex) {
-      lowestIndex = start;
-    }
+
     loading = false;
   }
-
 
   async function getPlayers(min, max, direction) {
     const res = await fetch(`${url}players?leaderboardId=${currentLeaderboard}&start=${min}&stop=${max}`);
@@ -126,8 +126,6 @@
 
   function clearTable(){
     players = [];
-    lowestIndex = undefined;
-    highestIndex = undefined;
   }
 
   function scrollToRow(rowNumber) {
@@ -182,8 +180,6 @@
     } else {
       scrollToRow(input-1);
     }
-
-    console.log(input);
   }
   function handleRankClear(e) {
     e.preventDefault();
@@ -220,7 +216,7 @@
     resetPage();
     handleNameSubmit(e);
   }
-  async function resetPage() { //TODO Skal fixes
+  async function resetPage() {
     scrollProcessing = false;
     scrollTop = 0;
     rankFormValue = "";
@@ -232,7 +228,6 @@
   }
 
   function getLeaderboardIndex(leaderboardId) {
-    console.log(leaderboardItems);
     for(let i = 0; i < leaderboardItems.length; i++){
       if(leaderboardId === leaderboardItems[i].split(" ")[1]){
         return i;
@@ -252,9 +247,7 @@
     currentLeaderboard = splitted[1];
     resetPage();
   }
-  //$: scrollY = table.scrollHeight - table.clientHeight - table.scrollTop;
-  //$: console.log(scrollY);
-  $: console.log(currentLeaderboard);
+
 
 </script>
 
