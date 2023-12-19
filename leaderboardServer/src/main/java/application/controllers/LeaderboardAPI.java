@@ -34,6 +34,7 @@ public class LeaderboardAPI {
         return new ResponseEntity<>(databaseService.getMembersByRange(leaderboardId, start, stop), HttpStatus.OK);
     }
 
+    // End-point that returns a list of the leaderboardIds that exists
     @GetMapping("/leaderboards")
     ResponseEntity<List<Integer>> leaderboards() {
         return new ResponseEntity<>(databaseService.getLeaderboardIds(), HttpStatus.OK);

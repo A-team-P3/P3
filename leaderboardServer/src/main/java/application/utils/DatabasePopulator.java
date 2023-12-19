@@ -37,7 +37,7 @@ public class DatabasePopulator {
                 fields.put("score", String.valueOf(score));
                 fields.put("region", randomRegion());
                 fields.put("creationDate", timestamp);
-                //fields.put("rank", null);     // TODO: Cannot be null!
+
                 transaction.hmset(databaseConventions.playerObjectKeyString(id), fields);
 
             // Map player's name to their ID

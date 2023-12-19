@@ -38,7 +38,7 @@ public class Player implements Serializable {
         this.rank = rank;
     }
 
-    // Update player constructor; Used when pulling a player from Redis
+    // Used when pulling a player from Redis
     public Player(String id, String name, String score, String region, String creationDate) {
         this.id = id;
         this.name = name;

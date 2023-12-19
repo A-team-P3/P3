@@ -81,7 +81,7 @@ public class DatabaseService {
                 }
             }
         } catch (JedisException e) {
-            // TODO: implement correct exception handling
+
             System.out.println("Error getting scores");
         }
         return null;
@@ -115,7 +115,7 @@ public class DatabaseService {
             String userCreationDate = parts[1];
             String userId = parts[2];
 
-            List<String> responseValues = (List<String>) responses.get(i); //TODO Exception her
+            List<String> responseValues = (List<String>) responses.get(i);
             String name = responseValues.get(0);
             String region = responseValues.get(1);
 
@@ -130,7 +130,7 @@ public class DatabaseService {
             return Math.toIntExact(jedis.zcard(leaderboardSortedKeyString(leaderboardId)));
         }
         catch (JedisException e) {
-            // TODO: implement correct exception handling
+
             System.out.println("Error getting size");
         }
         return null;
@@ -209,7 +209,7 @@ public class DatabaseService {
             Map<String, String> playerString = jedis.hgetAll(playerObjectKeyString(id));
             if (playerString.isEmpty()) {
                 return null;
-            } //TODO: Implement correct exception handling
+            }
             return new Player(
                     playerString.get("id"),
                     playerString.get("name"),
@@ -285,7 +285,7 @@ public class DatabaseService {
                 String playerId = entry.getValue();
 
                 // Check if this player name contains the specified name
-                // TODO: make faster (sync?)
+
                 if (playerName.toLowerCase().contains(specifiedName.toLowerCase())) {
                     counter++;
                     if (counter > 50) {
