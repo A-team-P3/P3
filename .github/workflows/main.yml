@@ -29,14 +29,19 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         
-    - name: Build and Run on Server
+    - name: Build and Run Spring Boot on Server
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "chmod +x /opt/docker/spring-boot/gradlew"
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/ && gradlew build && docker-compose down && docker-compose up --build -d"
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer && ./gradlew build && docker-compose down && docker-compose up --build -d"
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Run Svelte Server
+      run: |
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer Svelte && npm install && nohup npm run dev &"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Clean up Remote Gradle Cache
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/ && gradlew clean"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer && ./gradlew clean"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
