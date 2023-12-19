@@ -38,7 +38,7 @@ jobs:
 
     - name: Run Svelte Server
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer Svelte && npm install && nohup npm run dev &"
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer/Svelte && npm install && nohup npm run dev &"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
