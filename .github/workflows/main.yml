@@ -31,7 +31,7 @@ jobs:
         
     - name: Build and Run Spring Boot on Server
       run: |
-        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer && chmod +x ./gradlew && ./gradlew build && docker-compose down && docker-compose up --build -d"
+        ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /opt/docker/spring-boot/leaderboardServer && sudo chmod 777 /opt/docker/spring-boot/ && ./gradlew build && docker-compose down && docker-compose up --build -d"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
