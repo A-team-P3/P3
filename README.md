@@ -52,6 +52,8 @@ Build the Java project:
 
 Run the Java server:
 ./gradlew run
+
+and if this doesn't work, press run on the main method in the Application class
 ```
 Open your browser and visit http://localhost:7070 to view the application.
 
